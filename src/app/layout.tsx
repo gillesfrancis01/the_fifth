@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Josefin_Sans, Poppins} from 'next/font/google'
+import { Poppins} from 'next/font/google'
 
 export const metadata: Metadata = {
   title: "The Fifth",
