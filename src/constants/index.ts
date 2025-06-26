@@ -28,42 +28,42 @@ export const services= [
 
 export const Testimonials = [
     {
-        id: 1,
+        id: '1',
         userImg: "/user1.jpg",
         userName: "Abel Kant",
         rate: 4,
         userMessage: "There Are Many Variations Passages Of Lorem Ipsum Available, But The Majority Have Suffered Alteration In Some "
     },
     {
-        id: 2,
+        id: '2',
         userImg: "/user2.jpg",
         userName: "Steven Stuart",
         rate: 5,
         userMessage: "There Are Many Variations Passages Of Lorem Ipsum Available, But The Majority Have Suffered Alteration In Some "
     },
     {
-        id: 3,
+        id: '3',
         userImg: "/user3.jpg",
         userName: "Anderson De Pablo",
         rate: 5,
         userMessage: "There Are Many Variations Passages Of Lorem Ipsum Available, But The Majority Have Suffered Alteration In Some "
     },
     {
-        id: 4,
+        id: '4',
         userImg: "/user4.jpg",
         userName: "Amelie Crusoe",
         rate: 4.5,
         userMessage: "There Are Many Variations Passages Of Lorem Ipsum Available, But The Majority Have Suffered Alteration In Some "
     },
     {
-        id: 5,
+        id: '5',
         userImg: "/user3.jpg",
         userName: "Anderson De Pablo",
         rate: 5,
         userMessage: "There Are Many Variations Passages Of Lorem Ipsum Available, But The Majority Have Suffered Alteration In Some "
     },
     {
-        id: 6,
+        id: '6',
         userImg: "/user4.jpg",
         userName: "Amelie Crusoe",
         rate: 4.5,
