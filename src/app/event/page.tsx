@@ -18,8 +18,8 @@ export default function Events() {
   useEffect(() => {
     async function fetchEvents() {
       const data = await getAllEvents()
-      setAllEvents(data)
-      setFilteredEvents(data)
+      setAllEvents(data || [])
+      setFilteredEvents(data || [])
     }
     fetchEvents()
   }, [])
@@ -91,8 +91,10 @@ export default function Events() {
       </div>
 
       {/* Event List */}
-      <div className='flex flex-col'>
-        {filteredEvents.length > 0 ? (
+      <div className='flex flex-col mt-10'>
+        {allEvents.length === 0 ? (
+          <p className="text-gray-500">Aucun événement n’est actuellement disponible.</p>
+        ) : filteredEvents.length > 0 ? (
           filteredEvents.map((item) => {
             const date = formatDate(item.date)
             const hour = formatHour(item.date)
@@ -103,7 +105,7 @@ export default function Events() {
             )
           })
         ) : (
-          <p className="mt-10 text-gray-500">No events found.</p>
+          <p className="text-gray-500">Aucun événement ne correspond à vos critères de recherche.</p>
         )}
       </div>
     </div>
