@@ -1,9 +1,7 @@
 'use server'
-import { events } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
 import { ID } from 'node-appwrite'
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+
 
 async function addCustomer(previousState:any, formData:any) {
     try{
@@ -19,8 +17,10 @@ async function addCustomer(previousState:any, formData:any) {
             }
 
         )
+        console.log(newCustomer)
+
         return {
-            success: true
+            success: true,
         };
     } catch(error) {
        console.log('failed to add Customer', error);
