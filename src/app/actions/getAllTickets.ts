@@ -1,4 +1,5 @@
 'use server'
+import { Ticket } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
 
 import { Query } from "node-appwrite";
@@ -17,7 +18,7 @@ async function getAllTickets(id:string) {
             ]
 
         );
-        return tickets;
+        return tickets as unknown as Ticket[];
     } catch(error) {
        console.log('failed to get evens', error);
        console.log(id);
