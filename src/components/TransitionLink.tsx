@@ -5,7 +5,6 @@ const TransitionLink = ({
   href,
   label,
   className = '',
-  isActive,
 }: {
   href: string
   label: string
