@@ -23,7 +23,7 @@ async function getNextEvent() {
     
         if (documents.length === 0) return null;
     
-        return documents[0] as events;
+        return documents[0] as unknown as events;
       } catch (error) {
         console.error('Failed to fetch next event:', error);
         return null;
