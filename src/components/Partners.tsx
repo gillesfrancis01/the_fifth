@@ -49,8 +49,10 @@ const Partners = () => {
             src={logo.src}
             alt={logo.alt}
             className={`${logo.className} object-contain`}
-            ref={(el) => (logosRef.current[i] = el)}
-          />
+            ref={(el) => {
+              if (el) logosRef.current[i] = el
+            }}
+                      />
         ))}
       </div>
     </section>
