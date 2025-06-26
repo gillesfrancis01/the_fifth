@@ -8,7 +8,7 @@ async function getNextEvent() {
     try {
         const { databases } = await createAdminClient();
     
-        const { documents } = await databases.listDocuments(
+        const { documents:events } = await databases.listDocuments(
           process.env.NEXT_PUBLIC_DATABASE!,
           process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS!,
           [
@@ -21,9 +21,9 @@ async function getNextEvent() {
           ]
         );
     
-        if (documents.length === 0) return null;
+        if (events.length === 0) return null;
     
-        return documents[0] as unknown as events;
+        return events[0] as unknown as events;
       } catch (error) {
         console.error('Failed to fetch next event:', error);
         return null;

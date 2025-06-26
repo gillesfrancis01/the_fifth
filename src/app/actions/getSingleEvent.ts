@@ -1,4 +1,5 @@
 'use server'
+import { events } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
 
 
@@ -12,7 +13,7 @@ async function getSingleEvent(id:string) {
             process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS,
             id
         );
-        return event;
+        return event as unknown as events;
     } catch(error) {
        console.log('failed to get evens', error);
     }
