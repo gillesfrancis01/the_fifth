@@ -1,8 +1,7 @@
 'use server'
 import { events } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+
 
 async function getAllEvents() {
     try{

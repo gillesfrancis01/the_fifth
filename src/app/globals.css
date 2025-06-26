@@ -71,3 +71,6 @@ p {
   pointer-events: none;
   z-index: 2000;
 }
+.sidebar-active {
+  @apply translate-x-0;
+}

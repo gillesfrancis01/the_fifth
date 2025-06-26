@@ -18,6 +18,8 @@ export default function Events() {
       const data = await getAllEvents()
       setAllEvents(data)
       setFilteredEvents(data)
+      console.log(filteredEvents);
+      
     }
     fetchEvents()
   }, [])

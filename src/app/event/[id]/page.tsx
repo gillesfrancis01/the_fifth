@@ -1,9 +1,7 @@
 import getAllTickets from '@/app/actions/getAllTickets'
 import getSingleEvent from '@/app/actions/getSingleEvent'
 import React from 'react'
-import { GrStatusGood } from "react-icons/gr";
-import { FaLongArrowAltRight } from "react-icons/fa";
-import Image from 'next/image';
+
 import EventPage from '@/components/EventPage';
 
 

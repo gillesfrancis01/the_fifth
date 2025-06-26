@@ -8,6 +8,13 @@ export interface events{
     teaser: string,
     
 }
+export interface Ticket {
+    $id: string
+    name: string
+    advantages: string[]
+    price: number
+    available: boolean
+  }
 export interface service {
     id: string,
     title: string,

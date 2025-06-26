@@ -5,11 +5,17 @@ import { FaCalendarAlt } from 'react-icons/fa'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { events } from '@/types'
+import { events } from '@/types' // Assure-toi que ce type est bien défini
 
 gsap.registerPlugin(ScrollTrigger)
 
-export const Event = ({ event, date, hour }: { event: events; date: any; hour: any }) => {
+interface EventProps {
+  event: events
+  date: string
+  hour: string
+}
+
+export const Event = ({ event, date, hour }: EventProps) => {
   const containerRef = useRef<HTMLAnchorElement>(null)
 
   useEffect(() => {

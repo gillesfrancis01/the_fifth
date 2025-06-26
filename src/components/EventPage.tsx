@@ -1,14 +1,21 @@
 'use client'
+
 import React, { useEffect, useRef } from 'react'
 import { FaLongArrowAltRight } from 'react-icons/fa'
 import { GrStatusGood } from 'react-icons/gr'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { events, Ticket } from '@/types' // à adapter selon l'organisation de ton projet
 
 gsap.registerPlugin(ScrollTrigger)
 
-const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
+interface EventPageProps {
+  event: events
+  tickets: Ticket[]
+}
+
+const EventPage = ({ event, tickets }: EventPageProps) => {
   const imageRef = useRef<HTMLImageElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const descRef = useRef<HTMLParagraphElement>(null)
@@ -18,7 +25,6 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Parallax image scroll
       gsap.to(imageRef.current, {
         y: -100,
         ease: 'none',
@@ -30,7 +36,6 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
         },
       })
 
-      // Fade + slide titles and description on scroll
       gsap.fromTo(
         [titleRef.current, descRef.current],
         { opacity: 0, y: 40 },
@@ -47,7 +52,6 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
         }
       )
 
-      // Shine effect on title looping
       gsap.to(shineRef.current, {
         xPercent: 100,
         duration: 2,
@@ -56,7 +60,6 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
         yoyo: true,
       })
 
-      // Tickets appearance staggered
       gsap.fromTo(
         ticketsRef.current?.children,
         { opacity: 0, y: 50 },
@@ -73,7 +76,6 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
         }
       )
 
-      // Map zoom + fade in
       gsap.fromTo(
         mapRef.current,
         { opacity: 0, scale: 0.95 },
@@ -109,47 +111,40 @@ const EventPage = ({ event, tickets }: { event: any; tickets: any }) => {
         className="text-3xl text-center uppercase font-extrabold text-main mt-5 font-Josefin lg:text-left lg:w-[90vw] lg:m-auto lg:my-10 relative overflow-hidden"
       >
         {event.name}
-        {/* Shine effect overlay */}
         <div
           ref={shineRef}
           className="absolute top-0 left-0 w-20 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
           style={{ transform: 'translateX(-100%)', mixBlendMode: 'screen' }}
-        ></div>
+        />
       </h1>
 
       <p
         ref={descRef}
-        className="text-center my-10 lg:w-[90vw] lg:m-auto lg:text-left "
+        className="text-center my-10 lg:w-[90vw] lg:m-auto lg:text-left"
       >
         {event.description}
       </p>
 
       <h2 className="text-main text-center text-2xl font-Josefin">Tickets</h2>
-      <Image
-        src="/arrows.svg"
-        className="m-auto"
-        width={300}
-        height={100}
-        alt="arrows"
-      />
+      <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt="arrows" />
       <h3 className="uppercase text-2xl font-Josefin text-main font-bold text-center">
         Get your Ticket now
       </h3>
 
       <div ref={ticketsRef} className="lg:flex justify-center gap-10 flex-wrap mt-8">
-        {tickets?.map((item: any) => (
+        {tickets.map((item) => (
           <div
             key={item.$id}
-            className="flex flex-col w-[70vw] max-w-[300px] border-2 border-main p-8 mt-10 rounded-lg shadow-md  transition-transform hover:scale-105 hover:shadow-xl cursor-pointer"
+            className="flex flex-col w-[70vw] max-w-[300px] border-2 border-main p-8 mt-10 rounded-lg shadow-md transition-transform hover:scale-105 hover:shadow-xl cursor-pointer"
           >
             <h3 className="text-3xl uppercase font-extrabold text-main font-Josefin">
               {item.name}
             </h3>
             <ul>
-              {item.advantages.map((ad: any) => (
+              {item.advantages.map((ad) => (
                 <li
                   key={ad}
-                  className="flex gap-3 items-center mt-5 font-extralight "
+                  className="flex gap-3 items-center mt-5 font-extralight"
                 >
                   <GrStatusGood className="text-yellow-400" />
                   {ad}

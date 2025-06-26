@@ -1,10 +1,7 @@
 'use server'
-import { events } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+
 import { Query } from "node-appwrite";
-import { log } from "console";
 
 async function getAllTickets(id:string) {
     try{
