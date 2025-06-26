@@ -1,12 +1,9 @@
 import About from "@/components/About";
 import Contact from "@/components/Contact";
-import { Footer } from "@/components/Footer";
-import Header from "@/components/Header";
+
 import Hero from "@/components/Hero";
 import Partners from "@/components/Partners";
-import Testimonial from "@/components/Testimonial";
-import Image from "next/image";
-import getAllEvents from "./actions/getAllEvent";
+
 import PortfolioList from "@/components/PortfolioList";
 import { Portfolio } from "@/constants";
 import { Separator } from "@/components/Separator";

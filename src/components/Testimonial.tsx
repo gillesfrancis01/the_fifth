@@ -1,8 +1,6 @@
 import React from 'react'
-import FlatButton from './FlatButton'
 import Image from 'next/image'
 import { Testimonials } from '@/constants'
-import StarRating from './StarRating'
 import Carousel from './Carousel'
 const Testimonial = () => {
   return (

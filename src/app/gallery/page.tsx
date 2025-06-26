@@ -4,9 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import getAllEvents from '../actions/getAllEvent'
 import { events } from '@/types'
-import { Event } from '@/components/Event'
 import { CiSearch } from "react-icons/ci"
-import { formatDate, formatHour } from '../actions/dateFormat'
 
 export default function Events() {
   const [search, setSearch] = useState('')

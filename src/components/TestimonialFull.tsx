@@ -1,7 +1,6 @@
 "use client"
 import React from 'react'
 import Image from 'next/image'
-import { testimonial } from '@/types'
 import Slider from 'react-slick'
 import { Testimonials } from '@/constants'
 import "slick-carousel/slick/slick.css"

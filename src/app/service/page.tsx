@@ -1,8 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
-import { Portfolio, services, Testimonials } from '@/constants'
+import {  services } from '@/constants'
 import { Services } from '@/components/Services'
-import Carousel from '@/components/Carousel'
 import NextEvent from '@/components/NextEvent'
 import PortfolioFull from '@/components/PortfolioFull'
 const page = () => {
