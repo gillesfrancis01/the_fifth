@@ -28,7 +28,6 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const shineRef = useRef<HTMLDivElement>(null)
 
-  const [showForm, setShowForm] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [clientSecret, setClientSecret] = useState('')
@@ -267,7 +266,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   type="submit"
                   className="bg-main text-white py-2 px-4 rounded-md hover:bg-opacity-80"
                 >
-                  Confirmer l'achat
+                  Confirmer l achat
                 </button>
               </form>
             ) : (
