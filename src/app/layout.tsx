@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Poppins} from 'next/font/google'
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 export const metadata: Metadata = {
   title: "The Fifth",
@@ -23,7 +24,7 @@ export default function RootLayout({
     <html lang="en" className={PoppinsFont.className}>
       <body
       >
-
+        <SubscriptionModal />
         <Header/>
 
         {children}

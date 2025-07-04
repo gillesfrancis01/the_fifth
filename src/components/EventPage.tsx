@@ -1,14 +1,19 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FaLongArrowAltRight } from 'react-icons/fa'
 import { GrStatusGood } from 'react-icons/gr'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { events, Ticket } from '@/types' // à adapter selon l'organisation de ton projet
+import { events, Ticket } from '@/types'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import PaymentForm from './PaymentForm'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 interface EventPageProps {
   event: events
@@ -22,6 +27,20 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const ticketsRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<HTMLDivElement>(null)
   const shineRef = useRef<HTMLDivElement>(null)
+
+  const [showForm, setShowForm] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+  const [showModal, setShowModal] = useState(false)
+  const [clientSecret, setClientSecret] = useState('')
+
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+
+  const handleGetTicket = (ticket: Ticket) => {
+    setSelectedTicket(ticket)
+    setShowModal(true)
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -95,6 +114,31 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
     return () => ctx.revert()
   }, [])
 
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (!selectedTicket) return
+
+  const res = await fetch('/actions/create-payment-intent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      email,
+      phone,
+      ticket: selectedTicket,
+    }),
+  })
+
+  const data = await res.json()
+
+  if (data.clientSecret) {
+    setClientSecret(data.clientSecret)
+  } else {
+    alert('Erreur lors de la création du paiement.')
+  }
+}
+
+
   return (
     <div>
       <div className="relative overflow-hidden">
@@ -154,7 +198,10 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
             <div className="flex mt-10 gap-4 items-center justify-between">
               <h3 className="font-extrabold text-2xl">${item.price}</h3>
               {item.available ? (
-                <button className="flex gap-1 items-center border-main border p-2 text-main rounded-md shadow-md transition-transform hover:scale-110 hover:rotate-1 hover:shadow-yellow-400/50">
+                <button
+                  className="flex gap-1 items-center border-main border p-2 text-main rounded-md shadow-md transition-transform hover:scale-110 hover:rotate-1 hover:shadow-yellow-400/50"
+                  onClick={() => handleGetTicket(item)}
+                >
                   Get Ticket <FaLongArrowAltRight className="text-yellow-400" />
                 </button>
               ) : (
@@ -180,6 +227,67 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
           className="rounded-xl"
         />
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 overflow-scroll">
+          <div className="bg-[#171717] p-8 rounded-lg w-[90vw] max-w-md relative shadow-xl">
+            <button
+              className="absolute top-2 right-2 text-red-500 font-bold"
+              onClick={() => setShowModal(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-2xl font-bold text-main mb-4">
+              Ticket for: {selectedTicket?.name}
+            </h2>
+            {!clientSecret ? (
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Nom Complet"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="border p-2 rounded-md"
+                />
+                <input
+                  type="email"
+                  placeholder="Courriel"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border p-2 rounded-md"
+                />
+                <input
+                  type="tel"
+                  placeholder="Numéro de Téléphone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="border p-2 rounded-md"
+                />
+                <button
+                  type="submit"
+                  className="bg-main text-white py-2 px-4 rounded-md hover:bg-opacity-80"
+                >
+                  Confirmer l'achat
+                </button>
+              </form>
+            ) : (
+              <Elements stripe={stripePromise} options={{ clientSecret,appearance: {
+                theme: 'night',
+                variables: {
+                  colorPrimary: '#FFD700',
+                  colorBackground: '#171717',
+                  colorText: '#ffffff',
+                  colorDanger: '#ff4d4f',
+                  spacingUnit: '4px',
+                  borderRadius: '8px',
+                },
+              }, }}>
+                <PaymentForm />
+              </Elements>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
