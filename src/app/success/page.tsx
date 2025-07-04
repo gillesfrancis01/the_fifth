@@ -18,7 +18,7 @@ export default function Success() {
         href="/"
         className="mt-8 inline-block bg-main text-black font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition"
       >
-        Retour à l'accueil
+        Retour à l accueil
       </Link>
     </div>
   )
