@@ -9,12 +9,13 @@ interface TransitionLinkProps {
   onClick?: () => void
 }
 
-const TransitionLink = ({ href, label, className = '', onClick }: TransitionLinkProps) => {
+const TransitionLink = ({ href, label, className = '', onClick}: TransitionLinkProps) => {
   return (
     <Link
       href={href}
       onClick={onClick}
       className={`${className} transition-all`}
+      
     >
       {label}
     </Link>

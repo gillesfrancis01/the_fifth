@@ -28,7 +28,7 @@ const Header = () => {
 
     return (
       <li key={item.id} className='mt-9'>
-        <TransitionLink href={item.link} label={item.name} isActive={isActive} />
+        <TransitionLink href={item.link} label={item.name} />
        
       </li>
     )
