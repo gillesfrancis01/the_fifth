@@ -281,7 +281,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                   borderRadius: '8px',
                 },
               }, }}>
-                <PaymentForm />
+<PaymentForm
+  clientSecret={clientSecret}
+  fullName={name}
+  email={email}
+  phone={phone}
+  ticketId={selectedTicket.$id}
+  eventId={event.$id}
+/>
+
               </Elements>
             )}
           </div>

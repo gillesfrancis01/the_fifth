@@ -33,7 +33,7 @@ export const Footer = () => {
     </div>
     <div className='flex justify-between p-1 bg-[#262626] items-center px-14'>
        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link> 
-       <Link href="https://arnoldadadjissoportfolio.bit-technology.ca/">Made By Bit-Technology/kokouvi</Link>
+       <Link href="https://arnoldadadjissoportfolio.bit-technology.ca/">Bit</Link>
        </div>
     </div>
   )

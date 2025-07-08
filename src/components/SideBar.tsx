@@ -23,7 +23,7 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-[80vw] sm:w-[300px] bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 h-full w-[80vw] sm:w-[300px] bg-[#171717] z-50 shadow-2xl transform transition-transform duration-300 ease-in-out
         ${active ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex justify-between items-center p-4 border-b">
@@ -44,8 +44,8 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
                 <TransitionLink
                   href={item.link}
                   label={item.name}
-                  isActive={false}
-                  className="block text-gray-800 hover:text-main transition-colors font-medium"
+                  onClick={handleSetVisible}
+                  className="block text-main hover:text-main transition-colors font-medium"
                 />
               </li>
             ))}

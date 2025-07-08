@@ -1,18 +1,21 @@
-// Exemple TransitionLink.tsx
+'use client'
+
 import Link from 'next/link'
 
-const TransitionLink = ({
-  href,
-  label,
-  className = '',
-}: {
+interface TransitionLinkProps {
   href: string
   label: string
-  isActive?: boolean
   className?: string
-}) => {
+  onClick?: () => void
+}
+
+const TransitionLink = ({ href, label, className = '', onClick }: TransitionLinkProps) => {
   return (
-    <Link href={href} className={`${className} transition-all`}>
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`${className} transition-all`}
+    >
       {label}
     </Link>
   )

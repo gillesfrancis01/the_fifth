@@ -7,7 +7,22 @@ import {
 } from '@stripe/react-stripe-js'
 import { FormEvent, useState } from 'react'
 
-export default function PaymentForm() {
+export default function PaymentForm({
+  clientSecret,
+  fullName,
+  email,
+  phone,
+  ticketId,
+  eventId,
+}: {
+  clientSecret: string
+  fullName: string
+  email: string
+  phone: string
+  ticketId: string
+  eventId: string
+}) {
+
   const stripe = useStripe()
   const elements = useElements()
 
@@ -25,7 +40,7 @@ export default function PaymentForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/success`, // redirection après paiement réussi
+        return_url: `${window.location.origin}/success?name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&ticketId=${encodeURIComponent(ticketId)}&eventId=${eventId}&paymentIntent=${clientSecret.split('_secret')[0]}`,
       },
     })
 
