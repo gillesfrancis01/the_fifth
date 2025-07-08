@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { FaCheckCircle } from 'react-icons/fa'
 import Link from 'next/link'
 import { upsertAppwriteCustomer } from '../actions/upsertAppwriteCustomer'
@@ -36,7 +36,7 @@ export default function Success() {
           paymentIntent,
           eventId
         })
-      } catch (err: any) {
+      } catch (err) {
         console.error('Appwrite error:', err)
         setError("Erreur lors de l'enregistrement du client.")
       } finally {
@@ -69,7 +69,7 @@ export default function Success() {
         href="/"
         className="mt-8 inline-block bg-yellow-400 text-black font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition"
       >
-        Retour à l'accueil
+        Retour à l accueil
       </Link>
     </div>
   )
