@@ -6,7 +6,7 @@ import SideBar from './SideBar';
 import Link from 'next/link';
 import { SideBarMenu } from '@/constants';
 import FlatButton from './FlatButton';
-import { usePathname } from 'next/navigation'
+//import { usePathname } from 'next/navigation'
 import TransitionLink from './TransitionLink';
 
 const Header = () => {
@@ -16,7 +16,7 @@ const Header = () => {
         setVisible(!visible)
         console.log(visible)
   }
-  const pathname = usePathname()
+  //const pathname = usePathname()
 
   return (
     <section className='relative flex lg:space-arround items-center justify-between w-[90vw] m-auto '>
