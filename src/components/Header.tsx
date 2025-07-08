@@ -24,7 +24,7 @@ const Header = () => {
        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link> 
        <ul className='flex gap-10 max-md:hidden'>
   {SideBarMenu.map((item) => {
-    const isActive = pathname === item.link
+    //const isActive = pathname === item.link
 
     return (
       <li key={item.id} className='mt-9'>
