@@ -40,20 +40,20 @@ export default function ContactCard() {
         <div className="flex items-start gap-3">
           <FaMapMarkerAlt className="mt-1" />
           <p>
-            Germany -<br />
-            785 15th Street, Office 478<br />
-            Berlin, DE 81566
+            Montreal QC-<br />
+            738 Rue St-Paul O<br />
+            H3C 0N5
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <FaEnvelope />
-          <p>info@gmail.com</p>
+          <p>info@thefifthevent.com</p>
         </div>
 
         <div className="flex items-center gap-3">
           <FaPhoneAlt />
-          <p>+815 94125 69</p>
+          <p>+1 (514) 519 2002</p>
         </div>
       </div>
     </div>

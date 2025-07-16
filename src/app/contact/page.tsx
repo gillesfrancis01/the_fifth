@@ -39,7 +39,7 @@ const page = () => {
         <span className='bg-main p-4 rounded-full inline-block mt-4'>
         <FaLocationDot className='text-black'/>
         </span>
-        <p>785 15h Street, Office 478 Berlin, De 81566</p>
+        <p>738 Rue St-Paul O, Montreal QC, H3C 0N5</p>
         </div>
         <div className='lg:flex lg:items-center lg:w-[300px] lg:gap-3'>
         <span className='bg-main p-4 rounded-full inline-block mt-4'>
@@ -51,7 +51,7 @@ const page = () => {
         <span className='bg-main p-4 rounded-full inline-block mt-4'>
         <FaPhone className='text-black'/>
         </span>
-        <p>+4200 555 2569</p>
+        <p>+1 (514) 519 2002</p>
         </div>
        </div>
        </div>

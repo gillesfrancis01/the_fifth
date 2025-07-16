@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import gsap from 'gsap'
@@ -8,17 +8,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const heroImages = [
-  '/hero-background.jpg',
-  '/hero-background2.jpg',
-  '/hero-background3.jpg',
-  '/hero-background4.jpg',
-
-]
-
 const Hero = () => {
   const heroRef = useRef(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -39,32 +30,22 @@ const Hero = () => {
     return () => ctx.revert()
   }, [])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroImages.length)
-    }, 5000) // Change toutes les 5s
-    return () => clearInterval(interval)
-  }, [])
-
   return (
-    <section ref={heroRef} className="relative lg:mb-60">
-      {/* Carousel */}
-      <div className="absolute top-0 left-0 w-full h-[700px] max-md:hidden overflow-hidden">
-        {heroImages.map((src, index) => (
-          <Image
-            key={index}
-            src={src}
-            alt={`hero-${index}`}
-            fill
-            className={`object-cover object-top transition-opacity duration-1000 ${
-              currentIndex === index ? 'opacity-20' : 'opacity-0'
-            }`}
-          />
-        ))}
-      </div>
+    <section ref={heroRef} className="relative  h-[700px] overflow-hidden">
+      {/* Background Video */}
+      <video
+        className="absolute top-0 left-0 w-full h-[700px] object-cover opacity-20"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src="/hero.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
       {/* Content */}
-      <div className="text-center mt-10 lg:text-left lg:w-[564px] lg:relative lg:ml-[50%]">
+      <div className="text-center mt-[40%] lg:mt-[15%] lg:text-left lg:w-[564px] lg:relative lg:ml-[50%] z-10 relative">
         <h1 className="hero-text text font-Josefin font-bold text-main leading-13">
           EXPERIENCE EVENTS LIKE NEVER BEFORE.
         </h1>

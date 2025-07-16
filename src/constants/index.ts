@@ -193,14 +193,14 @@ export const Portfolio = [
         id:2,
         name: "Birthday Party",
         image: '/event2.png',
-        client:'Anonimous',
+        client:'Anonymous',
         description:'A night to remember! This exclusive private party featured dazzling lights, live DJ sets, gourmet treats, and a vibrant crowd. Laughter, dancing, and unforgettable vibes made it the ultimate celebration for our special guests',
     },
     {
         id:3,
         name: "Wedding Party",
         image: '/event3.png',
-        client:'Anonimous',
+        client:'Anonymous',
         description:'A timeless celebration of love, filled with elegance, joy, and unforgettable moments. Surrounded by family and friends, the couple said "I do" under a romantic floral arch, followed by an enchanting evening of fine dining, dancing, and heartfelt toasts.',
     }
 ]
