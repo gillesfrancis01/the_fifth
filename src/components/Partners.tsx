@@ -31,7 +31,7 @@ const Partners = () => {
   }, [])
 
   return (
-    <section ref={sectionRef} className="my-20">
+    <section ref={sectionRef} className="my-30">
       <h2 className="text-main text-center text-2xl font-Josefin mb-8">
         Check our best clients and partners
       </h2>

@@ -5,6 +5,7 @@ import Slider from 'react-slick'
 import { Portfolio } from '@/constants'
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import Link from 'next/link'
 
 
 
@@ -70,10 +71,10 @@ const PortfolioFull = () => {
     <h3 className="font-Josefin font-extrabold text-[42px] text-main text-left">
       {portfolio.name}
     </h3>
-    <h4 className="text-s text-left pt-5 flex items-center gap-2">
+    <Link className="text-s text-left pt-5 flex items-center gap-2" href={`/portfolio`}>
       Read More
       <Image src="/bi_arrow-right.png" width={18} height={18} alt="arrow" />
-    </h4>
+    </Link>
   </div>
 </div>
 

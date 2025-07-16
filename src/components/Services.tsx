@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { service } from '@/types'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Link from 'next/link'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -50,21 +51,24 @@ export const Services = ({ item }: { item: service }) => {
   }, [])
 
   return (
-    <div
+    <Link
+      href={`/service/${item.id}`}
       ref={containerRef}
       className="lg:text-left text-center my-10 font-Poppins font-light lg:flex items-center justify-around hover:text-yellow-400"
     >
       <h3 className="text-3xl">{item.id}.</h3>
       <h3 ref={textRef} className="text-3xl lg:text-left lg:w-[20%]">{item.title}</h3>
       <p className="mt-3 text-xl lg:w-[30%]">{item.description}</p>
+      
       <FlatButton
         ref={imageRef}
         className="mt-2 w-10 h-10"
         rounded
         borderColor="white"
+        
       >
         <Image src="/bi_arrow-right.png" width={18} height={18} alt="arrow" />
       </FlatButton>
-    </div>
+    </Link>
   )
 }
