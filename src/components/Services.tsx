@@ -51,24 +51,24 @@ export const Services = ({ item }: { item: service }) => {
   }, [])
 
   return (
-    <Link
-      href={`/service/${item.id}`}
+    <div
       ref={containerRef}
       className="lg:text-left text-center my-10 font-Poppins font-light lg:flex items-center justify-around hover:text-yellow-400"
     >
-      <h3 className="text-3xl">{item.id}.</h3>
-      <h3 ref={textRef} className="text-3xl lg:text-left lg:w-[20%]">{item.title}</h3>
-      <p className="mt-3 text-xl lg:w-[30%]">{item.description}</p>
-      
-      <FlatButton
-        ref={imageRef}
-        className="mt-2 w-10 h-10"
-        rounded
-        borderColor="white"
-        
-      >
-        <Image src="/bi_arrow-right.png" width={18} height={18} alt="arrow" />
-      </FlatButton>
-    </Link>
+      <Link href={`/service/${item.id}`} className="flex flex-col lg:flex-row items-center gap-6 w-full">
+        <h3 className="text-3xl">{item.id}.</h3>
+        <h3 ref={textRef} className="text-3xl lg:text-left lg:w-[20%]">{item.title}</h3>
+        <p className="mt-3 text-xl lg:w-[30%]">{item.description}</p>
+
+        <FlatButton
+          ref={imageRef}
+          className="mt-2 w-10 h-10"
+          rounded
+          borderColor="white"
+        >
+          <Image src="/bi_arrow-right.png" width={18} height={18} alt="arrow" />
+        </FlatButton>
+      </Link>
+    </div>
   )
 }
