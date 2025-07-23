@@ -2,9 +2,9 @@
 
 import { portfolio as PortfolioType } from '@/types'
 import React, { useEffect, useRef } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
-import { useLanguage } from '@/context/LanguageContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -18,6 +18,7 @@ const PortfolioList = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
+  const { t } = useLanguage()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -68,7 +69,6 @@ const PortfolioList = ({
 
     return () => ctx.revert()
   }, [reverse])
-  const { t } = useLanguage()
 
   return (
     <div
@@ -84,11 +84,11 @@ const PortfolioList = ({
         alt="project"
       />
       <div ref={textRef} className="mt-6 lg:mt-0 lg:w-1/2">
-        <h2 className="text-3xl text-main font-Josefin">{t(portfolio.name)}</h2>
-        <h3 className="mt-4">Client: {t(portfolio.client)}</h3>
+        <h2 className="text-3xl text-main font-Josefin">{portfolio.name}</h2>
+        <h3 className="mt-4">{t('client')}: {portfolio.client}</h3>
         <p className="mt-6">
-          <span className="text-main font-extrabold">Description:</span>{' '}
-          {t(portfolio.description)}
+          <span className="text-main font-extrabold">{t('description')}:</span>{' '}
+          {portfolio.description}
         </p>
       </div>
     </div>
