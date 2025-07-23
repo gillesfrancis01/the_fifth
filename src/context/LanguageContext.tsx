@@ -33,7 +33,15 @@ const translations: Record<Language, Record<string, string>> = {
     subscribePlaceholder: 'Your email here',
     subscribeButton: 'Subscribe',
     craftingEvents: 'Crafting Extraordinary Events Together',
-    links: 'Links'
+    links: 'Links',
+    client: 'Client',
+    description: 'Description',
+    ourPortfolio: 'Our Portfolio',
+    portfolioTagline: 'From Concept to Celebration, Where Your\u00A0Dreams Take Center Stage',
+    whatWeDo: 'What we do',
+    fullServiceEventProduction: 'Full-service event production',
+    nextEvent: 'Next Event',
+    noNextEvent: 'No next event'
   },
   fr: {
     Home: 'Accueil',
@@ -57,7 +65,15 @@ const translations: Record<Language, Record<string, string>> = {
     subscribePlaceholder: 'Votre email ici',
     subscribeButton: 'S\u2019abonner',
     craftingEvents: 'Cr\u00E9er ensemble des \u00E9v\u00E9nements extraordinaires',
-    links: 'Liens'
+    links: 'Liens',
+    client: 'Client',
+    description: 'Description',
+    ourPortfolio: 'Notre portfolio',
+    portfolioTagline: 'Du concept \u00E0 la c\u00E9l\u00E9bration, o\u00F9 vos r\u00EAves prennent le devant de la sc\u00E8ne',
+    whatWeDo: 'Ce que nous faisons',
+    fullServiceEventProduction: "Production d'\u00E9v\u00E9nements cl\u00E9s en main",
+    nextEvent: 'Prochain \u00E9v\u00E9nement',
+    noNextEvent: "Aucun \u00E9v\u00E9nement \u00E0 venir"
   },
   es: {
     Home: 'Inicio',
@@ -81,7 +97,15 @@ const translations: Record<Language, Record<string, string>> = {
     subscribePlaceholder: 'Tu correo aqu\u00ED',
     subscribeButton: 'Suscribirse',
     craftingEvents: 'Creando juntos eventos extraordinarios',
-    links: 'Enlaces'
+    links: 'Enlaces',
+    client: 'Cliente',
+    description: 'Descripci\u00F3n',
+    ourPortfolio: 'Nuestro portafolio',
+    portfolioTagline: 'Del concepto a la celebraci\u00F3n, donde tus sue\u00F1os toman el centro del escenario',
+    whatWeDo: 'Lo que hacemos',
+    fullServiceEventProduction: 'Producci\u00F3n de eventos integral',
+    nextEvent: 'Pr\u00F3ximo evento',
+    noNextEvent: 'No hay pr\u00F3ximo evento'
   }
 }
 
