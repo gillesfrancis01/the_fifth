@@ -5,13 +5,16 @@ import { FaFacebookF, FaXTwitter } from 'react-icons/fa6'
 import { SideBarMenu } from '@/constants'
 import Link from 'next/link'
 import Suscribe from './Suscribe'
+import { useLanguage } from '@/context/LanguageContext'
 export const Footer = () => {
+  const { t } = useLanguage()
   return (
     <div>
     <div className='max-md:text-center mt-32 lg:flex lg:w-[80vw] lg:m-auto lg:mt-32 lg:justify-between'>
       <div className='lg:w-[30%]'>
-        <h3 className='max-md:uppercase  text-4xl  font-Josefin text-main font-bold '>Crafting 
-        Extraordinary Events Together</h3>
+        <h3 className='max-md:uppercase  text-4xl  font-Josefin text-main font-bold '>
+          {t('craftingEvents')}
+        </h3>
         <p className='max-md:w-[70vw] m-auto'>From concept to celebration, we bring your vision to life with precision, passion, and a touch of luxury. Let’s make every moment unforgettable.</p>
         <div className='flex text-3xl mb-10 gap-5 w-40 max-md:m-auto mt-10 '>
        <div className='p-2  bg-white text-black rounded-full '><FaFacebookF /> </div> 
@@ -21,10 +24,10 @@ export const Footer = () => {
        </div>
       </div>
       <div>
-        <h2 className='font-Josefin text-main text-3xl'>Links</h2>
+        <h2 className='font-Josefin text-main text-3xl'>{t('links')}</h2>
         <ul className='text-xl '>
           {SideBarMenu.map((item) => (
-            <li key={item.id} className='py-3'><Link href={item.link}>{item.name}</Link></li>
+            <li key={item.id} className='py-3'><Link href={item.link}>{t(item.name)}</Link></li>
           ))}
         </ul>
       </div>

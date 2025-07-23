@@ -4,6 +4,7 @@ import React from 'react'
 import { MdClose } from 'react-icons/md'
 import { SideBarMenu } from '@/constants'
 import TransitionLink from './TransitionLink'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface SideBarProps {
   active: boolean
@@ -11,6 +12,7 @@ interface SideBarProps {
 }
 
 const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
+  const { t } = useLanguage()
   return (
     <>
       {/* Overlay */}
@@ -27,7 +29,7 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
         ${active ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Menu</h2>
+          <h2 className="text-lg font-semibold">{t('menu')}</h2>
           <button
             onClick={handleSetVisible}
             className="p-2 rounded-full hover:bg-gray-100"
@@ -43,7 +45,7 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
               <li key={item.id}>
                 <TransitionLink
                   href={item.link}
-                  label={item.name}
+                  label={t(item.name)}
                   onClick={handleSetVisible}
                   className="block text-main hover:text-main transition-colors font-medium"
                 />

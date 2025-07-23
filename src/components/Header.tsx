@@ -8,9 +8,11 @@ import { SideBarMenu } from '@/constants';
 import FlatButton from './FlatButton';
 //import { usePathname } from 'next/navigation'
 import TransitionLink from './TransitionLink';
+import { useLanguage, Language } from '@/context/LanguageContext';
 
 const Header = () => {
   const [visible, setVisible] = useState(false)
+  const { lang, setLang, t } = useLanguage()
 
   const handleSetVisible = () => {
         setVisible(!visible)
@@ -21,21 +23,25 @@ const Header = () => {
   return (
     <section className='relative flex lg:space-arround items-center justify-between w-[90vw] m-auto '>
        <SideBar active={visible} handleSetVisible = {handleSetVisible}/>
-       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link> 
+       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link>
        <ul className='flex gap-10 max-md:hidden'>
-  {SideBarMenu.map((item) => {
-    //const isActive = pathname === item.link
-
-    return (
+  {SideBarMenu.map((item) => (
       <li key={item.id} className='mt-9'>
-        <TransitionLink href={item.link} label={item.name} />
-       
+        <TransitionLink href={item.link} label={t(item.name)} />
       </li>
-    )
-  })}
+  ))}
 </ul>
 
-       <FlatButton className='max-md:hidden'><Link href="/contact">Contact Us</Link> </FlatButton>
+       <FlatButton className='max-md:hidden'><Link href="/contact">{t('contact')}</Link> </FlatButton>
+       <select
+        value={lang}
+        onChange={e => setLang(e.target.value as Language)}
+        className='border bg-transparent p-1 rounded ml-4'
+       >
+         <option value='en'>EN</option>
+         <option value='fr'>FR</option>
+         <option value='es'>ES</option>
+       </select>
         <button className='p-3 rounded-full bg-main lg:hidden' onClick={handleSetVisible}>
         <IoMenu className='text-black text-2xl'/>
 
