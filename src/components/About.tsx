@@ -29,8 +29,9 @@ const About = () => {
         <FlatButton className="mt-5 z-10 relative" border={0}>Learn More</FlatButton>
       </div>
       </div>
+      
  <Separator/>
-      <div className='relative z-10'>
+      <div className="relative z-10 bg-[url('/bg-logo.png')] bg-size-[100px]">
         {services.map((item) => (
           <Services item={item} key={item.id} />
         ))}

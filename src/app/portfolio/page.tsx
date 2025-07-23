@@ -5,7 +5,7 @@ import { Portfolio } from '@/constants'
 import PortfolioList from '@/components/PortfolioList'
 const page = () => {
   return (
-    <div className='flex flex-col'>
+    <div className="flex flex-col bg-[url('/bg-logo.png')] bg-size-[100px]">
         <div className='text-center '>
         <h2 className='text-main text-center text-2xl font-Josefin'>Our Portfolio</h2>
         <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows'/>

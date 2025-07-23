@@ -16,7 +16,7 @@ export default async function Home() {
       <Hero />
       <Partners />
       <About />
-      <div className="max-md:hidden">
+      <div className="max-md:hidden bg-[url('/bg-logo.png')] bg-size-[100px]">
       {Portfolio.map((item, index) => (
     <PortfolioList
       portfolio={item}
