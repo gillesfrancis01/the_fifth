@@ -3,11 +3,12 @@
 import React from 'react'
 import Image from 'next/image'
 import { BsYoutube } from 'react-icons/bs'
-import { FaFacebookF, FaXTwitter } from 'react-icons/fa6'
+import { FaFacebookF } from 'react-icons/fa6'
 import { SideBarMenu } from '@/constants'
 import Link from 'next/link'
 import Suscribe from './Suscribe'
 import { useLanguage } from '@/context/LanguageContext'
+import { FaInstagram } from 'react-icons/fa'
 export const Footer = () => {
   const { t } = useLanguage()
   return (
@@ -17,15 +18,16 @@ export const Footer = () => {
         <h3 className='max-md:uppercase  text-4xl  font-Josefin text-main font-bold '>
           {t('craftingEvents')}
         </h3>
-        <p className='max-md:w-[70vw] m-auto'>From concept to celebration, we bring your vision to life with precision, passion, and a touch of luxury. Let’s make every moment unforgettable.</p>
+        <p className='max-md:w-[70vw] mb-20 m-auto mt-10'>From concept to celebration, we bring your vision to life with precision, passion, and a touch of luxury. Let’s make every moment unforgettable.</p>
         <div className='flex text-3xl mb-10 gap-5 w-40 max-md:m-auto mt-10 '>
-       <div className='p-2  bg-white text-black rounded-full '><FaFacebookF /> </div> 
-       <div className='p-2  bg-white/10  rounded-full'> <FaXTwitter /> </div> 
+       <div   className='p-2  bg-white text-black rounded-full '>  <FaFacebookF /></div> 
+       <Link href='https://www.instagram.com/the_fifth_event/' className='p-2  bg-white/10  rounded-full'> <FaInstagram /></Link> 
+
        <div className='p-2  bg-white text-black rounded-full'> <BsYoutube /> </div> 
 
        </div>
       </div>
-      <div>
+      <div className='mt-10'>
         <h2 className='font-Josefin text-main text-3xl'>{t('links')}</h2>
         <ul className='text-xl '>
           {SideBarMenu.map((item) => (
