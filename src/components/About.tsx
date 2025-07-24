@@ -3,6 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import FlatButton from './FlatButton'
+import Link from 'next/link'
 import { services } from '@/constants'
 import { Services } from './Services'
 import { Separator } from './Separator'
@@ -30,7 +31,9 @@ const About = () => {
         <p className='w-[95vw] m-auto lg:w-[50%] lg:leading-8'>
           {t('aboutDescription')}
         </p>
-        <FlatButton className="mt-5 z-10 relative" border={0}>{t('learnMore')}</FlatButton>
+        <FlatButton className="mt-5 z-10 relative" border={0}>
+          <Link href="/about">{t('learnMore')}</Link>
+        </FlatButton>
       </div>
       </div>
       
