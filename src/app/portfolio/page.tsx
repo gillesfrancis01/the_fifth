@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 const Page = () => {
   const { t } = useLanguage()
   return (
-    <div className="flex flex-col bg-[url('/bg-logo-the-fifth.png')] bg-size-[90vw] bg-no-repeat bg-center">
+    <div className="flex flex-col ">
         <div className='text-center '>
         <h2 className='text-main text-center text-2xl font-Josefin'>{t('ourPortfolio')}</h2>
         <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows'/>
