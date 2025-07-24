@@ -5,7 +5,7 @@ import { Portfolio } from '@/constants'
 
 import PortfolioList from '@/components/PortfolioList'
 import { useLanguage } from '@/context/LanguageContext'
-const page = () => {
+const Page = () => {
   const { t } = useLanguage()
   return (
     <div className="flex flex-col bg-[url('/bg-logo-the-fifth.png')] bg-size-[90vw] bg-no-repeat bg-center">
@@ -21,4 +21,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
