@@ -1,6 +1,7 @@
 'use server'
 import { events } from "@/types";
 import { createAdminClient } from "../../../config/appwrite"
+import { Query } from "node-appwrite";
 
 
 async function getAllEvents() {
@@ -11,6 +12,8 @@ async function getAllEvents() {
         const {documents: events } = await databases.listDocuments(
             process.env.NEXT_PUBLIC_DATABASE,
             process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS,
+            [Query.orderDesc('date')]
+
         );
         return events as unknown as events[]
     } catch(error) {
