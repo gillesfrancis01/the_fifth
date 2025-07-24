@@ -20,10 +20,10 @@ export const Footer = () => {
         </h3>
         <p className='max-md:w-[70vw] mb-20 m-auto mt-10'>From concept to celebration, we bring your vision to life with precision, passion, and a touch of luxury. Let’s make every moment unforgettable.</p>
         <div className='flex text-3xl mb-10 gap-5 w-40 max-md:m-auto mt-10 '>
-       <div   className='p-2  bg-white text-black rounded-full '>  <FaFacebookF /></div> 
+       <Link href="https://www.facebook.com/profile.php?id=61555262770004" className='p-2  bg-white text-black rounded-full '>  <FaFacebookF /></Link> 
        <Link href='https://www.instagram.com/the_fifth_event/' className='p-2  bg-white/10  rounded-full'> <FaInstagram /></Link> 
 
-       <div className='p-2  bg-white text-black rounded-full'> <BsYoutube /> </div> 
+       <Link href="https://www.youtube.com/@FJaysEvents" className='p-2  bg-white text-black rounded-full'> <BsYoutube /> </Link> 
 
        </div>
       </div>
