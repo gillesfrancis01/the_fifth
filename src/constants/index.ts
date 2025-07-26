@@ -2,11 +2,11 @@ export const services= [
     {
         "id": "01",
         "title": "Event Planning",
-        "description": "We shine a light on emerging artists, musicians, and creators through vibrant events designed to celebrate local culture. From intimate showcases to community festivals, we create authentic spaces where talent meets opportunity — and creativity takes center stage.",
+        "description": "We shine a light on emerging artists, musicians, and creators through vibrant events designed to celebrate local culture. From intimate showcases to community festivals, we create authentic spaces where talent meets opportunity and creativity takes center stage.",
         "long_description": {
           "section_1": {
             "title": "A Stage for Emerging Talent",
-            "content": "At The Fifth, event planning is more than logistics — it's a mission to amplify the voices of rising artists, musicians, and creators. Every event we curate is a stage where passion meets purpose, offering local talent a chance to shine in professional, inspiring, and welcoming environments. We don't just host events; we elevate stories that deserve to be heard."
+            "content": "At The Fifth, event planning is more than logistics it's a mission to amplify the voices of rising artists, musicians, and creators. Every event we curate is a stage where passion meets purpose, offering local talent a chance to shine in professional, inspiring, and welcoming environments. We don't just host events; we elevate stories that deserve to be heard."
           },
           "section_2": {
             "title": "Celebrating Local Culture with Purpose",
@@ -14,30 +14,30 @@ export const services= [
           },
           "section_3": {
             "title": "Formats That Encourage Authentic Connection",
-            "content": "We design events that foster intimacy, interaction, and artistic freedom — whether it’s an acoustic showcase, a creative market, or a cross-disciplinary jam session. Our formats are flexible, but always intentional: crafted to break down barriers between artist and audience, to spark conversation, and to create unforgettable moments of raw creativity."
+            "content": "We design events that foster intimacy, interaction, and artistic freedom whether it’s an acoustic showcase, a creative market, or a cross-disciplinary jam session. Our formats are flexible, but always intentional: crafted to break down barriers between artist and audience, to spark conversation, and to create unforgettable moments of raw creativity."
           },
           "section_4": {
             "title": "A Platform Where Creativity Meets Opportunity",
-            "content": "We believe visibility is only the beginning. That’s why our events are designed as springboards — connecting creators with press, collaborators, brands, and industry professionals. Every event we plan is part of a larger ecosystem of opportunity, helping artists turn exposure into momentum, and momentum into growth."
+            "content": "We believe visibility is only the beginning. That’s why our events are designed as springboards connecting creators with press, collaborators, brands, and industry professionals. Every event we plan is part of a larger ecosystem of opportunity, helping artists turn exposure into momentum, and momentum into growth."
           },
           "section_5": {
             "title": "Impact That Lasts Beyond the Event",
-            "content": "Our work doesn’t end when the lights go down. We document each event with care, providing artists and partners with high-quality content and materials. More importantly, we strive to leave a lasting positive impact — by supporting the local creative economy, inspiring new partnerships, and building a legacy of authentic, purpose-driven cultural programming."
+            "content": "Our work doesn’t end when the lights go down. We document each event with care, providing artists and partners with high-quality content and materials. More importantly, we strive to leave a lasting positive impact by supporting the local creative economy, inspiring new partnerships, and building a legacy of authentic, purpose-driven cultural programming."
           }
         }
       },      
       {
         "id": "02",
         "title": "Corporate Event",
-        "description": "We plan and execute impactful corporate events that reflect your brand, engage your audience, and deliver lasting impressions — from conferences to product launches.",
+        "description": "We plan and execute impactful corporate events that reflect your brand, engage your audience, and deliver lasting impressions from conferences to product launches.",
         "long_description": {
           "section_1": {
             "title": "Strategy-Driven Planning with Purpose",
-            "content": "Every corporate event we produce begins with a clear objective. Whether it’s to inspire your team, launch a new product, celebrate a milestone, or connect with partners, we align every decision with your brand's values and goals. We take a strategic approach — ensuring that your message resonates, your impact is measurable, and your audience is fully engaged."
+            "content": "Every corporate event we produce begins with a clear objective. Whether it’s to inspire your team, launch a new product, celebrate a milestone, or connect with partners, we align every decision with your brand's values and goals. We take a strategic approach ensuring that your message resonates, your impact is measurable, and your audience is fully engaged."
           },
           "section_2": {
             "title": "Flawless Execution, From Concept to Completion",
-            "content": "We manage every detail with precision — from venue selection and vendor coordination to schedule management and contingency planning. Our team ensures that every element aligns with your vision, leaving nothing to chance. Whether it's a 50-person seminar or a 5,000-person convention, our systems, processes, and experience ensure flawless delivery every time."
+            "content": "We manage every detail with precision from venue selection and vendor coordination to schedule management and contingency planning. Our team ensures that every element aligns with your vision, leaving nothing to chance. Whether it's a 50-person seminar or a 5,000-person convention, our systems, processes, and experience ensure flawless delivery every time."
           },
           "section_3": {
             "title": "Immersive Brand Experiences",
@@ -45,11 +45,11 @@ export const services= [
           },
           "section_4": {
             "title": "Professionalism and Partnership",
-            "content": "Our team becomes an extension of yours. We bring professionalism, transparency, and reliability to every collaboration — ensuring clear communication, streamlined coordination, and a spirit of partnership at every step. We work with stakeholders across departments, executives, and external vendors to ensure every voice is heard and every need is met."
+            "content": "Our team becomes an extension of yours. We bring professionalism, transparency, and reliability to every collaboration ensuring clear communication, streamlined coordination, and a spirit of partnership at every step. We work with stakeholders across departments, executives, and external vendors to ensure every voice is heard and every need is met."
           },
           "section_5": {
             "title": "Measurable Impact and Post-Event Value",
-            "content": "A great corporate event doesn’t end when the lights go off. We help you analyze results, gather feedback, and capture the content and momentum needed for long-term value. From photo and video coverage to post-event analytics and reporting, we ensure that your investment delivers not just impressions — but impact."
+            "content": "A great corporate event doesn’t end when the lights go off. We help you analyze results, gather feedback, and capture the content and momentum needed for long-term value. From photo and video coverage to post-event analytics and reporting, we ensure that your investment delivers not just impressions but impact."
           }
         }
       },      
