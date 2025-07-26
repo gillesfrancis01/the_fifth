@@ -7,29 +7,28 @@ export default function AboutPage() {
       <h2 className='text-main text-center text-2xl font-Josefin'>F-JAY\'S EVENTS</h2>
       <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt='arrows' />
       <p className='mt-10 leading-8 max-w-3xl mx-auto'>
-        F-JAY\'S EVENTS : Une plateforme de promotions d'artistes variés et des soirées exceptionnelles hors du commun !
+        F-JAY'S EVENTS: A platform that promotes diverse artists and one-of-a-kind events!
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Chers amateurs d'arts et d'expériences uniques,
-        Nous sommes ravis de vous présenter F-JAY\'S EVENTS, une plateforme dédiée à la promotion d'artistes variés et à la création de soirées inoubliables. Chez F-JAY\'S EVENTS, nous croyons fermement que la diversité artistique est une richesse à célébrer, et nous nous efforçons de vous offrir des expériences uniques et hors du commun.
+        Dear lovers of the arts and unique experiences, We are delighted to present F-JAY'S EVENTS, a platform dedicated to promoting artists from every background and creating unforgettable nights. At F-JAY'S EVENTS we firmly believe that artistic diversity is something to celebrate, and we strive to offer extraordinary experiences.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Notre objectif est de mettre en lumière la diversité des talents artistiques du monde entier, qu'il s'agisse de musiciens, danseurs, chanteurs, magiciens, acrobates ou tout autre artiste à la recherche d'une plateforme pour exprimer leur créativité. Nous recherchons constamment de nouveaux talents et nous les accompagnons tout au long de leur parcours artistique pour les aider à atteindre de nouveaux sommets.
+        Our goal is to showcase the wide range of artistic talent from around the world&mdash;musicians, dancers, singers, magicians, acrobats and more&mdash;offering them a platform to express their creativity. We continually scout new talent and support them throughout their artistic journey so they can reach new heights.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Les soirées organisées par F-JAY\'S EVENTS sont bien plus que de simples spectacles. Elles sont conçues pour vous faire voyager à travers une multitude de performances artistiques captivantes. Des musiciens prodiges qui vous plongent dans une symphonie envoûtante aux danseurs qui repoussent les limites de leur corps avec grâce et souplesse, en passant par les artistes de cirque qui défient la gravité, nous vous promettons un mélange éclectique de talents.
+        Events hosted by F-JAY'S EVENTS are far more than simple shows. They are designed to take you on a journey through captivating performances: prodigious musicians immersing you in mesmerizing melodies, dancers pushing their bodies with grace and flexibility, and gravity-defying circus artists. We promise an eclectic blend of talent.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Mais nos soirées ne se limitent pas aux performances sur scène. Nous créons des expériences immersives en ajoutant des éléments visuels époustouflants, des décors créatifs et une ambiance unique pour vous faire vivre un moment exceptionnel. Laissez-vous emporter par la magie, l'énergie débordante et l'atmosphère électrisante de nos soirées.
+        But our events go beyond what happens on stage. We craft immersive experiences using stunning visuals, creative sets and a unique vibe so you can enjoy an exceptional moment. Let the magic, raw energy and electrifying atmosphere sweep you away.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Nous travaillons en partenariat avec des lieux prestigieux, des organisateurs d'événements renommés et des entreprises visionnaires pour garantir que chaque soirée soit une expérience exceptionnelle du début à la fin. Notre équipe passionnée met tout en œuvre pour créer une atmosphère accueillante et inclusive où chaque personne se sente à l'aise et prête à profiter de l'art sous toutes ses formes.
+        We partner with prestigious venues, renowned event organizers and visionary companies to ensure every night is exceptional from start to finish. Our passionate team works hard to create a welcoming, inclusive environment where everyone feels at ease and ready to enjoy art in all its forms.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Restez à l'affût de nos prochains événements en visitant notre site web [à venir] et en nous suivant sur les réseaux sociaux [@f_jaysevents_official]. Ne manquez pas l'occasion d'explorer, de découvrir et de célébrer la variété des talents artistiques au sein des soirées F-JAY\'S EVENTS.
+        Stay tuned for upcoming events by visiting our website [coming soon] and following us on social media [@f_jaysevents_official]. Don't miss the chance to explore, discover and celebrate the variety of artistic talents showcased at F-JAY'S EVENTS.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        F-JAY\'S EVENTS : Ressentez, appréciez et laissez-vous inspirer par l'extraordinaire palette d'artistes qui illuminent nos soirées !
+        F-JAY'S EVENTS: Feel, appreciate and let yourself be inspired by the extraordinary lineup of artists lighting up our nights!
       </p>
     </div>
   )

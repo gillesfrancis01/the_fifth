@@ -56,19 +56,19 @@ export const services= [
       {
         "id": "03",
         "title": "Wedding Event",
-        "description": "We curate exquisite weddings with refined elegance and bespoke detail — crafting once-in-a-lifetime celebrations that are as timeless as your love.",
+        "description": "We curate exquisite weddings with refined elegance and bespoke detail crafting once-in-a-lifetime celebrations that are as timeless as your love.",
         "long_description": {
           "section_1": {
             "title": "Tailored Love Stories, Perfectly Told",
-            "content": "Your wedding is more than a day — it’s the beginning of a story uniquely yours. At The Fifth, we design weddings that reflect your personality, your culture, and your dreams. Whether it’s a grand celebration or an intimate gathering, every detail is tailored to tell your love story with grace, emotion, and authenticity."
+            "content": "Your wedding is more than a day it’s the beginning of a story uniquely yours. At The Fifth, we design weddings that reflect your personality, your culture, and your dreams. Whether it’s a grand celebration or an intimate gathering, every detail is tailored to tell your love story with grace, emotion, and authenticity."
           },
           "section_2": {
             "title": "From Vision to Vows: A Seamless Journey",
-            "content": "We guide you through the entire planning journey, from venue scouting and theme conceptualization to vendor management and guest logistics. Our team works closely with you — listening, advising, refining — to bring your vision to life, stress-free. We believe that planning should be joyful, not overwhelming, and we’re here to make it effortless."
+            "content": "We guide you through the entire planning journey, from venue scouting and theme conceptualization to vendor management and guest logistics. Our team works closely with you listening, advising, refining  to bring your vision to life, stress-free. We believe that planning should be joyful, not overwhelming, and we’re here to make it effortless."
           },
           "section_3": {
             "title": "Exquisite Aesthetics and Meaningful Moments",
-            "content": "We obsess over ambiance. Our weddings are known for their visual elegance and emotional depth — from floral artistry to lighting design, from ceremony structure to music flow. Every element is curated with style and significance, creating a space where beauty meets purpose and every guest feels part of something extraordinary."
+            "content": "We obsess over ambiance. Our weddings are known for their visual elegance and emotional depth from floral artistry to lighting design, from ceremony structure to music flow. Every element is curated with style and significance, creating a space where beauty meets purpose and every guest feels part of something extraordinary."
           },
           "section_4": {
             "title": "Celebrating Cultural and Personal Traditions",
@@ -76,14 +76,14 @@ export const services= [
           },
           "section_5": {
             "title": "A Day Remembered for a Lifetime",
-            "content": "When the night is over and the candles are out, what remains are the memories. That’s why we capture every precious moment through professional photo, video, and storytelling — preserving the emotions, the faces, and the magic. Your wedding is a once-in-a-lifetime moment, and we ensure it’s remembered as timeless and unforgettable."
+            "content": "When the night is over and the candles are out, what remains are the memories. That’s why we capture every precious moment through professional photo, video, and storytelling preserving the emotions, the faces, and the magic. Your wedding is a once-in-a-lifetime moment, and we ensure it’s remembered as timeless and unforgettable."
           }
         }
       },      
       {
         "id": "04",
         "title": "Private Party",
-        "description": "We design exclusive private parties with sophistication and flair — offering personalized experiences in elegant settings for you and your guests.",
+        "description": "We design exclusive private parties with sophistication and flair offering personalized experiences in elegant settings for you and your guests.",
         "long_description": {
           "section_1": {
             "title": "Your Occasion, Your Way",
@@ -91,19 +91,19 @@ export const services= [
           },
           "section_2": {
             "title": "Exclusive Venues and Elegant Environments",
-            "content": "We work with a curated network of private villas, lofts, rooftops, gardens, and secret spaces to match the tone and scale of your party. Our team transforms each venue into an immersive environment — using lighting, textures, floral design, and layout to set the perfect mood for your guests to enjoy, explore, and connect."
+            "content": "We work with a curated network of private villas, lofts, rooftops, gardens, and secret spaces to match the tone and scale of your party. Our team transforms each venue into an immersive environment  using lighting, textures, floral design, and layout to set the perfect mood for your guests to enjoy, explore, and connect."
           },
           "section_3": {
             "title": "Food, Drink, and Atmosphere that Impresses",
-            "content": "Whether you want a five-course plated dinner or a stylish grazing table, we collaborate with top-tier chefs, sommeliers, and mixologists to craft a menu that delights. Entertainment, live music, DJs, custom bars, and signature cocktails complete the vibe — all coordinated to reflect your tastes and create unforgettable ambiance."
+            "content": "Whether you want a five-course plated dinner or a stylish grazing table, we collaborate with top-tier chefs, sommeliers, and mixologists to craft a menu that delights. Entertainment, live music, DJs, custom bars, and signature cocktails complete the vibe all coordinated to reflect your tastes and create unforgettable ambiance."
           },
           "section_4": {
             "title": "Seamless Planning, Stress-Free Hosting",
-            "content": "You deserve to enjoy your party, not manage it. From guest lists and RSVPs to setup, timing, and teardown, we take care of everything. Our planners work behind the scenes so that you’re free to focus on your guests, your moment, and your glass of champagne — knowing every detail is handled with precision and care."
+            "content": "You deserve to enjoy your party, not manage it. From guest lists and RSVPs to setup, timing, and teardown, we take care of everything. Our planners work behind the scenes so that you’re free to focus on your guests, your moment, and your glass of champagne  knowing every detail is handled with precision and care."
           },
           "section_5": {
             "title": "Memories Made to Last",
-            "content": "We ensure your private party lives far beyond the event itself. Our professional photographers and videographers capture the laughter, the energy, the elegance — delivering memories you can revisit and share. When you plan a party with The Fifth, you don’t just throw an event — you make a lasting impression."
+            "content": "We ensure your private party lives far beyond the event itself. Our professional photographers and videographers capture the laughter, the energy, the elegance  delivering memories you can revisit and share. When you plan a party with The Fifth, you don’t just throw an event  you make a lasting impression."
           }
         }
       },      
@@ -114,7 +114,7 @@ export const services= [
         "long_description": {
           "section_1": {
             "title": "Professional Equipment for Every Occasion",
-            "content": "From intimate dinners to full-scale festivals, the right equipment transforms an event from ordinary to exceptional. At The Fifth, we provide a curated range of high-quality, reliable gear — including audio systems, lighting, staging, video projection, furniture, tents, and more — all maintained to the highest standard. Whatever the scale, we have the tools to make your vision real."
+            "content": "From intimate dinners to full-scale festivals, the right equipment transforms an event from ordinary to exceptional. At The Fifth, we provide a curated range of high-quality, reliable gear  including audio systems, lighting, staging, video projection, furniture, tents, and more  all maintained to the highest standard. Whatever the scale, we have the tools to make your vision real."
           },
           "section_2": {
             "title": "Tailored Rentals That Match Your Style",
@@ -122,15 +122,15 @@ export const services= [
           },
           "section_3": {
             "title": "Setup, Delivery, and On-Site Support",
-            "content": "Renting equipment should never feel like a hassle. We handle the logistics from A to Z — including timely delivery, professional setup, live event support if needed, and post-event takedown. You get peace of mind knowing everything will arrive as expected and function flawlessly throughout your event."
+            "content": "Renting equipment should never feel like a hassle. We handle the logistics from A to Z  including timely delivery, professional setup, live event support if needed, and post-event takedown. You get peace of mind knowing everything will arrive as expected and function flawlessly throughout your event."
           },
           "section_4": {
             "title": "Scalable Solutions for Any Event Size",
-            "content": "Whether you’re hosting 20 guests or 2,000, we scale our offerings to meet your needs. We serve private events, weddings, corporate conferences, outdoor concerts, pop-up experiences, and more. From a single speaker to a complete stage and lighting rig, we make sure you get exactly what you need — no more, no less."
+            "content": "Whether you’re hosting 20 guests or 2,000, we scale our offerings to meet your needs. We serve private events, weddings, corporate conferences, outdoor concerts, pop-up experiences, and more. From a single speaker to a complete stage and lighting rig, we make sure you get exactly what you need  no more, no less."
           },
           "section_5": {
             "title": "Quality That Enhances Every Experience",
-            "content": "We believe that great equipment should elevate the experience — not distract from it. That’s why we invest in premium brands, inspect everything before each rental, and prioritize performance and aesthetics. When you rent with The Fifth, you’re not just renting gear — you’re enhancing the professionalism, energy, and wow factor of your event."
+            "content": "We believe that great equipment should elevate the experience  not distract from it. That’s why we invest in premium brands, inspect everything before each rental, and prioritize performance and aesthetics. When you rent with The Fifth, you’re not just renting gear you’re enhancing the professionalism, energy, and wow factor of your event."
           }
         }
       }
