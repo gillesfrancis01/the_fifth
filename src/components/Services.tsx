@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import FlatButton from './FlatButton'
 import Image from 'next/image'
 import { service } from '@/types'
 import gsap from 'gsap'
