@@ -7,7 +7,10 @@ export default function AboutPage() {
       <h2 className='text-main text-center text-2xl font-Josefin'>The Fifth Event</h2>
       <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt='arrows' />
       <p className='mt-10 leading-8 max-w-3xl mx-auto'>
-        The Fifth Event is more than an event platform it’s a movement. A celebration of bold talent, cultural fusion, and unforgettable nights.
+      Join us as we take you behind the scenes of our spectacular events, showcasing the magic we create from concept to execution. From elegant weddings to corporate galas and everything in between, our channel offers expert tips, creative inspiration, and captivating event recaps that will leave you inspired to host your own unforgettable gatherings.
+      </p>
+      <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
+      The Fifth Event is more than an event platform it’s a movement. A celebration of bold talent, cultural fusion, and unforgettable nights.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
         We shine a spotlight on artists from every background musicians, dancers, acrobats, magicians, and more  giving them the stage to showcase what makes them extraordinary. Our mission? To break boundaries and turn every event into a unique, immersive experience.
