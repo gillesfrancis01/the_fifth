@@ -161,12 +161,16 @@ const handleSubmit = async (e: React.FormEvent) => {
         />
       </h1>
 
-      <p
-        ref={descRef}
-        className="text-center my-10 lg:w-[90vw] lg:m-auto lg:text-left"
-      >
-        {event.description}
-      </p>
+      {event.description_sections.map((e,id) => (
+         <p
+         ref={descRef}
+         key={id}
+         className="text-center my-10 lg:w-[90vw] lg:m-auto lg:mt-10 lg:text-left mt-5"
+       >
+         {e}
+       </p>
+      ))}
+
 
       <h2 className="text-main text-center text-2xl font-Josefin">Tickets</h2>
       <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt="arrows" />

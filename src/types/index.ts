@@ -6,7 +6,7 @@ export interface events{
     adresse: string,
     image: string,
     teaser: string,
-    
+    description_sections: string[]
 }
 export interface Ticket {
     $id: string

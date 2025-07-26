@@ -28,7 +28,7 @@ const Page = async ({ params }) => {
       <h1 className="text-center uppercase text-3xl lg:text-4xl font-Josefin text-main font-extrabold mt-10">
         {item.title}
       </h1>
-      <div className='lg:flex lg:flex-row '>
+      <div className='flex flex-col gap-28 lg:flex-row'>
         <div>
       <p className="text-lg text-center mt-6 max-w-2xl mx-auto text-gray-300">
         {item.description}
@@ -46,7 +46,7 @@ const Page = async ({ params }) => {
           </div>
         ))}
       </div>
-    </div>
+        </div>
     <ContactCard />
     </div>
     </div>

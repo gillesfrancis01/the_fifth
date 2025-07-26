@@ -34,7 +34,7 @@ async function addCustomer(
   } catch (error) {
     console.error('Erreur lors de l’ajout du client:', error);
     const errorMessage =
-      error?.response?.message ?? 'Une erreur inattendue est survenue.';
+      error?.response?.message ?? 'Vous êtes déjà inscrit à la newsletter';
 
     return { error: errorMessage };
   }

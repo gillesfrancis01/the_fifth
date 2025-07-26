@@ -25,7 +25,7 @@ export default function AboutPage() {
         We partner with prestigious venues, renowned event organizers and visionary companies to ensure every night is exceptional from start to finish. Our passionate team works hard to create a welcoming, inclusive environment where everyone feels at ease and ready to enjoy art in all its forms.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
-        Stay tuned for upcoming events by visiting our website [coming soon] and following us on social media [@f_jaysevents_official]. Don&apos;t miss the chance to explore, discover and celebrate the variety of artistic talents showcased at F-JAY&apos;S EVENTS.
+        Stay tuned for upcoming events by subscribing to our newsletter and following us on social media [@f_jaysevents_official]. Don&apos;t miss the chance to explore, discover and celebrate the variety of artistic talents showcased at F-JAY&apos;S EVENTS.
       </p>
       <p className='mt-6 leading-8 text-justify max-w-3xl mx-auto'>
         F-JAY&apos;S EVENTS: Feel, appreciate and let yourself be inspired by the extraordinary lineup of artists lighting up our nights!
