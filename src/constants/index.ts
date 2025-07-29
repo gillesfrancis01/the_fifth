@@ -3,7 +3,7 @@ import * as en from './en'
 import * as es from './es'
 import { Language } from '@/context/LanguageContext'
 
-const data: Record<Language, any> = {
+const data: Record<Language, typeof fr> = {
   fr,
   en,
   es
