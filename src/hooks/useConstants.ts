@@ -1,5 +1,5 @@
 'use client'
-import constants, { getConstants } from '@/constants'
+import { getConstants } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
 
 export const useConstants = () => {

@@ -138,49 +138,50 @@ export const services= [
 ]
 
 export const Testimonials = [
-    {
-        id: '1',
-        userImg: "/user1.jpg",
-        userName: "Abel K.",
-        rate: 4,
-        userMessage: "Nous avons confié à The Fifth l’organisation de notre gala annuel, et le résultat a dépassé toutes nos attentes. L’équipe a su créer une ambiance à la fois élégante et dynamique, parfaitement alignée avec notre image. Professionnalisme, créativité et souci du détail : tout y était."
-    },
-    {
-        id: '2',
-        userImg: "/user2.jpg",
-        userName: "Steven B.",
-        rate: 5,
-        userMessage: "La soirée pré bal masqué était une réussite totale. Entre la déco immersive, la musique, et les animations surprises, j’ai passé un moment incroyable avec mes amis. The Fifth sait vraiment comment créer une atmosphère unique. Vivement le bal du 13 juillet !  "
-    },
-    {
-        id: '3',
-        userImg: "/user3.jpg",
-        userName: "Edwige P.",
-        rate: 5,
-        userMessage: "The Fifth a transformé notre rêve en réalité. De la cérémonie à la soirée, tout était fluide, émouvant et magnifique. Leur écoute et leur sens de l’organisation ont fait toute la différence. Merci pour ce souvenir inoubliable ! "
-    },
-    {
-        id: '4',
-        userImg: "/user4.jpg",
-        userName: "Amelie C.",
-        rate: 4.5,
-        userMessage: "On adore les univers à thème et là, on a été servies ! Le mystère, le glamour, l’élégance… tout y était. Les détails étaient soignés, et le fait que l’entrée soit gratuite a permis à tout le monde d’en profiter. On a déjà réservé pour la suite ! "
-    },
-    {
-        id: '5',
-        userImg: "/user5.jpg",
-        userName: "Anderson D.",
-        rate: 5,
-        userMessage: "J’ai adoré l’ambiance. La sélection musicale était parfaite, la piste de danse n’a jamais été vide. Et puis ce côté masqué, ça ajoutait un vrai charme à la soirée. C’est rare de voir un événement gratuit aussi bien organisé. The Fifth, bravo !  "
-    },
-    {
-        id: '6',
-        userImg: "/user6.jpg",
-        userName: "Julie S.",
-        rate: 4.5,
-        userMessage: "J’ai collaboré avec The Fifth pour le lancement de ma marque, et c’était un événement digne des plus grandes productions. Leur capacité à créer des expériences immersives est impressionnante. Une équipe à l’écoute, ultra réactive, avec un vrai sens du branding."
-    }
-]
+  {
+    id: '1',
+    userImg: "/user1.jpg",
+    userName: "Abel K.",
+    rate: 4,
+    userMessage: "We entrusted The Fifth with our annual gala and they exceeded expectations. Elegant, creative, and perfectly aligned with our brand. Professionalism and attention to detail were top notch."
+  },
+  {
+    id: '2',
+    userImg: "/user2.jpg",
+    userName: "Steven B.",
+    rate: 5,
+    userMessage: "The pre-masquerade party was an absolute blast. The decor, the music, the surprises—what a night! The Fifth truly knows how to create a unique vibe. Can’t wait for the July 13th ball!"
+  },
+  {
+    id: '3',
+    userImg: "/user3.jpg",
+    userName: "Edwige P.",
+    rate: 5,
+    userMessage: "The Fifth made our dream wedding come true. Everything was beautiful, seamless, and heartfelt. Their attention, calmness, and care made all the difference. Thank you!"
+  },
+  {
+    id: '4',
+    userImg: "/user4.jpg",
+    userName: "Amelie C.",
+    rate: 4.5,
+    userMessage: "We love themed events, and this one nailed it! Mystery, elegance, and glamour everywhere. The free access allowed everyone to enjoy it. We’ve already booked for the next one!"
+  },
+  {
+    id: '5',
+    userImg: "/user5.jpg",
+    userName: "Anderson D.",
+    rate: 5,
+    userMessage: "Loved the atmosphere. The dance floor was always full, and the masked twist brought charm and mystery. Rare to see such a well-organized free event. Hats off!"
+  },
+  {
+    id: '6',
+    userImg: "/user6.jpg",
+    userName: "Julie S.",
+    rate: 4.5,
+    userMessage: "I worked with The Fifth for my brand launch—it was next-level. They know how to create immersive brand experiences. Super responsive, creative, and detail-oriented team."
+  }
+];
+
 export const Portfolio = [
     {
         id:1,
