@@ -1,12 +1,13 @@
 'use client'
 import React from 'react'
 import Image from 'next/image'
-import { Portfolio } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 
 import PortfolioList from '@/components/PortfolioList'
 import { useLanguage } from '@/context/LanguageContext'
 const Page = () => {
   const { t } = useLanguage()
+  const { Portfolio } = useConstants()
   return (
     <div className="flex flex-col ">
         <div className='text-center '>

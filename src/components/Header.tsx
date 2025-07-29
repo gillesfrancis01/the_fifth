@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { IoMenu } from "react-icons/io5";
 import SideBar from './SideBar';
 import Link from 'next/link';
-import { SideBarMenu } from '@/constants';
+import useConstants from '@/hooks/useConstants';
 import FlatButton from './FlatButton';
 //import { usePathname } from 'next/navigation'
 import TransitionLink from './TransitionLink';
@@ -13,6 +13,7 @@ import { useLanguage, Language } from '@/context/LanguageContext';
 const Header = () => {
   const [visible, setVisible] = useState(false)
   const { lang, setLang, t } = useLanguage()
+  const { SideBarMenu } = useConstants()
 
   const handleSetVisible = () => {
         setVisible(!visible)

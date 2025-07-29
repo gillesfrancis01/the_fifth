@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Slider from 'react-slick'
-import { Portfolio } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import Link from 'next/link'
@@ -51,6 +51,7 @@ const settings = {
     ]
 }
 const PortfolioFull = () => {
+  const { Portfolio } = useConstants()
   return (
     <div className='text-center font-Poppins '>
 

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { MdClose } from 'react-icons/md'
-import { SideBarMenu } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import TransitionLink from './TransitionLink'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -13,6 +13,7 @@ interface SideBarProps {
 
 const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
   const { t } = useLanguage()
+  const { SideBarMenu } = useConstants()
   return (
     <>
       {/* Overlay */}

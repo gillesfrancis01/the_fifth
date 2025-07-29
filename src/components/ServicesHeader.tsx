@@ -2,12 +2,13 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { services } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import { Services } from './Services'
 import { useLanguage } from '@/context/LanguageContext'
 
 const ServicesHeader = () => {
   const { t } = useLanguage()
+  const { services } = useConstants()
   return (
     <div className='text-center '>
       <h2 className='text-main text-center text-2xl font-Josefin'>{t('whatWeDo')}</h2>
