@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Slider from 'react-slick'
-import { Testimonials } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import StarRating from './StarRating'
@@ -51,6 +51,7 @@ const settings = {
     ]
 }
 const TestimonialFull = () => {
+  const { Testimonials } = useConstants()
   return (
     <div className='text-center font-Poppins '>
     <h2 className='text-main text-center text-2xl font-Josefin'>Testimonials</h2>

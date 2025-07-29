@@ -1,3 +1,4 @@
+"use client"
 import About from "@/components/About";
 import Contact from "@/components/Contact";
 
@@ -5,12 +6,12 @@ import Hero from "@/components/Hero";
 import Partners from "@/components/Partners";
 
 import PortfolioList from "@/components/PortfolioList";
-import { Portfolio } from "@/constants";
+import useConstants from "@/hooks/useConstants";
 import { Separator } from "@/components/Separator";
 import TestimonialFull from "@/components/TestimonialFull";
 
-export default async function Home() {
-
+export default function Home() {
+  const { Portfolio } = useConstants()
   return (
     <div className="flex flex-col w-full overflow-hidden">
       <Hero />

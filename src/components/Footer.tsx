@@ -4,13 +4,14 @@ import React from 'react'
 import Image from 'next/image'
 import { BsYoutube } from 'react-icons/bs'
 import { FaFacebookF } from 'react-icons/fa6'
-import { SideBarMenu } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import Link from 'next/link'
 import Suscribe from './Suscribe'
 import { useLanguage } from '@/context/LanguageContext'
 import { FaInstagram } from 'react-icons/fa'
 export const Footer = () => {
   const { t } = useLanguage()
+  const { SideBarMenu } = useConstants()
   return (
     <div>
     <div className='max-md:text-center mt-32 lg:flex lg:w-[80vw] lg:m-auto lg:mt-32 lg:justify-between'>

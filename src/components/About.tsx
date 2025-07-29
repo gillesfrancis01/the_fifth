@@ -4,13 +4,14 @@ import React from 'react'
 import Image from 'next/image'
 import FlatButton from './FlatButton'
 import Link from 'next/link'
-import { services } from '@/constants'
+import useConstants from '@/hooks/useConstants'
 import { Services } from './Services'
 import { Separator } from './Separator'
 import { useLanguage } from '@/context/LanguageContext'
 
 const About = () => {
   const { t } = useLanguage()
+  const { services } = useConstants()
   return (
     <div className='text-center font-Poppins'>
       

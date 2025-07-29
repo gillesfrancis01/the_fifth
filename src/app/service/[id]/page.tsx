@@ -1,10 +1,12 @@
-import { services } from '@/constants'
+"use client"
 import React from 'react'
+import useConstants from '@/hooks/useConstants'
 import Image from 'next/image'
 import ContactCard from '@/components/ContactCard'
 
-const Page = async ({ params }) => {
-  const { id } = await params
+const Page = ({ params }) => {
+  const { id } = params
+  const { services } = useConstants()
   const item = services.find((el) => el.id === id)
 
   if (!item) {
