@@ -90,7 +90,23 @@ export default function Events() {
         </div>
       </div>
 
-   <p className='pt-40 pb-40'>Nothing to Show yet</p>
+      {/* Gallery Grid */}
+      <div className="mt-10 grid gap-6 w-[90vw] m-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredEvents.length === 0 ? (
+          <p className="col-span-full text-gray-500 py-40">Nothing to Show yet</p>
+        ) : (
+          filteredEvents.map(event => (
+            <Image
+              key={event.$id}
+              src={event.image}
+              alt={event.name}
+              width={500}
+              height={300}
+              className="object-cover w-full h-64 rounded-lg shadow-lg"
+            />
+          ))
+        )}
+      </div>
     </div>
   )
 }
