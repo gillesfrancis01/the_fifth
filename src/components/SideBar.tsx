@@ -48,7 +48,7 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
                   href={item.link}
                   label={t(item.name)}
                   onClick={handleSetVisible}
-                  className="block text-main hover:text-main transition-colors font-medium"
+                  className="block hover:text-main transition-colors font-medium"
                 />
               </li>
             ))}
