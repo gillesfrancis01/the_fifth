@@ -18,7 +18,7 @@ const TransitionLink = ({ href, label, className = '', onClick}: TransitionLinkP
     <Link
       href={href}
       onClick={onClick}
-      className={`${isActive ? 'text-[#FFD700]' : 'text-main'} ${className} transition-all`}
+      className={`${isActive ? 'text-[#FFD700] border-b-2 border-[#FFD700]' : 'text-main'} ${className} transition-all`}
     >
       {label}
     </Link>

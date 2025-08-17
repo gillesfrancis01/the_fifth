@@ -160,7 +160,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           style={{ transform: 'translateX(-100%)', mixBlendMode: 'screen' }}
         />
       </h1>
-
+      <p className='text-center'>French description will Follow</p>
       {event.description_sections.map((e,id) => (
          <p
          ref={descRef}
