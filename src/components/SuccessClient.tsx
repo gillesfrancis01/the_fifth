@@ -38,7 +38,7 @@ export default function SuccessClient() {
         })
       } catch (err) {
         console.error('Appwrite error:', err)
-        setError("Erreur lors de l'enregistrement du client.")
+        setError("Erreur lors de l'enregistrement du client ou de l'envoi du courriel.")
       } finally {
         setLoading(false)
       }
