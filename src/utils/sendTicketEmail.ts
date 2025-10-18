@@ -8,6 +8,13 @@ function escapePdfText(text: string) {
 
 type PdfColor = [number, number, number]
 
+interface PdfImage {
+  name: string
+  data: Buffer
+  width: number
+  height: number
+}
+
 function hexToPdfColor(hex: string): PdfColor {
   const normalized = hex.replace('#', '')
 
@@ -67,16 +74,42 @@ function approximateTextWidth(text: string, size: number) {
   return text.length * size * 0.55
 }
 
+function wrapText(text: string, size: number, maxWidth: number) {
+  const words = text.split(/\s+/)
+  const lines: string[] = []
+  let currentLine = ''
+
+  words.forEach((word) => {
+    if (!word) {
+      return
+    }
+
+    const candidate = currentLine ? `${currentLine} ${word}` : word
+    if (approximateTextWidth(candidate, size) <= maxWidth || !currentLine) {
+      currentLine = candidate
+    } else {
+      lines.push(currentLine)
+      currentLine = word
+    }
+  })
+
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  return lines
+}
+
 function createPdfDocument({
   pageWidth,
   pageHeight,
   contentParts,
-  image,
+  images,
 }: {
   pageWidth: number
   pageHeight: number
   contentParts: string[]
-  image?: { data: Buffer; width: number; height: number }
+  images?: PdfImage[]
 }) {
   const header = '%PDF-1.4\n'
   const objects: Buffer[] = [Buffer.from(header, 'utf8')]
@@ -110,8 +143,11 @@ function createPdfDocument({
 
   const resourceParts = [`/Font << /F1 5 0 R /F2 6 0 R >>`]
 
-  if (image) {
-    resourceParts.push('/XObject << /Im1 7 0 R >>')
+  if (images && images.length > 0) {
+    const xObjectEntries = images
+      .map((image, index) => `/${image.name} ${7 + index} 0 R`)
+      .join(' ')
+    resourceParts.push(`/XObject << ${xObjectEntries} >>`)
   }
 
   const resourceString = resourceParts.join(' ')
@@ -127,12 +163,13 @@ function createPdfDocument({
   addPlainObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
   addPlainObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>')
 
-  if (image) {
-    const { data, width, height } = image
-    addStreamObject(
-      `<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${data.length} >>`,
-      data,
-    )
+  if (images && images.length > 0) {
+    images.forEach((image) => {
+      addStreamObject(
+        `<< /Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.data.length} >>`,
+        image.data,
+      )
+    })
   }
 
   const xrefOffset = currentOffset
@@ -245,45 +282,54 @@ function parseJpegDimensions(buffer: Buffer) {
   return null
 }
 
-async function fetchQrImageData(qrCodeUrl: string) {
-  let requestUrl = ensureJpegFormat(qrCodeUrl)
+async function fetchImageAsJpeg(originalUrl: string) {
+  const tried = new Set<string>()
+  const candidateUrls: string[] = []
 
   try {
-    const parsed = new URL(qrCodeUrl)
-    if (!parsed.searchParams.has('format') || parsed.searchParams.get('format')?.toLowerCase() !== 'jpg') {
-      parsed.searchParams.set('format', 'jpg')
-      requestUrl = parsed.toString()
-    } else {
-      requestUrl = parsed.toString()
-    }
+    candidateUrls.push(ensureJpegFormat(originalUrl))
   } catch {
-    requestUrl = ensureJpegFormat(qrCodeUrl)
+    candidateUrls.push(originalUrl)
   }
 
-  try {
-    const response = await fetch(requestUrl)
-
-    if (!response.ok) {
-      return null
-    }
-
-    const arrayBuffer = await response.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-
-    if (!isJpeg(buffer)) {
-      return null
-    }
-
-    const dimensions = parseJpegDimensions(buffer)
-
-    if (!dimensions) {
-      return null
-    }
-
-    return { data: buffer, width: dimensions.width, height: dimensions.height }
-  } catch {
-    return null
+  if (!candidateUrls.includes(originalUrl)) {
+    candidateUrls.push(originalUrl)
   }
+
+  for (const requestUrl of candidateUrls) {
+    if (tried.has(requestUrl)) {
+      continue
+    }
+
+    tried.add(requestUrl)
+
+    try {
+      const response = await fetch(requestUrl)
+
+      if (!response.ok) {
+        continue
+      }
+
+      const arrayBuffer = await response.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+
+      if (!isJpeg(buffer)) {
+        continue
+      }
+
+      const dimensions = parseJpegDimensions(buffer)
+
+      if (!dimensions) {
+        continue
+      }
+
+      return { data: buffer, width: dimensions.width, height: dimensions.height }
+    } catch {
+      // Try the next candidate URL
+    }
+  }
+
+  return null
 }
 
 function drawImage({
@@ -314,160 +360,340 @@ async function buildInvoicePdf(payload: {
   const pageHeight = 792
   const margin = 48
 
-  const backgroundColor = hexToPdfColor('#f8fafc')
-  const primaryTextColor = hexToPdfColor('#0f172a')
-  const accentColor = hexToPdfColor('#9f7aea')
-  const cardColor = hexToPdfColor('#1e293b')
-  const cardTextColor = hexToPdfColor('#f8fafc')
-  const mutedTextColor = hexToPdfColor('#475569')
+  const titleColor = hexToPdfColor('#111827')
+  const accentColor = hexToPdfColor('#dc2626')
+  const mutedTextColor = hexToPdfColor('#64748b')
+  const panelColor = hexToPdfColor('#f8fafc')
+  const panelBorderColor = hexToPdfColor('#cbd5f5')
+  const dividerColor = hexToPdfColor('#e2e8f0')
+  const whiteColor = hexToPdfColor('#ffffff')
 
   const contentParts: string[] = []
-  contentParts.push(drawRectangle({ x: 0, y: 0, width: pageWidth, height: pageHeight, color: backgroundColor }))
+
+  const images: PdfImage[] = []
+  const registerImage = (imageData: { data: Buffer; width: number; height: number }) => {
+    const image: PdfImage = { name: `Im${images.length + 1}`, ...imageData }
+    images.push(image)
+    return image
+  }
+
+  const qrImageData = await fetchImageAsJpeg(payload.qrCodeUrl)
+  const qrPdfImage = qrImageData ? registerImage(qrImageData) : null
+
+  let eventPdfImage: PdfImage | null = null
+  if (payload.event.image) {
+    const eventImageData = await fetchImageAsJpeg(payload.event.image)
+    if (eventImageData) {
+      eventPdfImage = registerImage(eventImageData)
+    }
+  }
+
+  const formattedDate = formatDateTime(payload.event.date)
+  const formattedPrice = formatCurrency(payload.ticket.price)
+  const eventDate = new Date(payload.event.date)
+  const timeFormatter = new Intl.DateTimeFormat('fr-CA', { hour: '2-digit', minute: '2-digit' })
+  const formattedTime = Number.isNaN(eventDate.getTime()) ? '' : timeFormatter.format(eventDate)
 
   let cursorY = pageHeight - margin
 
   contentParts.push(
     drawText({
-      text: `Bonjour ${payload.fullName},`,
+      text: 'Ceci est votre billet',
       x: margin,
       y: cursorY,
       font: 'F2',
       size: 26,
-      color: accentColor,
+      color: titleColor,
     }),
   )
 
-  cursorY -= 38
+  const topNote = 'Pas de revente'
+  const topNoteWidth = approximateTextWidth(topNote, 10)
+  contentParts.push(
+    drawText({
+      text: topNote,
+      x: pageWidth - margin - topNoteWidth,
+      y: cursorY,
+      font: 'F1',
+      size: 10,
+      color: mutedTextColor,
+    }),
+  )
+
+  cursorY -= 32
 
   contentParts.push(
     drawText({
-      text: `Merci pour votre réservation. Voici les détails de votre billet pour ${payload.event.name}.`,
+      text: 'Présentez cette page à l’événement pour accéder à votre billet.',
       x: margin,
       y: cursorY,
       font: 'F1',
       size: 12,
-      color: primaryTextColor,
+      color: mutedTextColor,
     }),
   )
 
-  cursorY -= 28
-
-  const formattedDate = formatDateTime(payload.event.date)
-  const formattedPrice = formatCurrency(payload.ticket.price)
-
-  const cardLines = [
-    { label: 'Événement :', value: payload.event.name },
-    { label: 'Date :', value: formattedDate },
-    { label: 'Adresse :', value: payload.event.adresse },
-    { label: 'Billet :', value: payload.ticket.name },
-    { label: 'Prix :', value: formattedPrice },
-    { label: 'Identifiant de réservation :', value: payload.reservationId },
-    { label: 'Référence de paiement :', value: payload.paymentIntent },
-  ]
-
-  const cardPaddingX = 24
-  const cardPaddingY = 28
-  const cardLineHeight = 22
-  const cardWidth = pageWidth - margin * 2
-  const cardHeight = cardPaddingY * 2 + cardLines.length * cardLineHeight
-  const cardX = margin
-  const cardY = cursorY - cardHeight
-
-  contentParts.push(drawRectangle({ x: cardX, y: cardY, width: cardWidth, height: cardHeight, color: cardColor }))
-
-  let cardBaseline = cardY + cardHeight - cardPaddingY
-
-  cardLines.forEach((line) => {
-    const labelBaseline = cardBaseline
-
-    contentParts.push(
-      drawText({
-        text: line.label,
-        x: cardX + cardPaddingX,
-        y: labelBaseline,
-        font: 'F2',
-        size: 14,
-        color: cardTextColor,
-      }),
-    )
-
-    const labelWidth = approximateTextWidth(line.label, 14)
-    const valueX = cardX + cardPaddingX + labelWidth + 6
-
-    contentParts.push(
-      drawText({
-        text: line.value,
-        x: valueX,
-        y: labelBaseline,
-        font: 'F1',
-        size: 14,
-        color: cardTextColor,
-      }),
-    )
-
-    cardBaseline -= cardLineHeight
-  })
-
-  cursorY = cardY - 32
+  cursorY -= 24
 
   contentParts.push(
-    drawText({
-      text: 'Présentez le code QR ci-dessous à l’entrée de l’événement pour valider votre billet :',
+    drawRectangle({
       x: margin,
       y: cursorY,
-      font: 'F1',
-      size: 12,
-      color: primaryTextColor,
+      width: pageWidth - margin * 2,
+      height: 1.2,
+      color: dividerColor,
     }),
   )
 
-  cursorY -= 30
+  cursorY -= 24
 
-  const qrImage = await fetchQrImageData(payload.qrCodeUrl)
-  const qrDisplaySize = 220
+  const qrSize = 200
+  const qrX = margin
+  const qrY = cursorY - qrSize
 
-  if (qrImage) {
-    const qrX = (pageWidth - qrDisplaySize) / 2
-    const qrY = cursorY - qrDisplaySize
-
-    drawImage({ x: qrX, y: qrY, width: qrDisplaySize, height: qrDisplaySize, name: 'Im1' }).forEach((command) => {
+  if (qrPdfImage) {
+    drawImage({ x: qrX, y: qrY, width: qrSize, height: qrSize, name: qrPdfImage.name }).forEach((command) => {
       contentParts.push(command)
     })
-
-    cursorY = qrY - 32
   } else {
     contentParts.push(
       drawText({
-        text: `QR Code : ${payload.qrCodeUrl}`,
-        x: margin,
+        text: `Code QR : ${payload.qrCodeUrl}`,
+        x: qrX,
         y: cursorY,
         font: 'F1',
-        size: 12,
-        color: primaryTextColor,
+        size: 10,
+        color: mutedTextColor,
       }),
     )
+  }
 
-    cursorY -= 32
+  const infoX = qrX + qrSize + 28
+  const infoWidth = pageWidth - margin - infoX
+  let infoBaseline = cursorY + qrSize - 10
+
+  const eventNameLines = wrapText(payload.event.name, 18, infoWidth)
+  eventNameLines.forEach((line) => {
+    contentParts.push(
+      drawText({
+        text: line,
+        x: infoX,
+        y: infoBaseline,
+        font: 'F2',
+        size: 18,
+        color: titleColor,
+      }),
+    )
+    infoBaseline -= 22
+  })
+
+  const infoLines: string[] = [
+    formattedDate,
+    payload.event.adresse,
+    `Billet : ${payload.ticket.name}`,
+    `Prix : ${formattedPrice}`,
+  ]
+
+  if (formattedTime) {
+    infoLines.splice(1, 0, `Heure d’entrée : ${formattedTime}`)
+  }
+
+  const panelLineHeight = 18
+  const panelPadding = 14
+  const panelHeight = panelPadding * 2 + infoLines.length * panelLineHeight
+  const panelY = infoBaseline - panelHeight + panelLineHeight + panelPadding
+
+  contentParts.push(
+    drawRectangle({ x: infoX, y: panelY, width: infoWidth, height: panelHeight, color: panelColor }),
+  )
+  contentParts.push(
+    drawRectangle({ x: infoX, y: panelY, width: infoWidth, height: 1.2, color: panelBorderColor }),
+  )
+  contentParts.push(
+    drawRectangle({ x: infoX, y: panelY + panelHeight - 1.2, width: infoWidth, height: 1.2, color: panelBorderColor }),
+  )
+  contentParts.push(
+    drawRectangle({ x: infoX, y: panelY, width: 1.2, height: panelHeight, color: panelBorderColor }),
+  )
+  contentParts.push(
+    drawRectangle({ x: infoX + infoWidth - 1.2, y: panelY, width: 1.2, height: panelHeight, color: panelBorderColor }),
+  )
+
+  let panelBaseline = panelY + panelHeight - panelPadding
+  infoLines.forEach((line) => {
+    contentParts.push(
+      drawText({
+        text: `• ${line}`,
+        x: infoX + 10,
+        y: panelBaseline,
+        font: 'F1',
+        size: 12,
+        color: titleColor,
+      }),
+    )
+    panelBaseline -= panelLineHeight
+  })
+
+  const ticketCode = `${payload.reservationId}${payload.ticket.$id}`.replace(/[^0-9a-z]/gi, '').toUpperCase()
+  const qrLabelY = qrY - 18
+
+  contentParts.push(
+    drawText({
+      text: `Référence billet : ${ticketCode}`,
+      x: qrX,
+      y: qrLabelY,
+      font: 'F1',
+      size: 12,
+      color: titleColor,
+    }),
+  )
+
+  contentParts.push(
+    drawText({
+      text: `Paiement : ${payload.paymentIntent}`,
+      x: qrX,
+      y: qrLabelY - 18,
+      font: 'F1',
+      size: 12,
+      color: titleColor,
+    }),
+  )
+
+  contentParts.push(
+    drawText({
+      text: `Client : ${payload.fullName}`,
+      x: qrX,
+      y: qrLabelY - 36,
+      font: 'F1',
+      size: 12,
+      color: titleColor,
+    }),
+  )
+
+  let sectionBottom = qrLabelY - 54
+
+  contentParts.push(
+    drawRectangle({
+      x: margin,
+      y: sectionBottom,
+      width: pageWidth - margin * 2,
+      height: 1.2,
+      color: dividerColor,
+    }),
+  )
+
+  sectionBottom -= 32
+
+  if (eventPdfImage) {
+    const gutter = 16
+    const stubWidth = (pageWidth - margin * 2 - gutter) / 2
+    const maxStubHeight = 220
+    const computeDimensions = () => {
+      let displayWidth = stubWidth
+      let displayHeight = (eventPdfImage.height / eventPdfImage.width) * displayWidth
+
+      if (displayHeight > maxStubHeight) {
+        displayHeight = maxStubHeight
+        displayWidth = (eventPdfImage.width / eventPdfImage.height) * displayHeight
+      }
+
+      return { displayWidth, displayHeight }
+    }
+
+    const { displayWidth, displayHeight } = computeDimensions()
+    const leftX = margin + (stubWidth - displayWidth) / 2
+    const rightX = margin + stubWidth + gutter + (stubWidth - displayWidth) / 2
+    const imageY = sectionBottom - displayHeight
+
+    drawImage({ x: leftX, y: imageY, width: displayWidth, height: displayHeight, name: eventPdfImage.name }).forEach((command) => {
+      contentParts.push(command)
+    })
+    drawImage({ x: rightX, y: imageY, width: displayWidth, height: displayHeight, name: eventPdfImage.name }).forEach((command) => {
+      contentParts.push(command)
+    })
+
+    const overlayHeight = Math.min(64, displayHeight)
+    const leftOverlayX = leftX
+    const rightOverlayX = rightX
+
+    contentParts.push(
+      drawRectangle({ x: leftOverlayX, y: imageY, width: displayWidth, height: overlayHeight, color: accentColor }),
+    )
+    contentParts.push(
+      drawRectangle({ x: rightOverlayX, y: imageY, width: displayWidth, height: overlayHeight, color: accentColor }),
+    )
+
+    const ticketInfoLines = wrapText(`${payload.event.name} – ${formattedDate}`, 10, displayWidth - 16)
+    const locationLines = wrapText(payload.event.adresse, 10, displayWidth - 16)
+
+    let overlayBaseline = imageY + overlayHeight - 16
+    ticketInfoLines.forEach((line) => {
+      contentParts.push(
+        drawText({
+          text: line,
+          x: leftOverlayX + 8,
+          y: overlayBaseline,
+          font: 'F2',
+          size: 10,
+          color: whiteColor,
+        }),
+      )
+      contentParts.push(
+        drawText({
+          text: line,
+          x: rightOverlayX + 8,
+          y: overlayBaseline,
+          font: 'F2',
+          size: 10,
+          color: whiteColor,
+        }),
+      )
+      overlayBaseline -= 14
+    })
+
+    locationLines.forEach((line) => {
+      contentParts.push(
+        drawText({
+          text: line,
+          x: leftOverlayX + 8,
+          y: overlayBaseline,
+          font: 'F1',
+          size: 10,
+          color: whiteColor,
+        }),
+      )
+      contentParts.push(
+        drawText({
+          text: line,
+          x: rightOverlayX + 8,
+          y: overlayBaseline,
+          font: 'F1',
+          size: 10,
+          color: whiteColor,
+        }),
+      )
+      overlayBaseline -= 14
+    })
+
+    sectionBottom = imageY - 28
   }
 
   contentParts.push(
     drawText({
-      text: 'Votre facture et votre billet sont également disponibles en pièce jointe au format PDF.',
+      text: 'Merci de faire confiance à notre équipe. Pour toute question, répondez simplement à ce courriel.',
       x: margin,
-      y: cursorY,
+      y: sectionBottom,
       font: 'F1',
-      size: 12,
-      color: primaryTextColor,
+      size: 11,
+      color: mutedTextColor,
     }),
   )
 
-  cursorY -= 26
-
   contentParts.push(
     drawText({
-      text: 'Conservez ce courriel précieusement. Si vous avez des questions, répondez simplement à ce message.',
+      text: `Adresse de l’événement : ${payload.event.adresse}`,
       x: margin,
-      y: cursorY,
+      y: sectionBottom - 18,
       font: 'F1',
       size: 10,
       color: mutedTextColor,
@@ -478,7 +704,7 @@ async function buildInvoicePdf(payload: {
     pageWidth,
     pageHeight,
     contentParts,
-    image: qrImage ?? undefined,
+    images,
   })
 }
 
