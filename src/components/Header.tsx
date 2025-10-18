@@ -37,7 +37,7 @@ const Header = () => {
        <select
         value={lang}
         onChange={e => setLang(e.target.value as Language)}
-        className='border bg-transparent p-1 rounded ml-4'
+        className='border bg-black p-1 rounded ml-4'
        >
          <option value='en'>EN</option>
          <option value='fr'>FR</option>

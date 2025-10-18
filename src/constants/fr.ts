@@ -226,7 +226,7 @@ export const SideBarMenu = [
     },
     {
         id: 4,
-        name: 'Events',
+        name: 'Evenements',
         link: '/event'
 
     },

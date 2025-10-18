@@ -13,6 +13,8 @@ async function getSingleEvent(id:string) {
             process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS,
             id
         );
+        console.log(event);
+        
         return event as unknown as events;
     } catch(error) {
        console.log('failed to get evens', error);

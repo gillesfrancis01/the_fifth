@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
     Home: 'Accueil',
     Service: 'Service',
     Gallery: 'Galerie',
-    Event: 'Ev\u00E9nement',
+    Event: 'Evenement',
     Portfolio: 'Portfolio',
     contact: 'Contactez-nous',
     menu: 'Menu',
