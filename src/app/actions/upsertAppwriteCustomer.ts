@@ -1,8 +1,10 @@
 'use server'
 
-import { Query } from "appwrite"
-import { createAdminClient } from "../../../config/appwrite"
+import { Query } from 'appwrite'
+import { createAdminClient } from '../../../config/appwrite'
 import { ID } from 'node-appwrite'
+import type { events, Ticket } from '@/types'
+import { sendTicketConfirmationEmail } from '@/utils/sendTicketEmail'
 
 interface CustomerInfo {
   fullName: string
@@ -26,6 +28,8 @@ export async function upsertAppwriteCustomer({
   const dbId = process.env.NEXT_PUBLIC_DATABASE!
   const customerCol = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CUSTOMERS!
   const reservationCol = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_RESERVATION!
+  const eventCol = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS!
+  const ticketCol = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TICKET!
 
   let customerId: string
 
@@ -54,6 +58,20 @@ export async function upsertAppwriteCustomer({
     customer_ID: customerId,
     event_ID: eventId,
     ticket_ID: ticketId,
+    paymentIntent,
+  })
+
+  const eventDoc = (await databases.getDocument(dbId, eventCol, eventId)) as unknown as events
+  const ticketDoc = (await databases.getDocument(dbId, ticketCol, ticketId)) as unknown as Ticket
+
+  await sendTicketConfirmationEmail({
+    customerId,
+    reservationId: newReservation.$id,
+    fullName,
+    email,
+    phone,
+    event: eventDoc,
+    ticket: ticketDoc,
     paymentIntent,
   })
 
