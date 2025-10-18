@@ -95,7 +95,8 @@ function formatDateTime(dateString: string) {
       dateStyle: 'full',
       timeStyle: 'short',
     }).format(date)
-  } catch (error) {
+  } catch (error:unknown) {
+    
     return date.toISOString()
   }
 }
