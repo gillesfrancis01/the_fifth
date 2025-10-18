@@ -570,20 +570,7 @@ async function buildInvoicePdf(payload: {
     }),
   )
 
-  if (payload.phone) {
-    contentParts.push(
-      drawText({
-        text: `Téléphone : ${payload.phone}`,
-        x: qrX,
-        y: qrLabelY - 54,
-        font: 'F1',
-        size: 12,
-        color: titleColor,
-      }),
-    )
-  }
-
-  let sectionBottom = qrLabelY - (payload.phone ? 72 : 54)
+  let sectionBottom = qrLabelY - 54
 
   contentParts.push(
     drawRectangle({
