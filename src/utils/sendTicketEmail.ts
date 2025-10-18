@@ -78,7 +78,7 @@ function formatCurrency(amount: number) {
       currency: 'CAD',
       minimumFractionDigits: 2,
     }).format(amount)
-  } catch (error) {
+  } catch {
     return `${amount.toFixed(2)} CAD`
   }
 }
@@ -95,8 +95,7 @@ function formatDateTime(dateString: string) {
       dateStyle: 'full',
       timeStyle: 'short',
     }).format(date)
-  } catch (error:unknown) {
-    
+  } catch {
     return date.toISOString()
   }
 }
