@@ -1,6 +1,7 @@
 'use server'
 
 import type { events, Ticket } from '@/types'
+import { formatEventDateTime } from './eventDate'
 
 interface TicketEmailPayload {
   customerId: string
@@ -81,23 +82,6 @@ function formatCurrency(amount: number) {
   }
 }
 
-function formatDateTime(dateString: string) {
-  const date = new Date(dateString)
-
-  if (Number.isNaN(date.getTime())) {
-    return dateString
-  }
-
-  try {
-    return new Intl.DateTimeFormat('fr-CA', {
-      dateStyle: 'full',
-      timeStyle: 'short',
-    }).format(date)
-  } catch {
-    return date.toISOString()
-  }
-}
-
 function buildEmailHtml({
   fullName,
   event,
@@ -113,7 +97,7 @@ function buildEmailHtml({
   paymentIntent: string
   qrCodeUrl: string
 }) {
-  const formattedDate = formatDateTime(event.date)
+  const formattedDate = formatEventDateTime(event.date)
   const formattedPrice = formatCurrency(ticket.price)
 
   return `

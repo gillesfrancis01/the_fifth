@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import getAllEvents from '../actions/getAllEvent'
 import { events } from '@/types'
+import { getComparableEventDate } from '../actions/dateFormat'
 import { CiSearch } from "react-icons/ci"
 
 export default function Events() {
@@ -28,8 +29,12 @@ export default function Events() {
     const filtered = allEvents.filter(event => {
       const matchSearch = event.name.toLowerCase().includes(search.toLowerCase())
 
+      const normalizedEventDate = getComparableEventDate(event.date)
+
       const matchDate = selectedDate
-        ? new Date(event.date).toISOString().split('T')[0] === selectedDate
+        ? normalizedEventDate
+          ? normalizedEventDate === selectedDate
+          : true
         : true
 
       const matchLocation = selectedLocation
