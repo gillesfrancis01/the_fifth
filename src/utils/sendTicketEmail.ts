@@ -424,7 +424,7 @@ async function buildInvoicePdf(payload: {
 
   contentParts.push(
     drawText({
-      text: 'Présentez cette page à l’événement pour accéder à votre billet.',
+      text: 'Presentez cette page à l evenement pour acceder a votre billet.',
       x: margin,
       y: cursorY,
       font: 'F1',
@@ -680,7 +680,7 @@ async function buildInvoicePdf(payload: {
 
   contentParts.push(
     drawText({
-      text: 'Merci de faire confiance à notre équipe. Pour toute question, répondez simplement à ce courriel.',
+      text: 'Merci de faire confiance a notre equipe. Pour toute question, répondez simplement à ce courriel.',
       x: margin,
       y: sectionBottom,
       font: 'F1',
@@ -691,7 +691,7 @@ async function buildInvoicePdf(payload: {
 
   contentParts.push(
     drawText({
-      text: `Adresse de l’événement : ${payload.event.adresse}`,
+      text: `Adresse de l evenement : ${payload.event.adresse}`,
       x: margin,
       y: sectionBottom - 18,
       font: 'F1',
