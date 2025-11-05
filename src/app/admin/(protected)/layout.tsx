@@ -26,7 +26,7 @@ export default function AdminProtectedLayout({ children }: { children: ReactNode
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_5%,rgba(68,54,24,0.18),transparent_55%)]"
       />
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col gap-10 px-6 pb-16 pt-10 xl:flex-row xl:gap-14 xl:px-10">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col gap-10 px-6 pb-16 pt-10 xl:flex-row xl:gap-14 xl:px-12 2xl:px-16">
         <div className="xl:w-80 xl:flex-shrink-0">
           <AdminSidebar />
         </div>
@@ -86,7 +86,7 @@ export default function AdminProtectedLayout({ children }: { children: ReactNode
             </div>
           </header>
 
-          <main className="space-y-12 pb-6">{children}</main>
+          <main className="space-y-12 pb-6 lg:px-2 xl:px-4 2xl:px-6">{children}</main>
         </div>
       </div>
     </div>
