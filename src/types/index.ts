@@ -15,6 +15,20 @@ export interface Ticket {
     price: number
     available: boolean
   }
+export interface Customer {
+    $id: string
+    fullName: string
+    email: string
+    phone: string
+}
+export interface Reservation {
+    $id: string
+    customer_ID: string
+    event_ID: string
+    ticket_ID: string
+    paymentIntent: string
+    $createdAt?: string
+}
 export interface service {
     id: string,
     title: string,
