@@ -13,9 +13,9 @@ export default async function AdminEventsPage() {
   const spotlightEvent = upcomingEvents[0] ?? events[0]
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40"
+        className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 "
         style={{
           backgroundImage: spotlightEvent?.image
             ? `linear-gradient(180deg, rgba(5,5,5,0.7), rgba(5,5,5,0.95)), url(${spotlightEvent.image})`
@@ -24,7 +24,7 @@ export default async function AdminEventsPage() {
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,161,77,0.12),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,161,77,0.12),transparent_70%)] w-[70vw]" />
         <div className="relative grid gap-8 p-8 xl:grid-cols-[2fr_1.2fr]">
           <div className="space-y-5">
             <span className="inline-flex w-fit items-center rounded-full border border-white/20 bg-black/50 px-4 py-1 text-[11px] uppercase tracking-[0.4em] text-white/70">
