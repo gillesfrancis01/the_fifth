@@ -3,13 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useMemo, useState, useTransition } from 'react'
 
-import type { events, Ticket } from '@/types'
+import type { events } from '@/types'
+import type { TicketWithEvent } from '@/types/admin-dashboard'
 import { createTicket, deleteTicket, updateTicket } from '@/app/actions/adminTickets'
-
-interface TicketWithEvent extends Ticket {
-  eventId: string
-  eventName: string
-}
 
 interface TicketManagerProps {
   events: events[]
