@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { isValidAdminSession } from '@/utils/adminAuth'
 import LogoutButton from '@/components/admin/LogoutButton'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminProtectedLayout({ children }: { children: ReactNode }) {
   const token = cookies().get('admin-token')?.value
 
