@@ -22,6 +22,7 @@ const initialForm = {
   eventId: '',
   name: '',
   price: '',
+  quantity: '',
   advantages: '',
   available: true,
 }
@@ -71,15 +72,21 @@ export default function TicketManager({ events, tickets }: TicketManagerProps) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!formValues.eventId || !formValues.name || !formValues.price) {
-      setFeedback({ type: 'error', message: "L'événement, le nom et le prix sont obligatoires." })
+    if (!formValues.eventId || !formValues.name || !formValues.price || !formValues.quantity) {
+      setFeedback({ type: 'error', message: "L'événement, le nom, le prix et la quantité sont obligatoires." })
       return
     }
 
     const price = Number(formValues.price)
+    const quantity = Number(formValues.quantity)
 
-    if (Number.isNaN(price)) {
-      setFeedback({ type: 'error', message: 'Le prix doit être un nombre.' })
+    if (Number.isNaN(price) || Number.isNaN(quantity)) {
+      setFeedback({ type: 'error', message: 'Le prix et la quantité doivent être des nombres.' })
+      return
+    }
+
+    if (quantity < 0) {
+      setFeedback({ type: 'error', message: 'La quantité doit être positive.' })
       return
     }
 
@@ -90,6 +97,7 @@ export default function TicketManager({ events, tickets }: TicketManagerProps) {
         event: formValues.eventId,
         name: formValues.name,
         price,
+        quantity,
         available: Boolean(formValues.available),
         advantages,
       })
@@ -230,6 +238,7 @@ function EditableTicketCard({
     eventId: ticket.eventId,
     name: ticket.name,
     price: ticket.price.toString(),
+    quantity: ticket.quantity.toString(),
     advantages: ticket.advantages.join('\n'),
     available: ticket.available,
   })
@@ -242,6 +251,7 @@ function EditableTicketCard({
       eventId: ticket.eventId,
       name: ticket.name,
       price: ticket.price.toString(),
+      quantity: ticket.quantity.toString(),
       advantages: ticket.advantages.join('\n'),
       available: ticket.available,
     })
@@ -276,9 +286,15 @@ function EditableTicketCard({
     event.preventDefault()
 
     const price = Number(values.price)
+    const quantity = Number(values.quantity)
 
-    if (Number.isNaN(price)) {
-      setFeedback({ type: 'error', message: 'Le prix doit être un nombre.' })
+    if (Number.isNaN(price) || Number.isNaN(quantity)) {
+      setFeedback({ type: 'error', message: 'Le prix et la quantité doivent être des nombres.' })
+      return
+    }
+
+    if (quantity < 0) {
+      setFeedback({ type: 'error', message: 'La quantité doit être positive.' })
       return
     }
 
@@ -289,6 +305,7 @@ function EditableTicketCard({
         event: values.eventId,
         name: values.name,
         price,
+        quantity,
         available: Boolean(values.available),
         advantages,
       })
@@ -331,7 +348,10 @@ function EditableTicketCard({
           <h4 className="text-lg font-semibold text-white">{ticket.name}</h4>
           <p className="text-sm text-main">{formatCurrency(ticket.price)}</p>
           <p className="text-xs uppercase tracking-[0.35em] text-white/45">
-            {ticket.available ? 'Disponible' : 'Complet'} · {ticket.eventName}
+            {ticket.available && ticket.remaining > 0 ? 'Disponible' : 'Complet'} · {ticket.eventName}
+          </p>
+          <p className="text-xs text-white/55">
+            {ticket.sold} vendus · {ticket.remaining} restants / {ticket.quantity} au total
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -437,8 +457,17 @@ function TicketForm({
         </label>
         <Field label="Nom" name="name" value={values.name} onChange={onChange} required />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Prix" name="price" type="number" value={values.price} onChange={onChange} required />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="Prix" name="price" type="number" value={values.price} onChange={onChange} required min={0} />
+        <Field
+          label="Quantité totale"
+          name="quantity"
+          type="number"
+          value={values.quantity}
+          onChange={onChange}
+          required
+          min={0}
+        />
         <label className="flex items-center gap-3 text-sm text-white/70">
           <input
             type="checkbox"
@@ -488,10 +517,11 @@ interface FieldProps {
   value: string
   type?: string
   required?: boolean
+  min?: number
   onChange: (event: FormEvent<HTMLInputElement>) => void
 }
 
-function Field({ label, name, value, onChange, required, type = 'text' }: FieldProps) {
+function Field({ label, name, value, onChange, required, type = 'text', min }: FieldProps) {
   return (
     <label className="flex flex-col gap-2 text-sm text-white/80">
       <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">{label}</span>
@@ -501,6 +531,7 @@ function Field({ label, name, value, onChange, required, type = 'text' }: FieldP
         onChange={onChange}
         required={required}
         type={type}
+        min={min}
         className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
       />
     </label>

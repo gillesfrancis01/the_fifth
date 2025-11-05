@@ -2,7 +2,7 @@ import { fetchAdminCoreData, fetchTicketsForEvents, buildReservationsWithDetails
 import { formatEventDateTime } from '@/utils/eventDate'
 import { formatReservationTimestamp } from '@/utils/reservations'
 import type { ReservationWithDetails } from '@/types/admin-dashboard'
-import type { events as Event, Ticket } from '@/types'
+import type { events as Event, TicketWithAvailability } from '@/types'
 import { FiArrowUpRight, FiClock, FiMapPin, FiTrendingUp } from 'react-icons/fi'
 import type { IconType } from 'react-icons'
 
@@ -247,7 +247,7 @@ function getRecentReservations(reservations: ReservationWithDetails[]) {
 
 function computeEventPerformances(
   reservations: ReservationWithDetails[],
-  ticketsByEvent: Map<string, Ticket[]>,
+  ticketsByEvent: Map<string, TicketWithAvailability[]>,
   events: Event[],
 ) {
   const reservationsByEvent = new Map<string, number>()
@@ -261,8 +261,11 @@ function computeEventPerformances(
   return [...ticketsByEvent.entries()]
     .map(([eventId, tickets]) => {
       const reserved = reservationsByEvent.get(eventId) ?? 0
-      const totalTickets = tickets.length
-      const availableTickets = tickets.filter((ticket) => ticket.available).length
+      const totalTickets = tickets.reduce((total, ticket) => total + ticket.quantity, 0)
+      const availableTickets = tickets.reduce(
+        (total, ticket) => total + (ticket.available ? ticket.remaining : 0),
+        0
+      )
       const occupancy = totalTickets > 0 ? Math.round((reserved / totalTickets) * 100) : 0
       const event = eventMap.get(eventId)
 

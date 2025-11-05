@@ -6,7 +6,7 @@ import { GrStatusGood } from 'react-icons/gr'
 import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { events, Ticket } from '@/types'
+import { events, TicketWithAvailability } from '@/types'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import PaymentForm from './PaymentForm'
@@ -17,7 +17,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 interface EventPageProps {
   event: events
-  tickets: Ticket[]
+  tickets: TicketWithAvailability[]
 }
 
 const EventPage = ({ event, tickets }: EventPageProps) => {
@@ -28,7 +28,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const mapRef = useRef<HTMLDivElement>(null)
   const shineRef = useRef<HTMLDivElement>(null)
 
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+  const [selectedTicket, setSelectedTicket] = useState<TicketWithAvailability | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [clientSecret, setClientSecret] = useState('')
 
@@ -36,7 +36,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
-  const handleGetTicket = (ticket: Ticket) => {
+  const handleGetTicket = (ticket: TicketWithAvailability) => {
     setSelectedTicket(ticket)
     setShowModal(true)
   }
@@ -200,7 +200,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </ul>
             <div className="flex mt-10 gap-4 items-center justify-between">
               <h3 className="font-extrabold text-2xl">${item.price}</h3>
-              {item.available ? (
+              {item.available && item.remaining > 0 ? (
                 <button
                   className="flex gap-1 items-center border-main border p-2 text-main rounded-md shadow-md transition-transform hover:scale-110 hover:rotate-1 hover:shadow-yellow-400/50"
                   onClick={() => handleGetTicket(item)}
@@ -211,6 +211,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <p className="text-red-500 font-semibold">Not Available</p>
               )}
             </div>
+            <p className="mt-2 text-sm text-white/60">
+              {Math.max(item.remaining, 0)} tickets restants sur {item.quantity}
+            </p>
           </div>
         ))}
       </div>

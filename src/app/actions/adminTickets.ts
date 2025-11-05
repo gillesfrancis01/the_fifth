@@ -11,6 +11,7 @@ interface TicketPayload {
   advantages: string[]
   available: boolean
   event: string
+  quantity: number
 }
 
 interface ActionResult {
