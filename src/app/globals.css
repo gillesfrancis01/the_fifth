@@ -1,66 +1,102 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
 :root {
-  --foreground: #ffffff;
-  --background: #171717;
+  --foreground: #f8f5f0;
+  --background: #050505;
+  --gold: #c9a14d;
+  --gold-soft: #f0d79b;
+  --onyx: #0b0b0b;
+  --charcoal: #1a1a1a;
+  --serif: "Playfair Display", "Cormorant Garamond", serif;
+  --sans: "Montserrat", "Inter", sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-Josefin: "Josefin Sans", sans-serif;
-  --font-Poppins: "Poppins", sans-serif;
-}
-
-  .text-main {
-    @apply bg-gradient-to-r from-[#B78418] via-[#E6C55D] to-[#B78418] text-transparent bg-clip-text
-  }
-  .bg-main {
-    @apply bg-gradient-to-r from-[#B78418] via-[#E6C55D] to-[#B78418]
-
-  }
-  .border-main {
-    border-style: solid;
-    border-image: linear-gradient(to right, #B78418, #E6C55D,#B78418) 1;
-  }
-  .sidebar-active {
-    @apply h-[100vh] w-[50vw] text-center absolute top-0 z-200 right-0  bg-black block
-  }
-
-
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-heading: var(--serif);
+  --font-body: var(--sans);
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at 20% 20%, rgba(201, 161, 77, 0.08), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(74, 60, 26, 0.18), transparent 52%), var(--background);
   color: var(--foreground);
+  font-family: var(--sans);
+  letter-spacing: 0.01em;
 }
-h1{
-  font-size: 55px;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: var(--serif);
+  letter-spacing: 0.02em;
 }
+
+p,
+span,
+li,
+input,
+button,
+textarea {
+  font-family: var(--sans);
+}
+
+.text-main {
+  background-image: linear-gradient(120deg, var(--gold), var(--gold-soft), var(--gold));
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.bg-main {
+  background-image: linear-gradient(120deg, var(--gold), var(--gold-soft), var(--gold));
+}
+
+.border-main {
+  border-image: linear-gradient(120deg, var(--gold), var(--gold-soft), var(--gold)) 1;
+}
+
+.glass-elevated {
+  background: linear-gradient(145deg, rgba(26, 26, 26, 0.92), rgba(5, 5, 5, 0.7));
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(201, 161, 77, 0.18);
+}
+
+.luxe-card {
+  background: linear-gradient(165deg, rgba(15, 15, 15, 0.95), rgba(8, 8, 8, 0.7));
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 45px 90px -60px rgba(0, 0, 0, 0.9);
+}
+
+.luxe-border {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.luxe-separator {
+  background-image: linear-gradient(90deg, transparent, rgba(201, 161, 77, 0.4), transparent);
+}
+
 .flatButton {
   padding: 15px;
   background: linear-gradient(#000000, #000000) 50% 50%/calc(100% - 4px) calc(100% - 4px) no-repeat,
-            linear-gradient(90deg, #b78418 0%, #e6c55d 50%, #b78418 100%);
+    linear-gradient(90deg, #c9a14d 0%, #f0d79b 50%, #c9a14d 100%);
   box-sizing: border-box;
 }
+
 .flatButton:hover {
   padding: 15px;
-  background: linear-gradient(90deg, #b78418 0%, #e6c55d 50%, #b78418 100%);
+  background: linear-gradient(90deg, #c9a14d 0%, #f0d79b 50%, #c9a14d 100%);
   border-radius: 0px;
   box-sizing: border-box;
 }
 
-p {
-  font-size: 16px;
-}
-.revealer{
+.revealer {
   position: fixed;
   top: 0;
   left: 0;
@@ -71,6 +107,14 @@ p {
   pointer-events: none;
   z-index: 2000;
 }
+
 .sidebar-active {
   @apply translate-x-0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #050505;
+    --foreground: #f8f5f0;
+  }
 }

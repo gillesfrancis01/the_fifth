@@ -29,9 +29,9 @@ export default function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={isLoading}
-      className="inline-flex items-center gap-2 rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-[#E6C55D] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/60 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/70 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white focus:outline-none focus:ring-2 focus:ring-[rgba(201,161,77,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {isLoading ? 'Déconnexion...' : 'Se déconnecter'}
+      {isLoading ? 'Déconnexion…' : 'Déconnexion'}
     </button>
   )
 }
