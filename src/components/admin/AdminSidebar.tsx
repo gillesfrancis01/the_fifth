@@ -7,7 +7,7 @@ const links = [
 
 export default function AdminSidebar() {
   return (
-    <aside className="sticky top-10 h-fit rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
+    <aside className="h-fit rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 shadow-lg shadow-black/20 lg:sticky lg:top-10">
       <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-500">Navigation</h2>
       <nav className="mt-4 space-y-2">
         {links.map((link) => (

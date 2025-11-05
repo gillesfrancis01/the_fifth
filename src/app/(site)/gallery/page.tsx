@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import getAllEvents from '../actions/getAllEvent'
+import getAllEvents from '../../actions/getAllEvent'
 import { events } from '@/types'
-import { Event } from '@/components/Event'
+import { getComparableEventDate } from '../../actions/dateFormat'
 import { CiSearch } from "react-icons/ci"
-import { formatDate, formatHour, getComparableEventDate } from '../actions/dateFormat'
 
 export default function Events() {
   const [search, setSearch] = useState('')
@@ -18,8 +17,10 @@ export default function Events() {
   useEffect(() => {
     async function fetchEvents() {
       const data = await getAllEvents()
-      setAllEvents(data || [])
-      setFilteredEvents(data || [])
+      setAllEvents(data)
+      setFilteredEvents(data)
+      console.log(filteredEvents);
+      
     }
     fetchEvents()
   }, [])
@@ -48,9 +49,9 @@ export default function Events() {
 
   return (
     <div className='text-center'>
-      <h2 className='text-main text-center text-2xl font-Josefin'>Event</h2>
+      <h2 className='text-main text-center text-2xl font-Josefin'>Our Data</h2>
       <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows' />
-      <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>Our events</h3>
+      <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>Gallery</h3>
 
       {/* Search Bar */}
       <div className='flex flex-col mt-10'>
@@ -94,22 +95,21 @@ export default function Events() {
         </div>
       </div>
 
-      {/* Event List */}
-      <div className='flex flex-col mt-10'>
-        {allEvents.length === 0 ? (
-          <p className="text-gray-500">Aucun événement n’est actuellement disponible.</p>
-        ) : filteredEvents.length > 0 ? (
-          filteredEvents.map((item) => {
-            const date = formatDate(item.date)
-            const hour = formatHour(item.date)
-            return (
-              <div key={item.$id} className='mt-20'>
-                <Event event={item} date={date} hour={hour} />
-              </div>
-            )
-          })
+      {/* Gallery Grid */}
+      <div className="mt-10 grid gap-6 w-[90vw] m-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredEvents.length === 0 ? (
+          <p className="col-span-full text-gray-500 py-40">Nothing to Show yet</p>
         ) : (
-          <p className="text-gray-500">Aucun événement ne correspond à vos critères de recherche.</p>
+          filteredEvents.map(event => (
+            <Image
+              key={event.$id}
+              src={event.image}
+              alt={event.name}
+              width={500}
+              height={300}
+              className="object-cover w-full h-64 rounded-lg shadow-lg"
+            />
+          ))
         )}
       </div>
     </div>

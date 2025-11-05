@@ -2,7 +2,6 @@ import getAllEvents from '@/app/actions/getAllEvent'
 import getAllReservations from '@/app/actions/getAllReservations'
 import getAllCustomers from '@/app/actions/getAllCustomers'
 import getAllTickets from '@/app/actions/getAllTickets'
-import AdminSidebar from '@/components/admin/AdminSidebar'
 import EventManager from '@/components/admin/EventManager'
 import TicketManager from '@/components/admin/TicketManager'
 import { formatEventDateTime } from '@/utils/eventDate'
@@ -64,61 +63,58 @@ export default async function AdminDashboardPage() {
   })
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[260px,1fr]">
-      <AdminSidebar />
-      <div className="space-y-12">
-        <section id="overview" className="rounded-2xl border border-zinc-800 bg-black/40 p-6">
-          <h2 className="text-xl font-semibold text-white">Vue d’ensemble</h2>
-          <p className="mt-1 text-sm text-zinc-400">
-            Surveillez en un coup d’œil l’activité de votre plateforme.
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Événements" value={events.length} />
-            <StatCard label="Réservations" value={reservations.length} />
-            <StatCard label="Tickets" value={totalTickets} />
-            <StatCard label="Clients" value={customers.length} />
-          </div>
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            {events.map((event) => {
-              const tickets = ticketsByEvent.get(event.$id) ?? []
+    <>
+      <section id="overview" className="rounded-2xl border border-zinc-800 bg-black/40 p-6">
+        <h2 className="text-xl font-semibold text-white">Vue d’ensemble</h2>
+        <p className="mt-1 text-sm text-zinc-400">
+          Surveillez en un coup d’œil l’activité de votre plateforme.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard label="Événements" value={events.length} />
+          <StatCard label="Réservations" value={reservations.length} />
+          <StatCard label="Tickets" value={totalTickets} />
+          <StatCard label="Clients" value={customers.length} />
+        </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {events.map((event) => {
+            const tickets = ticketsByEvent.get(event.$id) ?? []
 
-              return (
-                <article key={event.$id} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-lg font-semibold text-white">{event.name}</h3>
-                    <p className="text-xs text-zinc-500">{formatEventDateTime(event.date, 'fr-FR')}</p>
-                    <p className="text-xs text-zinc-500">{event.adresse}</p>
-                  </div>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <InfoBadge
-                      label="Tickets disponibles"
-                      value={tickets.filter((ticket) => ticket.available).length}
-                    />
-                    <InfoBadge label="Tickets publiés" value={tickets.length} />
-                    <InfoBadge
-                      label="Réservations"
-                      value={reservationsWithDetails.filter((item) => item.event?.$id === event.$id).length}
-                    />
-                  </div>
-                </article>
-              )
-            })}
+            return (
+              <article key={event.$id} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-lg font-semibold text-white">{event.name}</h3>
+                  <p className="text-xs text-zinc-500">{formatEventDateTime(event.date, 'fr-FR')}</p>
+                  <p className="text-xs text-zinc-500">{event.adresse}</p>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <InfoBadge
+                    label="Tickets disponibles"
+                    value={tickets.filter((ticket) => ticket.available).length}
+                  />
+                  <InfoBadge label="Tickets publiés" value={tickets.length} />
+                  <InfoBadge
+                    label="Réservations"
+                    value={reservationsWithDetails.filter((item) => item.event?.$id === event.$id).length}
+                  />
+                </div>
+              </article>
+            )
+          })}
 
-            {events.length === 0 && (
-              <p className="rounded-lg border border-dashed border-zinc-700 p-6 text-sm text-zinc-400">
-                Aucun événement n’est enregistré pour le moment.
-              </p>
-            )}
-          </div>
-        </section>
+          {events.length === 0 && (
+            <p className="rounded-lg border border-dashed border-zinc-700 p-6 text-sm text-zinc-400">
+              Aucun événement n’est enregistré pour le moment.
+            </p>
+          )}
+        </div>
+      </section>
 
-        <EventManager events={events} />
+      <EventManager events={events} />
 
-        <TicketManager events={events} tickets={ticketsWithEvent} />
+      <TicketManager events={events} tickets={ticketsWithEvent} />
 
-        <ReservationsSection reservations={reservationsWithDetails} />
-      </div>
-    </div>
+      <ReservationsSection reservations={reservationsWithDetails} />
+    </>
   )
 }
 

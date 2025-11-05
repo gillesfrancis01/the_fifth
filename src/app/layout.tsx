@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Poppins } from 'next/font/google'
 import SubscriptionModal from "@/components/SubscriptionModal";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -26,9 +24,7 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <SubscriptionModal />
-          <Header />
           {children}
-          <Footer />
         </LanguageProvider>
       </body>
     </html>
