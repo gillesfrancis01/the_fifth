@@ -78,13 +78,20 @@ export default function EventManager({ events }: EventManagerProps) {
   )
 
   return (
-    <section id="events" className="space-y-6 rounded-2xl border border-zinc-800 bg-black/40 p-6">
-      <header>
-        <h2 className="text-xl font-semibold text-white">Gestion des événements</h2>
-        <p className="text-sm text-zinc-400">Créez, mettez à jour ou supprimez les événements du site.</p>
+    <section
+      id="events"
+      className="space-y-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(10,10,10,0.9),rgba(5,5,5,0.78))] p-6 shadow-[0_40px_90px_-60px_rgba(0,0,0,0.85)]"
+    >
+      <header className="space-y-2">
+        <p className="text-[11px] uppercase tracking-[0.45em] text-white/55">Back-office contenu</p>
+        <h2 className="font-heading text-2xl text-white">Gestion des événements</h2>
+        <p className="text-sm text-white/60">Créez, mettez à jour ou supprimez les événements du site.</p>
       </header>
 
-      <form onSubmit={handleSubmit} className="grid gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <form
+        onSubmit={handleSubmit}
+        className="grid gap-4 rounded-3xl border border-white/10 bg-black/35 p-5 shadow-[0_30px_70px_-50px_rgba(0,0,0,0.8)]"
+      >
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Nom" name="name" value={formValues.name} onChange={handleChange} required />
           <Field label="Date" name="date" type="datetime-local" value={formValues.date} onChange={handleChange} required />
@@ -104,11 +111,13 @@ export default function EventManager({ events }: EventManagerProps) {
           helperText="Une section par ligne"
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-          {feedback && <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>{feedback.message}</p>}
+          {feedback && (
+            <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
+          )}
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center rounded-md bg-main px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? 'Création...' : 'Ajouter un événement'}
           </button>
@@ -121,7 +130,7 @@ export default function EventManager({ events }: EventManagerProps) {
         ))}
 
         {sortedEvents.length === 0 && (
-          <p className="rounded-lg border border-dashed border-zinc-700 p-6 text-sm text-zinc-400">
+          <p className="rounded-2xl border border-dashed border-white/15 bg-black/30 p-6 text-sm text-white/60">
             Aucun événement n’est enregistré pour le moment.
           </p>
         )}
@@ -206,22 +215,20 @@ function EditableEventCard({ event }: { event: events }) {
   }
 
   return (
-    <article className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+    <article className="space-y-4 rounded-3xl border border-white/10 bg-black/35 p-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-white">{event.name}</h3>
-          <p className="text-xs text-zinc-500">ID : {event.$id}</p>
+          <h3 className="font-heading text-xl text-white">{event.name}</h3>
+          <p className="text-xs uppercase tracking-[0.35em] text-white/45">ID : {event.$id}</p>
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isPending}
-            className="rounded-md border border-red-500/40 px-3 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Supprimer
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={isPending}
+          className="inline-flex items-center justify-center rounded-full border border-red-500/60 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-red-300 transition hover:border-red-400 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Supprimer
+        </button>
       </div>
 
       <form onSubmit={handleUpdate} className="grid gap-4">
@@ -244,11 +251,13 @@ function EditableEventCard({ event }: { event: events }) {
           helperText="Une section par ligne"
         />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {feedback && <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>{feedback.message}</p>}
+          {feedback && (
+            <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
+          )}
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center rounded-md border border-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-200 transition hover:border-[#E6C55D] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? 'Enregistrement...' : 'Enregistrer les modifications'}
           </button>
@@ -269,10 +278,10 @@ interface FieldProps {
 
 function Field({ label, name, value, onChange, required, type = 'text' }: FieldProps) {
   return (
-    <label className="flex flex-col gap-1 text-sm text-zinc-300">
-      <span className="text-xs uppercase tracking-wide text-zinc-500">{label}</span>
+    <label className="flex flex-col gap-2 text-sm text-white/80">
+      <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">{label}</span>
       <input
-        className="rounded-md border border-zinc-700 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-[#E6C55D]"
+        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
         name={name}
         value={value}
         onChange={onChange}
@@ -294,16 +303,16 @@ interface TextareaProps {
 
 function Textarea({ label, name, value, onChange, rows = 4, helperText }: TextareaProps) {
   return (
-    <label className="flex flex-col gap-1 text-sm text-zinc-300">
-      <span className="text-xs uppercase tracking-wide text-zinc-500">{label}</span>
+    <label className="flex flex-col gap-2 text-sm text-white/80">
+      <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">{label}</span>
       <textarea
-        className="rounded-md border border-zinc-700 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-[#E6C55D]"
+        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
         name={name}
         value={value}
         onChange={onChange}
         rows={rows}
       />
-      {helperText && <span className="text-xs text-zinc-500">{helperText}</span>}
+      {helperText && <span className="text-xs text-white/45">{helperText}</span>}
     </label>
   )
 }
