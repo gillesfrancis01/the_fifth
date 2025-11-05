@@ -14,6 +14,7 @@ export interface Ticket {
     advantages: string[]
     price: number
     available: boolean
+    event?: string
   }
 export interface Customer {
     $id: string
