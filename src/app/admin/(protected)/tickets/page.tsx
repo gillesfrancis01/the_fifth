@@ -65,9 +65,13 @@ export default async function AdminTicketsPage() {
           <ul className="space-y-4">
             {events.map((event) => {
               const tickets = ticketsByEvent.get(event.$id) ?? []
-              const available = tickets.filter((ticket) => ticket.available).length
-              const sold = tickets.length - available
-              const sellThrough = tickets.length > 0 ? Math.round((sold / tickets.length) * 100) : 0
+              const totalQuantity = tickets.reduce((total, ticket) => total + ticket.quantity, 0)
+              const available = tickets.reduce(
+                (total, ticket) => total + (ticket.available ? ticket.remaining : 0),
+                0
+              )
+              const sold = tickets.reduce((total, ticket) => total + ticket.sold, 0)
+              const sellThrough = totalQuantity > 0 ? Math.round((sold / totalQuantity) * 100) : 0
 
               return (
                 <li
@@ -81,7 +85,7 @@ export default async function AdminTicketsPage() {
                       <p className="text-xs uppercase tracking-[0.35em] text-white/45">{formatEventDateTime(event.date, 'fr-FR')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-white/60">
-                      <span className="inline-flex items-center rounded-full border border-white/15 px-3 py-1">{tickets.length} tickets</span>
+                      <span className="inline-flex items-center rounded-full border border-white/15 px-3 py-1">{totalQuantity} en stock</span>
                       <span className="inline-flex items-center rounded-full border border-white/15 px-3 py-1">{available} disponibles</span>
                       <span className="inline-flex items-center rounded-full border border-white/15 px-3 py-1">{sellThrough}% vendus</span>
                     </div>
@@ -140,5 +144,7 @@ function StatusRow({ label, available }: { label: string; available: number }) {
 }
 
 function countTickets(tickets: TicketWithEvent[], tier: string) {
-  return tickets.filter((ticket) => ticket.name.toLowerCase().includes(tier.toLowerCase())).filter((ticket) => ticket.available).length
+  return tickets
+    .filter((ticket) => ticket.name.toLowerCase().includes(tier.toLowerCase()))
+    .reduce((total, ticket) => total + (ticket.available ? ticket.remaining : 0), 0)
 }

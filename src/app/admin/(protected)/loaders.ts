@@ -2,7 +2,7 @@ import getAllEvents from '@/app/actions/getAllEvent'
 import getAllReservations from '@/app/actions/getAllReservations'
 import getAllCustomers from '@/app/actions/getAllCustomers'
 import getAllTickets from '@/app/actions/getAllTickets'
-import type { events as Event, Reservation, Customer, Ticket } from '@/types'
+import type { events as Event, Reservation, Customer, TicketWithAvailability } from '@/types'
 import type { ReservationWithDetails, TicketWithEvent } from '@/types/admin-dashboard'
 
 export async function fetchEvents(): Promise<Event[]> {
@@ -38,14 +38,22 @@ export async function fetchTicketsForEvents(events: Event[]) {
     })
   )
 
-  const ticketsByEvent = new Map<string, Ticket[]>(ticketEntries)
-  const ticketMapById = new Map<string, Ticket>(
+  const ticketsByEvent = new Map<string, TicketWithAvailability[]>(ticketEntries)
+  const ticketMapById = new Map<string, TicketWithAvailability>(
     ticketEntries.flatMap(([, tickets]) => tickets.map((ticket) => [ticket.$id, ticket] as const))
   )
 
-  const totalTickets = ticketEntries.reduce((total, [, tickets]) => total + tickets.length, 0)
+  const totalTickets = ticketEntries.reduce(
+    (total, [, tickets]) => total + tickets.reduce((sum, ticket) => sum + ticket.quantity, 0),
+    0
+  )
   const availableTickets = ticketEntries.reduce(
-    (total, [, tickets]) => total + tickets.filter((ticket) => ticket.available).length,
+    (total, [, tickets]) =>
+      total +
+      tickets.reduce(
+        (sum, ticket) => sum + (ticket.available ? ticket.remaining : 0),
+        0
+      ),
     0
   )
 
