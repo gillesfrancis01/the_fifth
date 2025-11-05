@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState, useTransition } from 'react'
 
 import type { events } from '@/types'
 import { createEvent, deleteEvent, updateEvent } from '@/app/actions/adminEvents'
+import Modal from '@/components/ui/Modal'
 
 interface EventManagerProps {
   events: events[]
@@ -29,10 +30,30 @@ export default function EventManager({ events }: EventManagerProps) {
   const router = useRouter()
   const [formValues, setFormValues] = useState(() => ({ ...emptyForm }))
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
+  const [banner, setBanner] = useState<FeedbackState | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const resetForm = () => {
+  useEffect(() => {
+    if (!banner) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => setBanner(null), 4000)
+    return () => window.clearTimeout(timeout)
+  }, [banner])
+
+  const openCreateModal = () => {
     setFormValues({ ...emptyForm })
+    setFeedback(null)
+    setIsModalOpen(true)
+  }
+
+  const closeCreateModal = () => {
+    if (isPending) {
+      return
+    }
+    setIsModalOpen(false)
   }
 
   const handleChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -66,8 +87,10 @@ export default function EventManager({ events }: EventManagerProps) {
         return
       }
 
-      setFeedback({ type: 'success', message: 'Événement créé avec succès.' })
-      resetForm()
+      setFormValues({ ...emptyForm })
+      setFeedback(null)
+      setIsModalOpen(false)
+      setBanner({ type: 'success', message: 'Événement créé avec succès.' })
       router.refresh()
     })
   }
@@ -77,56 +100,63 @@ export default function EventManager({ events }: EventManagerProps) {
     [events]
   )
 
+  const handleActionFeedback = (value: FeedbackState) => {
+    setBanner(value)
+  }
+
   return (
     <section
       id="events"
       className="space-y-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(10,10,10,0.9),rgba(5,5,5,0.78))] p-6 shadow-[0_40px_90px_-60px_rgba(0,0,0,0.85)]"
     >
-      <header className="space-y-2">
-        <p className="text-[11px] uppercase tracking-[0.45em] text-white/55">Back-office contenu</p>
-        <h2 className="font-heading text-2xl text-white">Gestion des événements</h2>
-        <p className="text-sm text-white/60">Créez, mettez à jour ou supprimez les événements du site.</p>
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-2">
+          <p className="text-[11px] uppercase tracking-[0.45em] text-white/55">Back-office contenu</p>
+          <h2 className="font-heading text-2xl text-white">Gestion des événements</h2>
+          <p className="text-sm text-white/60">Créez, mettez à jour ou supprimez les événements du site.</p>
+        </div>
+        <button
+          type="button"
+          onClick={openCreateModal}
+          className="inline-flex items-center justify-center rounded-full border border-white/20 bg-black/40 px-6 py-2.5 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white"
+        >
+          Nouvel événement
+        </button>
       </header>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-4 rounded-3xl border border-white/10 bg-black/35 p-5 shadow-[0_30px_70px_-50px_rgba(0,0,0,0.8)]"
+      {banner && (
+        <p
+          className={`rounded-2xl border px-4 py-3 text-sm ${
+            banner.type === 'success'
+              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+              : 'border-red-500/40 bg-red-500/10 text-red-200'
+          }`}
+        >
+          {banner.message}
+        </p>
+      )}
+
+      <Modal
+        open={isModalOpen}
+        onClose={closeCreateModal}
+        title="Nouvel événement signature"
+        description="Déployez un nouveau rendez-vous : renseignez les informations clés avant de l’ouvrir aux invités."
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nom" name="name" value={formValues.name} onChange={handleChange} required />
-          <Field label="Date" name="date" type="datetime-local" value={formValues.date} onChange={handleChange} required />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Adresse" name="adresse" value={formValues.adresse} onChange={handleChange} />
-          <Field label="Image (URL)" name="image" value={formValues.image} onChange={handleChange} />
-        </div>
-        <Field label="Teaser" name="teaser" value={formValues.teaser} onChange={handleChange} />
-        <Textarea label="Description" name="description" value={formValues.description} onChange={handleChange} rows={3} />
-        <Textarea
-          label="Sections de description"
-          name="descriptionSections"
-          value={formValues.descriptionSections}
+        <EventForm
+          values={formValues}
           onChange={handleChange}
-          rows={4}
-          helperText="Une section par ligne"
+          onSubmit={handleSubmit}
+          onCancel={closeCreateModal}
+          isPending={isPending}
+          feedback={feedback}
+          submitLabel="Créer l’événement"
+          pendingLabel="Création..."
         />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-          {feedback && (
-            <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
-          )}
-          <button
-            type="submit"
-            disabled={isPending}
-            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPending ? 'Création...' : 'Ajouter un événement'}
-          </button>
-        </div>
-      </form>
+      </Modal>
 
       <div className="space-y-4">
         {sortedEvents.map((event) => (
-          <EditableEventCard key={event.$id} event={event} />
+          <EditableEventCard key={event.$id} event={event} onActionFeedback={handleActionFeedback} />
         ))}
 
         {sortedEvents.length === 0 && (
@@ -139,7 +169,7 @@ export default function EventManager({ events }: EventManagerProps) {
   )
 }
 
-function EditableEventCard({ event }: { event: events }) {
+function EditableEventCard({ event, onActionFeedback }: { event: events; onActionFeedback: (feedback: FeedbackState) => void }) {
   const router = useRouter()
   const [values, setValues] = useState({
     name: event.name,
@@ -152,6 +182,7 @@ function EditableEventCard({ event }: { event: events }) {
   })
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     setValues({
@@ -165,6 +196,18 @@ function EditableEventCard({ event }: { event: events }) {
     })
     setFeedback(null)
   }, [event])
+
+  const openModal = () => {
+    setFeedback(null)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    if (isPending) {
+      return
+    }
+    setIsModalOpen(false)
+  }
 
   const handleChange = (formEvent: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = formEvent.currentTarget as HTMLInputElement | HTMLTextAreaElement
@@ -191,7 +234,9 @@ function EditableEventCard({ event }: { event: events }) {
         return
       }
 
-      setFeedback({ type: 'success', message: 'Événement mis à jour.' })
+      setFeedback(null)
+      setIsModalOpen(false)
+      onActionFeedback({ type: 'success', message: 'Événement mis à jour.' })
       router.refresh()
     })
   }
@@ -209,69 +254,165 @@ function EditableEventCard({ event }: { event: events }) {
         return
       }
 
-      setFeedback({ type: 'success', message: 'Événement supprimé.' })
+      setFeedback(null)
+      onActionFeedback({ type: 'success', message: 'Événement supprimé.' })
       router.refresh()
     })
   }
 
   return (
     <article className="space-y-4 rounded-3xl border border-white/10 bg-black/35 p-5">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
           <h3 className="font-heading text-xl text-white">{event.name}</h3>
-          <p className="text-xs uppercase tracking-[0.35em] text-white/45">ID : {event.$id}</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-white/45">{formatEventDisplayDate(event.date)}</p>
+          {event.teaser && <p className="text-sm text-white/60">{event.teaser}</p>}
         </div>
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={isPending}
-          className="inline-flex items-center justify-center rounded-full border border-red-500/60 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-red-300 transition hover:border-red-400 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Supprimer
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={openModal}
+            className="inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-1.5 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white"
+          >
+            Modifier
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="inline-flex items-center justify-center rounded-full border border-red-500/60 px-4 py-1.5 text-[11px] uppercase tracking-[0.35em] text-red-300 transition hover:border-red-400 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Supprimer
+          </button>
+        </div>
       </div>
 
-      <form onSubmit={handleUpdate} className="grid gap-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nom" name="name" value={values.name} onChange={handleChange} required />
-          <Field label="Date" name="date" type="datetime-local" value={values.date} onChange={handleChange} required />
+      <div className="grid gap-3 text-sm text-white/60 sm:grid-cols-2">
+        <InfoRow label="Date" value={formatEventDisplayDate(event.date)} />
+        {event.adresse && <InfoRow label="Adresse" value={event.adresse} />}
+        {event.image && <InfoRow label="Visuel" value={event.image} isLink />}
+        {event.description && <InfoRow label="Description" value={event.description} full />}
+      </div>
+
+      {event.description_sections.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {event.description_sections.map((section) => (
+            <span key={section} className="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/55">
+              {section}
+            </span>
+          ))}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Adresse" name="adresse" value={values.adresse} onChange={handleChange} />
-          <Field label="Image (URL)" name="image" value={values.image} onChange={handleChange} />
-        </div>
-        <Field label="Teaser" name="teaser" value={values.teaser} onChange={handleChange} />
-        <Textarea label="Description" name="description" value={values.description} onChange={handleChange} rows={3} />
-        <Textarea
-          label="Sections de description"
-          name="descriptionSections"
-          value={values.descriptionSections}
+      )}
+
+      {feedback && !isModalOpen && feedback.type === 'error' && (
+        <p className="text-xs text-red-400">{feedback.message}</p>
+      )}
+
+      <Modal
+        open={isModalOpen}
+        onClose={closeModal}
+        title="Modifier l’événement"
+        description="Actualisez les informations de l’expérience pour synchroniser la vitrine et les ventes."
+      >
+        <EventForm
+          values={values}
           onChange={handleChange}
-          rows={4}
-          helperText="Une section par ligne"
+          onSubmit={handleUpdate}
+          onCancel={closeModal}
+          isPending={isPending}
+          feedback={feedback}
+          submitLabel="Enregistrer les modifications"
+          pendingLabel="Enregistrement..."
         />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {feedback && (
-            <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
-          )}
+      </Modal>
+    </article>
+  )
+}
+
+interface InfoRowProps {
+  label: string
+  value: string
+  isLink?: boolean
+  full?: boolean
+}
+
+function InfoRow({ label, value, isLink, full }: InfoRowProps) {
+  return (
+    <p className={`flex flex-col gap-1 text-white/60 ${full ? 'sm:col-span-2' : ''}`}>
+      <span className="text-[11px] uppercase tracking-[0.35em] text-white/45">{label}</span>
+      {isLink ? (
+        <a href={value} target="_blank" rel="noopener noreferrer" className="text-sm text-main underline decoration-dotted underline-offset-4">
+          {value}
+        </a>
+      ) : (
+        <span className="text-sm text-white/70">{value}</span>
+      )}
+    </p>
+  )
+}
+
+interface EventFormProps {
+  values: typeof emptyForm
+  onChange: (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  onCancel: () => void
+  isPending: boolean
+  feedback: FeedbackState | null
+  submitLabel: string
+  pendingLabel: string
+}
+
+function EventForm({ values, onChange, onSubmit, onCancel, isPending, feedback, submitLabel, pendingLabel }: EventFormProps) {
+  return (
+    <form onSubmit={onSubmit} className="grid gap-5">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Nom" name="name" value={values.name} onChange={onChange} required />
+        <Field label="Date" name="date" type="datetime-local" value={values.date} onChange={onChange} required />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Adresse" name="adresse" value={values.adresse} onChange={onChange} />
+        <Field label="Image (URL)" name="image" value={values.image} onChange={onChange} />
+      </div>
+      <Field label="Teaser" name="teaser" value={values.teaser} onChange={onChange} />
+      <Textarea label="Description" name="description" value={values.description} onChange={onChange} rows={3} />
+      <Textarea
+        label="Sections de description"
+        name="descriptionSections"
+        value={values.descriptionSections}
+        onChange={onChange}
+        rows={4}
+        helperText="Une section par ligne"
+      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {feedback && (
+          <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
+        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/60 transition hover:border-white/25 hover:text-white"
+          >
+            Annuler
+          </button>
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isPending ? 'Enregistrement...' : 'Enregistrer les modifications'}
+            {isPending ? pendingLabel : submitLabel}
           </button>
         </div>
-      </form>
-    </article>
+      </div>
+    </form>
   )
 }
 
 interface FieldProps {
   label: string
   name: string
-  type?: string
   value: string
+  type?: string
   required?: boolean
   onChange: (event: FormEvent<HTMLInputElement>) => void
 }
@@ -333,3 +474,15 @@ function formatDateInput(value: string) {
   const corrected = new Date(date.getTime() - offset * 60 * 1000)
   return corrected.toISOString().slice(0, 16)
 }
+
+function formatEventDisplayDate(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return 'Date non définie'
+  }
+  return new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  }).format(date)
+}
+
