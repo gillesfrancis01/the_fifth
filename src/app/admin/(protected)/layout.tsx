@@ -86,7 +86,7 @@ export default function AdminProtectedLayout({ children }: { children: ReactNode
             </div>
           </header>
 
-          <main className="space-y-12 pb-6 lg:px-2 xl:px-4 2xl:px-6">{children}</main>
+          <main className="mx-auto w-full max-w-[1180px] space-y-12 pb-6 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">{children}</main>
         </div>
       </div>
     </div>
