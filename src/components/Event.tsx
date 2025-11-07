@@ -12,10 +12,9 @@ gsap.registerPlugin(ScrollTrigger)
 interface EventProps {
   event: events
   date: string
-  hour: string
 }
 
-export const Event = ({ event, date, hour }: EventProps) => {
+export const Event = ({ event, date}: EventProps) => {
   const containerRef = useRef<HTMLAnchorElement>(null)
 
   useEffect(() => {

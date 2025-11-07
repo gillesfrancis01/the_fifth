@@ -101,10 +101,9 @@ export default function Events() {
         ) : filteredEvents.length > 0 ? (
           filteredEvents.map((item) => {
             const date = formatDate(item.date)
-            const hour = formatHour(item.date)
             return (
               <div key={item.$id} className='mt-20'>
-                <Event event={item} date={date} hour={hour} />
+                <Event event={item} date={date}  />
               </div>
             )
           })
