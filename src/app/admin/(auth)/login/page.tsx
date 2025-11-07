@@ -3,8 +3,9 @@ import { isValidAdminSession } from '@/utils/adminAuth'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export default function AdminLoginPage() {
-  const token = cookies().get('admin-token')?.value
+export default async function AdminLoginPage() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('admin-token')?.value
 
   if (isValidAdminSession(token)) {
     redirect('/admin')

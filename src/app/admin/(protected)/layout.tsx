@@ -9,8 +9,9 @@ import { PiBellSimpleRinging, PiGearSix, PiUserCircle } from 'react-icons/pi'
 
 export const dynamic = 'force-dynamic'
 
-export default function AdminProtectedLayout({ children }: { children: ReactNode }) {
-  const token = cookies().get('admin-token')?.value
+export default async function AdminProtectedLayout({ children }: { children: ReactNode }) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('admin-token')?.value
 
   if (!isValidAdminSession(token)) {
     redirect('/admin/login')
