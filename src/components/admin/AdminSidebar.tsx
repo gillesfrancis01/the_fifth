@@ -9,7 +9,7 @@ import {
   PiTicket,
   PiUsersThree,
 } from 'react-icons/pi'
-
+import Image from 'next/image'
 const links = [
   { href: '/admin/dashboard', label: 'Vue d’ensemble', icon: PiChartLineUp },
   { href: '/admin/events', label: 'Événements', icon: PiMaskHappy },
@@ -27,7 +27,7 @@ export default function AdminSidebar() {
       <div className="absolute inset-0 rounded-3xl border border-white/5 [mask-image:radial-gradient(circle_at_top,black,transparent_70%)]" />
       <div className="relative space-y-5">
         <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-black/60 px-4 py-3">
-          <span className="font-heading text-lg tracking-[0.35em] text-main">THE FIFTH</span>
+        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link>
         </div>
         <div className="space-y-2">
           <h2 className="font-heading text-2xl text-white">Ambiance & Direction</h2>

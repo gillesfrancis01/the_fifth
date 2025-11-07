@@ -29,7 +29,7 @@ export default async function AdminReservationsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <ReservationMetric label="Réservations" value={reservationsWithDetails.length} helper="Confirmées sur la plateforme" />
           <ReservationMetric label="Clients uniques" value={uniqueCustomers} helper="Contacts qualifiés" />
-          <ReservationMetric label="Revenus estimés" value={new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(revenue)} helper="Basés sur le prix des tickets" />
+          <ReservationMetric label="Revenus estimés" value={new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'CAD' }).format(revenue)} helper="Basés sur le prix des tickets" />
           <ReservationMetric label="Conversion" value={`${conversionRate}%`} helper="Réservations / tickets publiés" />
         </div>
       </section>

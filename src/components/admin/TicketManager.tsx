@@ -572,7 +572,7 @@ function parseLines(value: string) {
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR',
+    currency: 'CAD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value)
