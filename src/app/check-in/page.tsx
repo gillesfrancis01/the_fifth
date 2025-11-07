@@ -177,11 +177,13 @@ async function validateReservation(formData: FormData) {
 export default async function CheckInPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Promise<Record<string, string | string[] | undefined> | undefined>
 }) {
-  const rawData = getFirstValue(searchParams.data)
-  const queryError = getFirstValue(searchParams.error)
-  const statusParam = getFirstValue(searchParams.status)
+  const resolvedSearchParams = (await searchParams) ?? {}
+
+  const rawData = getFirstValue(resolvedSearchParams.data)
+  const queryError = getFirstValue(resolvedSearchParams.error)
+  const statusParam = getFirstValue(resolvedSearchParams.status)
 
   const { payload, error: payloadError } = parsePayload(rawData ?? undefined)
 
