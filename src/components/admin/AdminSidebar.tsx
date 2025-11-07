@@ -21,11 +21,7 @@ const links = [
   { href: '/admin/tickets', label: 'Tickets & réservations', icon: PiTicket },
   { href: '/admin/reservations', label: 'Clients & invités', icon: PiUsersThree },
   { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiCalendarBlank },
-  { href: '#paiements', label: 'Paiements & finances', icon: PiCreditCard, disabled: true },
-  { href: '#content', label: 'Gestion contenu', icon: PiFolders, disabled: true },
-  { href: '#crm', label: 'CRM & campagnes', icon: PiEnvelopeSimpleOpen, disabled: true },
-  { href: '#vip', label: 'VIP / Guest-list privée', icon: PiCrownSimple, disabled: true },
-  { href: '#admin', label: 'Administration & rôles', icon: PiShieldStar, disabled: true },
+
 ] as const
 
 export default function AdminSidebar() {
@@ -49,19 +45,18 @@ export default function AdminSidebar() {
       <div className="relative h-[1px] w-full bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
       <nav className="relative space-y-2">
-        {links.map(({ href, label, icon: Icon, disabled }) => {
-          const isActive = !disabled && pathname ? pathname === href || pathname.startsWith(`${href}/`) : false
+        {links.map(({ href, label, icon: Icon}) => {
+          const isActive = pathname ? pathname === href || pathname.startsWith(`${href}/`) : false
 
           return (
             <Link
               key={href}
-              href={disabled ? '#' : href}
-              aria-disabled={disabled}
+              href={ href}
               className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 transition-all duration-300 ${
                 isActive
                   ? 'border-[rgba(201,161,77,0.45)] bg-[rgba(201,161,77,0.08)] text-white shadow-[0_20px_35px_-25px_rgba(201,161,77,0.7)]'
                   : 'border-white/5 text-white/60 hover:border-[rgba(201,161,77,0.35)] hover:text-white'
-              } ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+              } `}
             >
               <span className="absolute inset-0 translate-x-[-100%] bg-[radial-gradient(circle_at_left,rgba(201,161,77,0.16),transparent_70%)] transition duration-500 group-hover:translate-x-0" />
               <span
