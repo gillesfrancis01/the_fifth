@@ -49,7 +49,6 @@ export const Event = ({ event, date, hour }: EventProps) => {
         </div>
 
         <h2 className='inline-block ml-3'>{date}</h2>
-        <h2 className='inline-block ml-3'>{hour}</h2>
         <h1 className='text-2xl lg:font-Josefin lg:capitalize lg:w-[70%]'>{event.name}</h1>
         <h2 className='text-xl'>{event.adresse}</h2>
         <p className='mt-5'>{event.teaser}</p>
