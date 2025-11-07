@@ -74,7 +74,7 @@ export function buildReservationsWithDetails(
   reservations: Reservation[],
   events: Event[],
   customers: Customer[],
-  ticketMapById: Map<string, Ticket>
+  ticketMapById: Map<string, TicketWithAvailability>
 ): ReservationWithDetails[] {
   const customerMap = new Map(customers.map((customer) => [customer.$id, customer] as const))
   const eventMap = new Map(events.map((event) => [event.$id, event] as const))
