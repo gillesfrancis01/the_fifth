@@ -1,6 +1,6 @@
 import React from 'react'
 import getNextEvent from '@/app/actions/getNextEvent'
-import { formatDate, formatHour } from '@/app/actions/dateFormat'
+import { formatDate } from '@/app/actions/dateFormat'
 import NextEventClient from './NextEventClient'
 
 const NextEvent = async () => {
