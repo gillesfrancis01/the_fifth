@@ -59,6 +59,7 @@ export async function upsertAppwriteCustomer({
     event_ID: eventId,
     ticket_ID: ticketId,
     paymentIntent,
+    available: true,
   })
 
   const eventDoc = (await databases.getDocument(dbId, eventCol, eventId)) as unknown as events

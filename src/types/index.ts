@@ -33,6 +33,7 @@ export interface Reservation {
     event_ID: string
     ticket_ID: string
     paymentIntent: string
+    available?: boolean
     $createdAt?: string
 }
 export interface service {
