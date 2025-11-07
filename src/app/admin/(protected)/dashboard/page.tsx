@@ -8,7 +8,7 @@ import type { IconType } from 'react-icons'
 
 const revenueFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'CAD',
 })
 
 export default async function AdminDashboardPage() {
