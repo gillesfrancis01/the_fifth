@@ -6,7 +6,7 @@ import getAllEvents from '../../actions/getAllEvent'
 import { events } from '@/types'
 import { Event } from '@/components/Event'
 import { CiSearch } from "react-icons/ci"
-import { formatDate, formatHour, getComparableEventDate } from '../../actions/dateFormat'
+import { formatDate, getComparableEventDate } from '../../actions/dateFormat'
 
 export default function Events() {
   const [search, setSearch] = useState('')
