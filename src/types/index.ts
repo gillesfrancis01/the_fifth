@@ -28,6 +28,7 @@ export interface Customer {
     phone: string
 }
 export interface Reservation {
+    status: string
     $id: string
     customer_ID: string
     event_ID: string
