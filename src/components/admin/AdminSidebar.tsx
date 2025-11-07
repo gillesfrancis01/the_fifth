@@ -5,12 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   PiCalendarBlank,
   PiChartLineUp,
-  PiCreditCard,
-  PiCrownSimple,
-  PiEnvelopeSimpleOpen,
-  PiFolders,
   PiMaskHappy,
-  PiShieldStar,
   PiTicket,
   PiUsersThree,
 } from 'react-icons/pi'
