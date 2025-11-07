@@ -2,6 +2,7 @@
 import TicketManager from '@/components/admin/TicketManager'
 import { fetchEvents, fetchTicketsForEvents } from '../loaders'
 import { formatEventDateTime } from '@/utils/eventDate'
+import type { TicketWithEvent } from '@/types/admin-dashboard'
 
 export default async function AdminTicketsPage() {
   const events = await fetchEvents()
