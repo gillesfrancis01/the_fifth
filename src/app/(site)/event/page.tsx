@@ -6,7 +6,7 @@ import getAllEvents from '../../actions/getAllEvent'
 import { events } from '@/types'
 import { Event } from '@/components/Event'
 import { CiSearch } from "react-icons/ci"
-import { formatDate, getComparableEventDate } from '../../actions/dateFormat'
+import { formatDate, getComparableEventDate, parseEventDate } from '../../actions/dateFormat'
 
 export default function Events() {
   const [search, setSearch] = useState('')
@@ -15,14 +15,24 @@ export default function Events() {
   const [allEvents, setAllEvents] = useState<events[]>([])
   const [filteredEvents, setFilteredEvents] = useState<events[]>([])
 
+  const sortEventsByDate = React.useCallback((list: events[]) => {
+    const getTimestamp = (eventDate: string) => {
+      const parsed = parseEventDate(eventDate)
+      return parsed ? parsed.getTime() : Number.POSITIVE_INFINITY
+    }
+
+    return [...list].sort((a, b) => getTimestamp(a.date) - getTimestamp(b.date))
+  }, [])
+
   useEffect(() => {
     async function fetchEvents() {
       const data = await getAllEvents()
-      setAllEvents(data || [])
-      setFilteredEvents(data || [])
+      const sortedEvents = sortEventsByDate(data || [])
+      setAllEvents(sortedEvents)
+      setFilteredEvents(sortedEvents)
     }
     fetchEvents()
-  }, [])
+  }, [sortEventsByDate])
 
   useEffect(() => {
     const filtered = allEvents.filter(event => {
@@ -43,8 +53,8 @@ export default function Events() {
       return matchSearch && matchDate && matchLocation
     })
 
-    setFilteredEvents(filtered)
-  }, [search, selectedDate, selectedLocation, allEvents])
+    setFilteredEvents(sortEventsByDate(filtered))
+  }, [search, selectedDate, selectedLocation, allEvents, sortEventsByDate])
 
   return (
     <div className='text-center'>
