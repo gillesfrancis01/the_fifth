@@ -21,7 +21,7 @@ export default function Events() {
       return parsed ? parsed.getTime() : Number.POSITIVE_INFINITY
     }
 
-    return [...list].sort((a, b) => getTimestamp(a.date) - getTimestamp(b.date))
+    return [...list].sort((a, b) => getTimestamp(b.date) - getTimestamp(a.date))
   }, [])
 
   useEffect(() => {
