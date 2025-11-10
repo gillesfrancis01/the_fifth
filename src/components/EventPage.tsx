@@ -211,9 +211,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <p className="text-red-500 font-semibold">Not Available</p>
               )}
             </div>
-            <p className="mt-2 text-sm text-white/60">
-              {Math.max(item.remaining, 0)} tickets restants sur {item.quantity}
-            </p>
+
           </div>
         ))}
       </div>

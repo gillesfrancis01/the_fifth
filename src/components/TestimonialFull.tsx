@@ -64,7 +64,7 @@ const TestimonialFull = () => {
         <div className='p-8 rounded-lg  flex max-md:flex-col lg:gap-9 lg:items-center text-center'>
             <img src={testimonial.userImg} alt={testimonial.userImg} className='object-cover h-[400px] lg:w-[250px]'/>
             <div className='text-left'>
-            <span className='bg-main p-3 inline-block rounded-full'>
+            <span className='bg-main p-3 inline-block rounded-full mt-2'>
             <FaQuoteLeft />
 
             </span>

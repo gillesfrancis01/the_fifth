@@ -4,8 +4,8 @@
 :root {
   --foreground: #f8f5f0;
   --background: #050505;
-  --gold: #c9a14d;
-  --gold-soft: #f0d79b;
+  --gold:  #B78418;
+  --gold-soft: #E6C55D;
   --onyx: #0b0b0b;
   --charcoal: #1a1a1a;
   --serif: "Playfair Display" serif;
@@ -20,8 +20,7 @@
 }
 
 body {
-  background: radial-gradient(circle at 20% 20%, rgba(201, 161, 77, 0.08), transparent 55%),
-    radial-gradient(circle at 80% 0%, rgba(74, 60, 26, 0.18), transparent 52%), var(--background);
+  background: black;
   color: var(--foreground);
   font-family: var(--sans);
   letter-spacing: 0.01em;
