@@ -72,7 +72,7 @@ function buildQrCodeUrl(payload: string) {
 
 function formatCurrency(amount: number) {
   try {
-    return new Intl.NumberFormat('fr-CA', {
+    return new Intl.NumberFormat('en-CA', {
       style: 'currency',
       currency: 'CAD',
       minimumFractionDigits: 2,
@@ -80,6 +80,101 @@ function formatCurrency(amount: number) {
   } catch {
     return `${amount.toFixed(2)} CAD`
   }
+}
+
+function escapePdfText(value: string) {
+  return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
+}
+
+function buildPdfBuffer(lines: string[]) {
+  const startX = 72
+  const startY = 720
+  const header = 'Event Ticket'
+  const contentLines = lines.map((line) => escapePdfText(line))
+
+  const streamParts = [
+    'BT',
+    '/F1 20 Tf',
+    `${startX} ${startY} Td`,
+    `(${escapePdfText(header)}) Tj`,
+    '/F1 12 Tf',
+  ]
+
+  contentLines.forEach((line, index) => {
+    const offset = index === 0 ? -32 : -18
+    streamParts.push(`0 ${offset} Td`, `(${line}) Tj`)
+  })
+
+  streamParts.push('ET')
+
+  const stream = streamParts.join('\n')
+  const streamLength = Buffer.byteLength(stream, 'utf8')
+
+  const objects = [
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n',
+    `4 0 obj\n<< /Length ${streamLength} >>\nstream\n${stream}\nendstream\nendobj\n`,
+    '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
+  ]
+
+  let pdfContent = '%PDF-1.4\n'
+  const offsets = [0]
+
+  for (const object of objects) {
+    offsets.push(Buffer.byteLength(pdfContent, 'utf8'))
+    pdfContent += object
+  }
+
+  const xrefPosition = Buffer.byteLength(pdfContent, 'utf8')
+  const xrefEntries = offsets
+    .slice(0, 6)
+    .map((offset) => String(offset).padStart(10, '0'))
+    .map((offset, index) => `${offset} 00000 ${index === 0 ? 'f' : 'n'} `)
+    .join('\n')
+
+  pdfContent += `xref\n0 6\n${xrefEntries}\ntrailer\n<< /Root 1 0 R /Size 6 >>\nstartxref\n${xrefPosition}\n%%EOF`
+
+  return Buffer.from(pdfContent, 'utf8')
+}
+
+function generateTicketPdf({
+  fullName,
+  email,
+  phone,
+  event,
+  ticket,
+  reservationId,
+  paymentIntent,
+  qrCodeUrl,
+}: {
+  fullName: string
+  email: string
+  phone: string
+  event: events
+  ticket: Ticket
+  reservationId: string
+  paymentIntent: string
+  qrCodeUrl: string
+}) {
+  const formattedDate = formatEventDateTime(event.date, 'en-CA')
+  const formattedPrice = formatCurrency(ticket.price)
+
+  const lines = [
+    `Event: ${event.name}`,
+    `Date: ${formattedDate}`,
+    `Location: ${event.adresse}`,
+    `Ticket: ${ticket.name}`,
+    `Price: ${formattedPrice}`,
+    `Reservation ID: ${reservationId}`,
+    `Payment reference: ${paymentIntent}`,
+    `Name: ${fullName}`,
+    `Email: ${email}`,
+    `Phone: ${phone}`,
+    `QR code: ${qrCodeUrl}`,
+  ]
+
+  return buildPdfBuffer(lines)
 }
 
 function buildEmailHtml({
@@ -97,27 +192,28 @@ function buildEmailHtml({
   paymentIntent: string
   qrCodeUrl: string
 }) {
-  const formattedDate = formatEventDateTime(event.date)
+  const formattedDate = formatEventDateTime(event.date, 'en-CA')
   const formattedPrice = formatCurrency(ticket.price)
 
   return `
     <div style="font-family: Arial, sans-serif; color: #0f172a; background-color: #f8fafc; padding: 24px;">
-      <h1 style="color: #9f7aea;">Bonjour ${fullName},</h1>
-      <p>Merci pour votre réservation. Voici les détails de votre billet pour <strong>${event.name}</strong>.</p>
+      <h1 style="color: #4f46e5;">Hello ${fullName},</h1>
+      <p>Thank you for your reservation. Your ticket for <strong>${event.name}</strong> is attached to this email as a PDF.</p>
+      <p>You can also find the key details below for quick reference:</p>
       <div style="margin: 24px 0; padding: 16px; background: #1e293b; color: #f8fafc; border-radius: 12px;">
-        <p style="margin: 0; font-size: 16px;"><strong>Événement :</strong> ${event.name}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Date :</strong> ${formattedDate}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Adresse :</strong> ${event.adresse}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Billet :</strong> ${ticket.name}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Prix :</strong> ${formattedPrice}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Identifiant de réservation :</strong> ${reservationId}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Référence de paiement :</strong> ${paymentIntent}</p>
+        <p style="margin: 0; font-size: 16px;"><strong>Event:</strong> ${event.name}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Date:</strong> ${formattedDate}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Location:</strong> ${event.adresse}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Ticket:</strong> ${ticket.name}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Price:</strong> ${formattedPrice}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Reservation ID:</strong> ${reservationId}</p>
+        <p style="margin: 4px 0; font-size: 16px;"><strong>Payment reference:</strong> ${paymentIntent}</p>
       </div>
-      <p style="margin-bottom: 16px;">Présentez le code QR ci-dessous à l’entrée de l’événement pour valider votre billet :</p>
+      <p style="margin-bottom: 16px;">Present the QR code below at the event entrance to validate your ticket.</p>
       <div style="text-align: center; margin-bottom: 16px;">
-        <img src="${qrCodeUrl}" alt="Code QR du billet" style="width: 220px; height: 220px;" />
+        <img src="${qrCodeUrl}" alt="Ticket QR code" style="width: 220px; height: 220px;" />
       </div>
-      <p style="font-size: 14px; color: #475569;">Conservez ce courriel précieusement. Si vous avez des questions, répondez simplement à ce message.</p>
+      <p style="font-size: 14px; color: #475569;">Keep this email for your records. If you have any questions, reply directly to this message.</p>
     </div>
   `
 }
@@ -145,6 +241,17 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
     qrCodeUrl,
   })
 
+  const pdfBuffer = await generateTicketPdf({
+    fullName: payload.fullName,
+    email: payload.email,
+    phone: payload.phone,
+    event: payload.event,
+    ticket: payload.ticket,
+    reservationId: payload.reservationId,
+    paymentIntent: payload.paymentIntent,
+    qrCodeUrl,
+  })
+
   const response = await fetch(RESEND_API_URL, {
     method: 'POST',
     headers: {
@@ -154,8 +261,15 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
     body: JSON.stringify({
       from: fromEmail,
       to: [payload.email],
-      subject: `Votre billet pour ${payload.event.name}`,
+      subject: `Your ticket for ${payload.event.name}`,
       html,
+      attachments: [
+        {
+          filename: `${payload.event.name}-ticket.pdf`,
+          content: pdfBuffer.toString('base64'),
+          type: 'application/pdf',
+        },
+      ],
     }),
   })
 
