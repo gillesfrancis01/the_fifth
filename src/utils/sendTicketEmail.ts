@@ -250,8 +250,6 @@ function buildTicketTemplate(data: TicketTemplateData) {
     </td>
   </tr>
 </table>
-
-
   `
 }
 
@@ -289,17 +287,32 @@ function prepareTicketTemplateData({
   }
 }
 
+/**
+ * VERSION 2 PDF : layout premium, colonne QR + infos, bloc lieu + bloc légal,
+ * et ajout de la référence de paiement + email dans la zone "coordonnées".
+ */
 async function generateTicketPdf(params: {
   fullName: string
+  email: string
   phone: string
   event: events
   ticket: Ticket
   reservationId: string
+  paymentIntent: string
   qrCodeUrl: string
 }): Promise<Buffer> {
-  const templateData = prepareTicketTemplateData(params)
+  const { fullName, email, phone, event, ticket, reservationId, paymentIntent, qrCodeUrl } = params
+  const templateData = prepareTicketTemplateData({
+    fullName,
+    phone,
+    event,
+    ticket,
+    reservationId,
+    qrCodeUrl,
+  })
+
   const pdfDoc = await PDFDocument.create()
-  const page = pdfDoc.addPage([595, 842])
+  const page = pdfDoc.addPage([595, 842]) // A4
   const { width, height } = page.getSize()
 
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
@@ -312,6 +325,7 @@ async function generateTicketPdf(params: {
   const containerWidth = width - margin * 2
   const containerHeight = height - margin * 2
 
+  // Fond + bordure principale
   page.drawRectangle({
     x: containerX,
     y: containerY,
@@ -326,6 +340,7 @@ async function generateTicketPdf(params: {
   const contentWidth = containerWidth - containerPadding * 2
   const contentTop = containerY + containerHeight - containerPadding
 
+  // Header
   const headerY = contentTop - 20
   page.drawText('Ceci est votre billet', {
     x: contentX,
@@ -336,7 +351,7 @@ async function generateTicketPdf(params: {
   })
 
   const subheaderY = headerY - 22
-  page.drawText(`${templateData.eventName}`, {
+  page.drawText(templateData.eventName, {
     x: contentX,
     y: subheaderY,
     size: 24,
@@ -345,20 +360,25 @@ async function generateTicketPdf(params: {
   })
 
   const detailsY = subheaderY - 24
-  page.drawText(`${templateData.formattedDate}  •  Portes : ${templateData.openingTime}`, {
-    x: contentX,
-    y: detailsY,
-    size: 12,
-    font: regularFont,
-    color: rgb(0.25, 0.25, 0.25),
-  })
+  page.drawText(
+    `${templateData.formattedDate}  •  Portes : ${templateData.openingTime}`,
+    {
+      x: contentX,
+      y: detailsY,
+      size: 12,
+      font: regularFont,
+      color: rgb(0.25, 0.25, 0.25),
+    }
+  )
 
+  // Colonnes + QR
   const qrSectionWidth = 210
   const leftColumnX = contentX
   const rightColumnX = contentX + qrSectionWidth + 20
   const sectionTop = detailsY - 30
   const sectionBottom = containerY + 150
 
+  // Ligne verticale séparatrice
   page.drawLine({
     start: { x: contentX + qrSectionWidth, y: sectionBottom },
     end: { x: contentX + qrSectionWidth, y: sectionTop },
@@ -366,6 +386,7 @@ async function generateTicketPdf(params: {
     color: rgb(0.83, 0.83, 0.83),
   })
 
+  // QR Code
   let qrImage
   try {
     const response = await fetch(templateData.qrCodeUrl)
@@ -405,6 +426,7 @@ async function generateTicketPdf(params: {
     options?: { lineHeight?: number }
   ) => {
     const lineHeight = options?.lineHeight ?? 15
+
     page.drawText(label.toUpperCase(), {
       x,
       y: startY,
@@ -412,6 +434,7 @@ async function generateTicketPdf(params: {
       font: boldFont,
       color: labelColor,
     })
+
     const lines = value.split('\n')
     lines.forEach((line, index) => {
       page.drawText(line, {
@@ -422,9 +445,11 @@ async function generateTicketPdf(params: {
         color: valueColor,
       })
     })
+
     return startY - 13 - lines.length * lineHeight - 14
   }
 
+  // Colonne gauche : série / numéro de commande
   let leftColumnY = sectionTop - 10
   leftColumnY = drawLabelValue('En série', templateData.serialNumber, leftColumnX, leftColumnY)
   leftColumnY = drawLabelValue(
@@ -434,26 +459,32 @@ async function generateTicketPdf(params: {
     leftColumnY
   )
 
+  // Colonne droite : infos client / billet / paiement
   let rightColumnY = sectionTop - 10
-  rightColumnY = drawLabelValue('Délivré à', templateData.fullName, rightColumnX, rightColumnY)
+  rightColumnY = drawLabelValue('Délivré à', fullName, rightColumnX, rightColumnY)
+
+  // Coordonnées : email + téléphone
   rightColumnY = drawLabelValue(
     'Coordonnées de contact',
-    `${templateData.phone}`,
+    `${email}\n${templateData.phone}`,
     rightColumnX,
     rightColumnY
   )
+
   rightColumnY = drawLabelValue(
     "Adresse de l'événement",
-    `${templateData.eventAddress}`,
+    templateData.eventAddress,
     rightColumnX,
     rightColumnY
   )
+
   rightColumnY = drawLabelValue(
     'Type de billet',
     'Admission générale',
     rightColumnX,
     rightColumnY
   )
+
   rightColumnY = drawLabelValue(
     'Montant payé',
     templateData.formattedPrice,
@@ -461,6 +492,15 @@ async function generateTicketPdf(params: {
     rightColumnY
   )
 
+  // 🔹 Ajout : référence de paiement dans le PDF (version 2 complète)
+  rightColumnY = drawLabelValue(
+    'Référence de paiement',
+    paymentIntent,
+    rightColumnX,
+    rightColumnY
+  )
+
+  // Bloc lieu
   const locationY = Math.min(leftColumnY, rightColumnY) - 10
   page.drawLine({
     start: { x: contentX, y: locationY },
@@ -477,6 +517,7 @@ async function generateTicketPdf(params: {
     font: boldFont,
     color: valueColor,
   })
+
   page.drawText(templateData.locationFullAddress, {
     x: contentX,
     y: locationBlockY - 16,
@@ -484,6 +525,7 @@ async function generateTicketPdf(params: {
     font: regularFont,
     color: valueColor,
   })
+
   if (templateData.phone) {
     page.drawText(`Téléphone : ${templateData.phone}`.trim(), {
       x: contentX,
@@ -494,6 +536,7 @@ async function generateTicketPdf(params: {
     })
   }
 
+  // Texte légal en bas
   const wrapText = (text: string, maxChars: number) => {
     const words = text.split(' ')
     const lines: string[] = []
@@ -516,6 +559,7 @@ async function generateTicketPdf(params: {
     "Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, veuillez confirmer titre, heure et lieu de l'événement."
   const legalLines = wrapText(legalText, 110)
   const legalStartY = containerY + 60
+
   legalLines.forEach((line, index) => {
     page.drawText(line, {
       x: contentX,
@@ -567,10 +611,12 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
 
   const pdfBuffer = await generateTicketPdf({
     fullName: payload.fullName,
+    email: payload.email,
     phone: payload.phone,
     event: payload.event,
     ticket: payload.ticket,
     reservationId: payload.reservationId,
+    paymentIntent: payload.paymentIntent,
     qrCodeUrl,
   })
 
