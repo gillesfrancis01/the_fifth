@@ -196,25 +196,57 @@ function buildEmailHtml({
   const formattedPrice = formatCurrency(ticket.price)
 
   return `
-    <div style="font-family: Arial, sans-serif; color: #0f172a; background-color: #f8fafc; padding: 24px;">
-      <h1 style="color: #4f46e5;">Hello ${fullName},</h1>
-      <p>Thank you for your reservation. Your ticket for <strong>${event.name}</strong> is attached to this email as a PDF.</p>
-      <p>You can also find the key details below for quick reference:</p>
-      <div style="margin: 24px 0; padding: 16px; background: #1e293b; color: #f8fafc; border-radius: 12px;">
-        <p style="margin: 0; font-size: 16px;"><strong>Event:</strong> ${event.name}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Date:</strong> ${formattedDate}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Location:</strong> ${event.adresse}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Ticket:</strong> ${ticket.name}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Price:</strong> ${formattedPrice}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Reservation ID:</strong> ${reservationId}</p>
-        <p style="margin: 4px 0; font-size: 16px;"><strong>Payment reference:</strong> ${paymentIntent}</p>
-      </div>
-      <p style="margin-bottom: 16px;">Present the QR code below at the event entrance to validate your ticket.</p>
-      <div style="text-align: center; margin-bottom: 16px;">
-        <img src="${qrCodeUrl}" alt="Ticket QR code" style="width: 220px; height: 220px;" />
-      </div>
-      <p style="font-size: 14px; color: #475569;">Keep this email for your records. If you have any questions, reply directly to this message.</p>
-    </div>
+   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc; padding:24px; font-family:Arial, sans-serif; color:#0f172a;">
+  <tr>
+    <td>
+
+      <h1 style="color:#4f46e5; margin:0 0 16px 0;">Hello ${fullName},</h1>
+
+      <p style="margin:0 0 16px 0;">
+        Thank you for your reservation. Your ticket for 
+        <strong>${event.name}</strong> is attached to this email as a PDF.
+      </p>
+
+      <p style="margin:0 0 16px 0;">
+        You can also find the key details below for quick reference:
+      </p>
+
+      <!-- Ticket Info Box -->
+      <table width="100%" cellpadding="12" cellspacing="0" border="0" style="background-color:#1e293b; color:#f8fafc; margin-bottom:24px;">
+        <tr>
+          <td style="font-size:16px;">
+            <p style="margin:0 0 8px 0;"><strong>Event:</strong> ${event.name}</p>
+            <p style="margin:0 0 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin:0 0 8px 0;"><strong>Location:</strong> ${event.adresse}</p>
+            <p style="margin:0 0 8px 0;"><strong>Ticket:</strong> ${ticket.name}</p>
+            <p style="margin:0 0 8px 0;"><strong>Price:</strong> ${formattedPrice}</p>
+            <p style="margin:0 0 8px 0;"><strong>Reservation ID:</strong> ${reservationId}</p>
+            <p style="margin:0;"><strong>Payment reference:</strong> ${paymentIntent}</p>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 16px 0;">
+        Present the QR code below at the event entrance to validate your ticket.
+      </p>
+
+      <!-- QR Code -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="text-align:center; margin-bottom:16px;">
+        <tr>
+          <td>
+            <img src="${qrCodeUrl}" alt="Ticket QR code" width="220" height="220" style="display:block; margin:auto;" />
+          </td>
+        </tr>
+      </table>
+
+      <p style="font-size:14px; color:#475569; margin:0;">
+        Keep this email for your records. If you have any questions, reply directly to this message.
+      </p>
+
+    </td>
+  </tr>
+</table>
+
   `
 }
 
