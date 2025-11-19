@@ -1,5 +1,7 @@
 'use server'
 
+import { chromium } from 'playwright'
+
 import type { events, Ticket } from '@/types'
 import { formatEventDateTime } from './eventDate'
 
@@ -82,119 +84,22 @@ function formatCurrency(amount: number) {
   }
 }
 
-function escapePdfText(value: string) {
-  return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
-}
-
-function buildPdfBuffer(lines: string[]) {
-  const startX = 72
-  const startY = 720
-  const header = 'Event Ticket'
-  const contentLines = lines.map((line) => escapePdfText(line))
-
-  const streamParts = [
-    'BT',
-    '/F1 20 Tf',
-    `${startX} ${startY} Td`,
-    `(${escapePdfText(header)}) Tj`,
-    '/F1 12 Tf',
-  ]
-
-  contentLines.forEach((line, index) => {
-    const offset = index === 0 ? -32 : -18
-    streamParts.push(`0 ${offset} Td`, `(${line}) Tj`)
-  })
-
-  streamParts.push('ET')
-
-  const stream = streamParts.join('\n')
-  const streamLength = Buffer.byteLength(stream, 'utf8')
-
-  const objects = [
-    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
-    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
-    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n',
-    `4 0 obj\n<< /Length ${streamLength} >>\nstream\n${stream}\nendstream\nendobj\n`,
-    '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
-  ]
-
-  let pdfContent = '%PDF-1.4\n'
-  const offsets = [0]
-
-  for (const object of objects) {
-    offsets.push(Buffer.byteLength(pdfContent, 'utf8'))
-    pdfContent += object
-  }
-
-  const xrefPosition = Buffer.byteLength(pdfContent, 'utf8')
-  const xrefEntries = offsets
-    .slice(0, 6)
-    .map((offset) => String(offset).padStart(10, '0'))
-    .map((offset, index) => `${offset} 00000 ${index === 0 ? 'f' : 'n'} `)
-    .join('\n')
-
-  pdfContent += `xref\n0 6\n${xrefEntries}\ntrailer\n<< /Root 1 0 R /Size 6 >>\nstartxref\n${xrefPosition}\n%%EOF`
-
-  return Buffer.from(pdfContent, 'utf8')
-}
-
-function generateTicketPdf({
-  fullName,
-  email,
-  phone,
-  event,
-  ticket,
-  reservationId,
-  paymentIntent,
-  qrCodeUrl,
-}: {
+interface TicketTemplateData {
+  qrCodeUrl: string
+  serialNumber: string
+  reservationId: string
+  formattedDate: string
+  openingTime: string
+  eventName: string
   fullName: string
-  email: string
+  eventAddress: string
+  formattedPrice: string
+  locationName: string
+  locationFullAddress: string
   phone: string
-  event: events
-  ticket: Ticket
-  reservationId: string
-  paymentIntent: string
-  qrCodeUrl: string
-}) {
-  const formattedDate = formatEventDateTime(event.date, 'en-CA')
-  const formattedPrice = formatCurrency(ticket.price)
-
-  const lines = [
-    `Event: ${event.name}`,
-    `Date: ${formattedDate}`,
-    `Location: ${event.adresse}`,
-    `Ticket: ${ticket.name}`,
-    `Price: ${formattedPrice}`,
-    `Reservation ID: ${reservationId}`,
-    `Payment reference: ${paymentIntent}`,
-    `Name: ${fullName}`,
-    `Email: ${email}`,
-    `Phone: ${phone}`,
-    `QR code: ${qrCodeUrl}`,
-  ]
-
-  return buildPdfBuffer(lines)
 }
 
-function buildEmailHtml({
-  fullName,
-  event,
-  ticket,
-  reservationId,
-  paymentIntent,
-  qrCodeUrl,
-}: {
-  fullName: string
-  event: events
-  ticket: Ticket
-  reservationId: string
-  paymentIntent: string
-  qrCodeUrl: string
-}) {
-  const formattedDate = formatEventDateTime(event.date, 'en-CA')
-  const formattedPrice = formatCurrency(ticket.price)
-
+function buildTicketTemplate(data: TicketTemplateData) {
   return `
 <table width="100%" cellpadding="0" cellspacing="0" border="0" 
   style="background-color:#e5e7eb; padding:24px; font-family:Arial, sans-serif; color:#000;">
@@ -241,7 +146,7 @@ function buildEmailHtml({
                   <table width="100%">
                     <tr>
                       <td align="center" style="padding-bottom:16px;">
-                        <img src="${qrCodeUrl}" alt="QR Code" width="190" height="190"
+                        <img src="${data.qrCodeUrl}" alt="QR Code" width="190" height="190"
                           style="display:block; border:1px solid #ddd; padding:4px;" />
                       </td>
                     </tr>
@@ -249,11 +154,11 @@ function buildEmailHtml({
                     <!-- SERIAL + ORDER -->
                     <tr>
                       <td align="center" style="font-size:12px; color:#444; line-height:1.4;">
-                        <span style="font-size:11px; color:#666;">Numero de Paiement</span><br>
-                        ${paymentIntent}<br><br>
+                        <span style="font-size:11px; color:#666;">EN SÉRIE</span><br>
+                        ${data.serialNumber}<br><br>
                         <span style="font-size:11px; color:#666;">NUMÉRO DE COMMANDE</span><br>
                         <span style="font-size:17px; font-weight:bold; color:#111;">
-                          ${reservationId}
+                          ${data.reservationId}
                         </span>
                       </td>
                     </tr>
@@ -266,20 +171,21 @@ function buildEmailHtml({
 
                   <!-- DATE -->
                   <p style="margin:0 0 14px 0; font-size:14px; color:#000; line-height:1.5;">
-                    📅 <strong>${formattedDate}</strong><br>
+                    📅 <strong>${data.formattedDate}</strong><br>
+                    Les portes ouvrent à ${data.openingTime}
                   </p>
 
                   <!-- EVENT NAME -->
                   <p style="margin:0 0 18px 0; font-size:22px; line-height:1.25; font-weight:bold; color:#000;">
-                    ${event.name}
+                    ${data.eventName}
                   </p>
 
                   <!-- INFO BLOCK -->
                   <p style="margin:0; font-size:15px; color:#000; line-height:1.6;">
                     <strong>BILLET RÉGULIER</strong><br>
-                    👤 Délivré à : <strong>${fullName}</strong><br>
-                    📍 ${event.adresse}<br>
-                    💵 ${formattedPrice}
+                    👤 Délivré à : <strong>${data.fullName}</strong><br>
+                    📍 ${data.eventAddress}<br>
+                    💵 ${data.formattedPrice}
                   </p>
 
                   <br>
@@ -301,9 +207,9 @@ function buildEmailHtml({
         <!-- LOCATION FOOTER -->
         <tr>
           <td style="padding:24px; font-size:14px; color:#111; border-top:1px solid #e5e5e5;">
-            <strong>${event.adresse}</strong><br>
-            ${event.adresse}<br><br>
-            
+            <strong>${data.locationName}</strong><br>
+            ${data.locationFullAddress}<br><br>
+            📞 ${data.phone}
           </td>
         </tr>
 
@@ -349,6 +255,87 @@ function buildEmailHtml({
   `
 }
 
+function prepareTicketTemplateData({
+  fullName,
+  phone,
+  event,
+  ticket,
+  reservationId,
+  qrCodeUrl,
+}: {
+  fullName: string
+  phone: string
+  event: events
+  ticket: Ticket
+  reservationId: string
+  qrCodeUrl: string
+}): TicketTemplateData {
+  const formattedDate = formatEventDateTime(event.date, 'fr-CA')
+  const formattedPrice = formatCurrency(ticket.price)
+
+  return {
+    qrCodeUrl,
+    serialNumber: ticket.$id ?? reservationId,
+    reservationId,
+    formattedDate,
+    openingTime: event.openingTime ?? "Heure d'ouverture à confirmer",
+    eventName: event.name,
+    fullName,
+    eventAddress: event.adresse,
+    formattedPrice,
+    locationName: event.locationName ?? event.name,
+    locationFullAddress: event.locationFullAddress ?? event.adresse,
+    phone: event.phone ?? phone,
+  }
+}
+
+async function generateTicketPdf(params: {
+  fullName: string
+  phone: string
+  event: events
+  ticket: Ticket
+  reservationId: string
+  qrCodeUrl: string
+}) {
+  const templateData = prepareTicketTemplateData(params)
+  const html = buildTicketTemplate(templateData)
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  })
+
+  try {
+    const page = await browser.newPage({ viewport: { width: 900, height: 1400 } })
+    await page.setContent(html, { waitUntil: 'networkidle' })
+
+    return await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '12mm',
+        bottom: '12mm',
+        left: '10mm',
+        right: '10mm',
+      },
+    })
+  } finally {
+    await browser.close()
+  }
+}
+
+function buildEmailHtml(params: {
+  fullName: string
+  phone: string
+  event: events
+  ticket: Ticket
+  reservationId: string
+  qrCodeUrl: string
+}) {
+  const templateData = prepareTicketTemplateData(params)
+  return buildTicketTemplate(templateData)
+}
+
 export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
   const { apiKey, fromEmail } = assertEmailConfig()
 
@@ -365,21 +352,19 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
 
   const html = buildEmailHtml({
     fullName: payload.fullName,
+    phone: payload.phone,
     event: payload.event,
     ticket: payload.ticket,
     reservationId: payload.reservationId,
-    paymentIntent: payload.paymentIntent,
     qrCodeUrl,
   })
 
   const pdfBuffer = await generateTicketPdf({
     fullName: payload.fullName,
-    email: payload.email,
     phone: payload.phone,
     event: payload.event,
     ticket: payload.ticket,
     reservationId: payload.reservationId,
-    paymentIntent: payload.paymentIntent,
     qrCodeUrl,
   })
 

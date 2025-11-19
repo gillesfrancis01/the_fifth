@@ -4,6 +4,10 @@ export interface events{
     description: string,
     date: string,
     adresse: string,
+    openingTime?: string,
+    locationName?: string,
+    locationFullAddress?: string,
+    phone?: string,
     image: string,
     teaser: string,
     description_sections: string[]
