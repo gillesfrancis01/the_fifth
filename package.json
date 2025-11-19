@@ -17,7 +17,6 @@
     "@supabase/supabase-js": "^2.57.4",
     "appwrite": "^17.0.2",
     "gsap": "^3.13.0",
-    "playwright": "^1.49.1",
     "next": "15.3.1",
     "next-intl": "^4.1.0",
     "node-appwrite": "^16.0.0",
