@@ -293,120 +293,156 @@ function prepareTicketTemplateData({
  */
 async function generateTicketPdf(params: {
   fullName: string
-  email: string
   phone: string
   event: events
   ticket: Ticket
   reservationId: string
-  paymentIntent: string
   qrCodeUrl: string
 }): Promise<Buffer> {
-  const { fullName, email, phone, event, ticket, reservationId, paymentIntent, qrCodeUrl } = params
-  const templateData = prepareTicketTemplateData({
-    fullName,
-    phone,
-    event,
-    ticket,
-    reservationId,
-    qrCodeUrl,
-  })
+  const { fullName, phone, event, ticket, reservationId, qrCodeUrl } = params
+
+  const formattedDate = formatEventDateTime(event.date, 'fr-CA')
+  const formattedPrice = formatCurrency(ticket.price)
+  const serialNumber = ticket.$id ?? reservationId
+
+  const locationName = event.locationName ?? event.name
+  const locationAddress = event.locationFullAddress ?? event.adresse
+  const locationPhone = event.phone ?? phone
 
   const pdfDoc = await PDFDocument.create()
-  const page = pdfDoc.addPage([595, 842]) // A4
+  const page = pdfDoc.addPage([595, 842]) // A4 portrait (approx. comme le PDF TIXR)
   const { width, height } = page.getSize()
 
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-  const margin = 36
-  const containerPadding = 16
-  const containerX = margin
-  const containerY = margin
-  const containerWidth = width - margin * 2
-  const containerHeight = height - margin * 2
+  const margin = 40
 
-  // Fond + bordure principale
-  page.drawRectangle({
-    x: containerX,
-    y: containerY,
-    width: containerWidth,
-    height: containerHeight,
-    color: rgb(0.97, 0.98, 0.99),
-    borderWidth: 1.5,
-    borderColor: rgb(0.8, 0.82, 0.85),
-  })
+  // ---------- HEADER (haut de page) ----------
+  const headerY = height - margin - 10
 
-  const contentX = containerX + containerPadding
-  const contentWidth = containerWidth - containerPadding * 2
-  const contentTop = containerY + containerHeight - containerPadding
-
-  // Header
-  const headerY = contentTop - 20
+  // "Ceci est votre billet"
   page.drawText('Ceci est votre billet', {
-    x: contentX,
+    x: margin,
     y: headerY,
-    size: 13,
+    size: 18,
     font: boldFont,
-    color: rgb(0.33, 0.33, 0.33),
+    color: rgb(0.1, 0.1, 0.1),
   })
 
-  const subheaderY = headerY - 22
-  page.drawText(templateData.eventName, {
-    x: contentX,
-    y: subheaderY,
-    size: 24,
+  // Sous-texte
+  page.drawText("Présentez cette page entière à l'événement", {
+    x: margin,
+    y: headerY - 20,
+    size: 11,
+    font: regularFont,
+    color: rgb(0.35, 0.35, 0.35),
+  })
+
+  // "Pas de rentrée" centré
+  const noReEntry = 'Pas de rentrée'
+  const noReEntryWidth = boldFont.widthOfTextAtSize(noReEntry, 11)
+  page.drawText(noReEntry, {
+    x: width / 2 - noReEntryWidth / 2,
+    y: headerY - 5,
+    size: 11,
+    font: regularFont,
+    color: rgb(0.35, 0.35, 0.35),
+  })
+
+  // "TIXR" en haut à droite
+  const tixrLabel = 'TIXR'
+  const tixrWidth = boldFont.widthOfTextAtSize(tixrLabel, 16)
+  page.drawText(tixrLabel, {
+    x: width - margin - tixrWidth,
+    y: headerY,
+    size: 16,
     font: boldFont,
-    color: rgb(0.07, 0.07, 0.07),
+    color: rgb(0.08, 0.08, 0.08),
   })
 
-  const detailsY = subheaderY - 24
-  page.drawText(
-    `${templateData.formattedDate}  •  Portes : ${templateData.openingTime}`,
-    {
-      x: contentX,
-      y: detailsY,
-      size: 12,
-      font: regularFont,
-      color: rgb(0.25, 0.25, 0.25),
-    }
-  )
+  // ---------- BILLET PRINCIPAL (bloc supérieur) ----------
+  const ticketWidth = width - margin * 2
+  const ticketHeight = 230
+  const ticketX = margin
+  const ticketTopY = headerY - 40
+  const ticketY = ticketTopY - ticketHeight
 
-  // Colonnes + QR
-  const qrSectionWidth = 210
-  const leftColumnX = contentX
-  const rightColumnX = contentX + qrSectionWidth + 20
-  const sectionTop = detailsY - 30
-  const sectionBottom = containerY + 150
-
-  // Ligne verticale séparatrice
-  page.drawLine({
-    start: { x: contentX + qrSectionWidth, y: sectionBottom },
-    end: { x: contentX + qrSectionWidth, y: sectionTop },
-    thickness: 1,
-    color: rgb(0.83, 0.83, 0.83),
+  // Contour du billet
+  page.drawRectangle({
+    x: ticketX,
+    y: ticketY,
+    width: ticketWidth,
+    height: ticketHeight,
+    borderWidth: 1.2,
+    borderColor: rgb(0.75, 0.75, 0.78),
+    color: rgb(1, 1, 1),
   })
 
-  // QR Code
-  let qrImage
-  try {
-    const response = await fetch(templateData.qrCodeUrl)
-    if (!response.ok) {
-      throw new Error(`Impossible de récupérer le QR code (statut ${response.status})`)
-    }
-    const bytes = new Uint8Array(await response.arrayBuffer())
-    qrImage = await pdfDoc.embedJpg(bytes)
-  } catch (error) {
-    console.warn('Impossible de charger le QR code pour le billet PDF', error)
+  // Colonnes gauche / droite
+  const leftWidth = ticketWidth * 0.35
+  const rightWidth = ticketWidth - leftWidth
+  const leftX = ticketX
+  const rightX = ticketX + leftWidth
+
+  // Ligne verticale pointillée (séparation)
+  const dashHeight = 6
+  const dashGap = 4
+  for (let y = ticketY + 10; y < ticketY + ticketHeight - 10; y += dashHeight + dashGap) {
+    page.drawLine({
+      start: { x: rightX, y },
+      end: { x: rightX, y: y + dashHeight },
+      thickness: 0.8,
+      color: rgb(0.7, 0.7, 0.7),
+    })
   }
 
-  const qrSize = 170
+  // Demi-cercles (effet découpe) haut / bas
+  const notchRadius = 12
+  page.drawCircle({
+    x: rightX,
+    y: ticketY + ticketHeight - notchRadius,
+    size: notchRadius,
+    color: rgb(1, 1, 1),
+    borderWidth: 1.2,
+    borderColor: rgb(0.75, 0.75, 0.78),
+  })
+  page.drawCircle({
+    x: rightX,
+    y: ticketY + notchRadius,
+    size: notchRadius,
+    color: rgb(1, 1, 1),
+    borderWidth: 1.2,
+    borderColor: rgb(0.75, 0.75, 0.78),
+  })
+
+  // ---------- QR CODE (colonne gauche) ----------
+  let qrImage
+  try {
+    const qrResponse = await fetch(qrCodeUrl)
+    if (!qrResponse.ok) {
+      throw new Error(`QR fetch failed with status ${qrResponse.status}`)
+    }
+    const qrBytes = new Uint8Array(await qrResponse.arrayBuffer())
+    // On essaye JPG puis PNG au cas où
+    try {
+      qrImage = await pdfDoc.embedJpg(qrBytes)
+    } catch {
+      qrImage = await pdfDoc.embedPng(qrBytes)
+    }
+  } catch (e) {
+    console.warn('Impossible de charger le QR code pour le billet PDF', e)
+  }
+
+  const qrZoneSize = leftWidth - 40
   if (qrImage) {
-    const { width: qrWidth, height: qrHeight } = qrImage
-    const scale = Math.min(qrSize / qrWidth, qrSize / qrHeight)
-    const finalWidth = qrWidth * scale
-    const finalHeight = qrHeight * scale
-    const qrX = leftColumnX + (qrSectionWidth - finalWidth) / 2
-    const qrY = sectionTop - finalHeight - 10
+    const { width: qrW, height: qrH } = qrImage
+    const scale = Math.min(qrZoneSize / qrW, qrZoneSize / qrH)
+    const finalWidth = qrW * scale
+    const finalHeight = qrH * scale
+    const qrX = leftX + (leftWidth - finalWidth) / 2
+    const qrY = ticketY + ticketHeight - finalHeight - 30
+
     page.drawImage(qrImage, {
       x: qrX,
       y: qrY,
@@ -415,164 +451,237 @@ async function generateTicketPdf(params: {
     })
   }
 
-  const labelColor = rgb(0.38, 0.38, 0.38)
-  const valueColor = rgb(0.08, 0.08, 0.08)
+  // Texte sous QR (EN SÉRIE, NUMÉRO COMMANDE)
+  let leftTextY = ticketY + 40
 
-  const drawLabelValue = (
-    label: string,
-    value: string,
-    x: number,
-    startY: number,
-    options?: { lineHeight?: number }
-  ) => {
-    const lineHeight = options?.lineHeight ?? 15
-
-    page.drawText(label.toUpperCase(), {
-      x,
-      y: startY,
-      size: 9,
-      font: boldFont,
-      color: labelColor,
-    })
-
-    const lines = value.split('\n')
-    lines.forEach((line, index) => {
-      page.drawText(line, {
-        x,
-        y: startY - 13 - index * lineHeight,
-        size: 12,
-        font: regularFont,
-        color: valueColor,
-      })
-    })
-
-    return startY - 13 - lines.length * lineHeight - 14
-  }
-
-  // Colonne gauche : série / numéro de commande
-  let leftColumnY = sectionTop - 10
-  leftColumnY = drawLabelValue('En série', templateData.serialNumber, leftColumnX, leftColumnY)
-  leftColumnY = drawLabelValue(
-    'Numéro de commande',
-    templateData.reservationId,
-    leftColumnX,
-    leftColumnY
-  )
-
-  // Colonne droite : infos client / billet / paiement
-  let rightColumnY = sectionTop - 10
-  rightColumnY = drawLabelValue('Délivré à', fullName, rightColumnX, rightColumnY)
-
-  // Coordonnées : email + téléphone
-  rightColumnY = drawLabelValue(
-    'Coordonnées de contact',
-    `${email}\n${templateData.phone}`,
-    rightColumnX,
-    rightColumnY
-  )
-
-  rightColumnY = drawLabelValue(
-    "Adresse de l'événement",
-    templateData.eventAddress,
-    rightColumnX,
-    rightColumnY
-  )
-
-  rightColumnY = drawLabelValue(
-    'Type de billet',
-    ticket.name,
-    rightColumnX,
-    rightColumnY
-  )
-
-  rightColumnY = drawLabelValue(
-    'Montant payé',
-    templateData.formattedPrice,
-    rightColumnX,
-    rightColumnY
-  )
-
-  // 🔹 Ajout : référence de paiement dans le PDF (version 2 complète)
-  rightColumnY = drawLabelValue(
-    'Référence de paiement',
-    paymentIntent,
-    rightColumnX,
-    rightColumnY
-  )
-
-  // Bloc lieu
-  const locationY = Math.min(leftColumnY, rightColumnY) - 10
-  page.drawLine({
-    start: { x: contentX, y: locationY },
-    end: { x: contentX + contentWidth, y: locationY },
-    thickness: 1,
-    color: rgb(0.87, 0.87, 0.87),
-  })
-
-  const locationBlockY = locationY - 18
-  page.drawText(templateData.locationName, {
-    x: contentX,
-    y: locationBlockY,
-    size: 13,
-    font: boldFont,
-    color: valueColor,
-  })
-
-  page.drawText(templateData.locationFullAddress, {
-    x: contentX,
-    y: locationBlockY - 16,
-    size: 11,
+  page.drawText('EN SÉRIE', {
+    x: leftX + 20,
+    y: leftTextY + 24,
+    size: 9,
     font: regularFont,
-    color: valueColor,
+    color: rgb(0.4, 0.4, 0.4),
   })
 
-  if (templateData.phone) {
-    page.drawText(`Téléphone : ${templateData.phone}`.trim(), {
-      x: contentX,
-      y: locationBlockY - 32,
-      size: 11,
-      font: regularFont,
-      color: valueColor,
+  page.drawText(serialNumber, {
+    x: leftX + 20,
+    y: leftTextY + 10,
+    size: 9,
+    font: regularFont,
+    color: rgb(0.25, 0.25, 0.25),
+  })
+
+  page.drawText('NUMÉRO DE COMMANDE', {
+    x: leftX + 20,
+    y: leftTextY - 8,
+    size: 9,
+    font: regularFont,
+    color: rgb(0.4, 0.4, 0.4),
+  })
+
+  page.drawText(reservationId, {
+    x: leftX + 20,
+    y: leftTextY - 24,
+    size: 14,
+    font: boldFont,
+    color: rgb(0.12, 0.12, 0.12),
+  })
+
+  // ---------- COLONNE DROITE : infos billet ----------
+  let infoY = ticketY + ticketHeight - 40
+
+  const drawRightLine = (
+    text: string,
+    options: { size?: number; bold?: boolean; color?: ReturnType<typeof rgb>; gap?: number } = {}
+  ) => {
+    const size = options.size ?? 11
+    const gap = options.gap ?? 14
+    const font = options.bold ? boldFont : regularFont
+    const color = options.color ?? rgb(0.1, 0.1, 0.1)
+
+    page.drawText(text, {
+      x: rightX + 18,
+      y: infoY,
+      size,
+      font,
+      color,
+    })
+    infoY -= gap
+  }
+
+  // Date + heure
+  drawRightLine(`samedi ${formattedDate}`, { size: 11 })
+  drawRightLine(`Les portes ouvrent à ${event.openingTime ?? '16 h 00'}`, {
+    size: 10,
+    color: rgb(0.4, 0.4, 0.4),
+    gap: 16,
+  })
+
+  infoY -= 6
+
+  // Nom de l’événement
+  drawRightLine(event.name, { size: 16, bold: true, gap: 20 })
+
+  infoY -= 4
+
+  // Bloc "Billet régulier"
+  drawRightLine('BILLET RÉGULIER', { size: 11, bold: true, gap: 16 })
+  drawRightLine(`Délivré à : ${fullName}`, { size: 10 })
+  drawRightLine(locationName, { size: 10 })
+  drawRightLine(locationAddress, { size: 10 })
+  drawRightLine(formattedPrice, { size: 10, gap: 18 })
+
+  // Type de billet
+  infoY -= 4
+  drawRightLine('TYPE DE BILLET', { size: 10, bold: true, color: rgb(0.45, 0.45, 0.45), gap: 14 })
+  drawRightLine('ADMISSION GÉNÉRALE', { size: 11 })
+
+  // ---------- BAS DE PAGE : affiches + infos lieu + QR ----------
+  // Zone des affiches
+  const posterTopY = ticketY - 40
+  const posterHeight = 220
+  const posterWidth = 180
+  const posterY = posterTopY - posterHeight
+
+  // Charger l'image d'événement (event.image)
+  let eventImage
+  if (event.image) {
+    try {
+      const imgRes = await fetch(event.image)
+      if (!imgRes.ok) {
+        throw new Error(`Impossible de charger event.image (statut ${imgRes.status})`)
+      }
+      const imgBytes = new Uint8Array(await imgRes.arrayBuffer())
+      try {
+        eventImage = await pdfDoc.embedJpg(imgBytes)
+      } catch {
+        eventImage = await pdfDoc.embedPng(imgBytes)
+      }
+    } catch (e) {
+      console.warn('Erreur lors du chargement de event.image pour le billet PDF', e)
+    }
+  }
+
+  if (eventImage) {
+    const { width: imgW, height: imgH } = eventImage
+    const scale = Math.min(posterWidth / imgW, posterHeight / imgH)
+    const finalW = imgW * scale
+    const finalH = imgH * scale
+
+    const poster1X = margin
+    const poster2X = margin + posterWidth + 16
+
+    page.drawImage(eventImage, {
+      x: poster1X,
+      y: posterY,
+      width: finalW,
+      height: finalH,
+    })
+
+    page.drawImage(eventImage, {
+      x: poster2X,
+      y: posterY,
+      width: finalW,
+      height: finalH,
     })
   }
 
-  // Texte légal en bas
+  // Bloc texte lieu à droite des affiches
+  const infoRightX = margin + posterWidth * 2 + 32
+  let venueY = posterY + posterHeight - 10
+
+  page.drawText(locationName, {
+    x: infoRightX,
+    y: venueY,
+    size: 12,
+    font: boldFont,
+    color: rgb(0.08, 0.08, 0.08),
+  })
+  venueY -= 16
+
+  page.drawText(locationAddress, {
+    x: infoRightX,
+    y: venueY,
+    size: 10,
+    font: regularFont,
+    color: rgb(0.18, 0.18, 0.18),
+  })
+  venueY -= 16
+
+  if (locationPhone) {
+    page.drawText(locationPhone, {
+      x: infoRightX,
+      y: venueY,
+      size: 10,
+      font: regularFont,
+      color: rgb(0.18, 0.18, 0.18),
+    })
+    venueY -= 16
+  }
+
+  // QR en bas à droite (réutilise le même qrImage si disponible)
+  if (qrImage) {
+    const qrSizeBottom = 90
+    const { width: qrW2, height: qrH2 } = qrImage
+    const scale2 = Math.min(qrSizeBottom / qrW2, qrSizeBottom / qrH2)
+    const finalW2 = qrW2 * scale2
+    const finalH2 = qrH2 * scale2
+    const qrBottomX = width - margin - finalW2
+    const qrBottomY = margin + 40
+
+    page.drawImage(qrImage, {
+      x: qrBottomX,
+      y: qrBottomY,
+      width: finalW2,
+      height: finalH2,
+    })
+  }
+
+  // ---------- TEXTE LÉGAL ----------
   const wrapText = (text: string, maxChars: number) => {
     const words = text.split(' ')
     const lines: string[] = []
     let currentLine = ''
-    words.forEach((word) => {
+    for (const word of words) {
       if ((currentLine + word).length > maxChars) {
         lines.push(currentLine.trim())
         currentLine = `${word} `
       } else {
         currentLine += `${word} `
       }
-    })
-    if (currentLine.trim()) {
-      lines.push(currentLine.trim())
     }
+    if (currentLine.trim()) lines.push(currentLine.trim())
     return lines
   }
 
   const legalText =
-    "Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, veuillez confirmer titre, heure et lieu de l'événement."
-  const legalLines = wrapText(legalText, 110)
-  const legalStartY = containerY + 60
+    "NOS CONDITIONS JURIDIQUES ET SERVICES - Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, nous vous invitons à confirmer le titre, l'heure et le lieu de l'événement. Sous réserve des termes et conditions trouvés sur www.tixr.com."
+  const legalLines = wrapText(legalText, 115)
 
-  legalLines.forEach((line, index) => {
+  let legalY = posterY - 26
+  legalLines.forEach((line) => {
     page.drawText(line, {
-      x: contentX,
-      y: legalStartY - index * 12,
-      size: 9,
+      x: margin,
+      y: legalY,
+      size: 8.5,
       font: regularFont,
       color: rgb(0.35, 0.35, 0.35),
     })
+    legalY -= 10
   })
+
+  // (Facultatif) message de page vide en bas de page
+  // page.drawText('==== Cette page est intentionnellement laissée vide ====', {
+  //   x: margin,
+  //   y: 28,
+  //   size: 8,
+  //   font: regularFont,
+  //   color: rgb(0.6, 0.6, 0.6),
+  // })
 
   const pdfBytes = await pdfDoc.save()
   return Buffer.from(pdfBytes)
 }
+
 
 function buildEmailHtml(params: {
   fullName: string
@@ -611,12 +720,10 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
 
   const pdfBuffer = await generateTicketPdf({
     fullName: payload.fullName,
-    email: payload.email,
     phone: payload.phone,
     event: payload.event,
     ticket: payload.ticket,
     reservationId: payload.reservationId,
-    paymentIntent: payload.paymentIntent,
     qrCodeUrl,
   })
 
