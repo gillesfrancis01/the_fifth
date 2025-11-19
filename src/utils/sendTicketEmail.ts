@@ -385,7 +385,7 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
       attachments: [
         {
           filename: `${payload.event.name}-ticket.pdf`,
-          content: pdfBuffer.toString('base64'),
+          content: Buffer.from(pdfBuffer).toString('base64'),
           type: 'application/pdf',
         },
       ],
