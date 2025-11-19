@@ -53,7 +53,7 @@ export default function SubscriptionModal() {
       <div ref={modalRef} className="bg-[#171717] text-white p-6 rounded-2xl shadow-xl max-w-md w-full">
         {!isSubmitted ? (
           <form action={formAction} className="flex flex-col space-y-4">
-            <h2 className="text-xl font-semibold">Inscrivez-vous à notre newsletter</h2>
+            <h2 className="text-xl font-semibold">Unlock exclusive access • Accédez aux privilèges exclusifs</h2>
             <input
               type="email"
               required
