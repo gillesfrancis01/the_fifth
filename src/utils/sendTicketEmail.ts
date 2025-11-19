@@ -381,7 +381,6 @@ async function generateTicketPdf(params: {
 
   // Colonnes gauche / droite
   const leftWidth = ticketWidth * 0.35
-  const rightWidth = ticketWidth - leftWidth
   const leftX = ticketX
   const rightX = ticketX + leftWidth
 
