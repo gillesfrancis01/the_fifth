@@ -340,7 +340,7 @@ async function generateTicketPdf(params: {
   })
 
   // "Pas de rentrée" centré
-  const noReEntry = 'Pas de rentrée'
+  const noReEntry = 'Pass de rentrée'
   const noReEntryWidth = boldFont.widthOfTextAtSize(noReEntry, 11)
   page.drawText(noReEntry, {
     x: width / 2 - noReEntryWidth / 2,
@@ -563,7 +563,7 @@ async function generateTicketPdf(params: {
     const finalH = imgH * scale
 
     const poster1X = margin
-    const poster2X = margin + posterWidth + 16
+    const poster2X = margin + posterWidth + 40
 
     page.drawImage(eventImage, {
       x: poster1X,
