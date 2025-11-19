@@ -451,7 +451,7 @@ async function generateTicketPdf(params: {
   }
 
   // Texte sous QR (EN SÉRIE, NUMÉRO COMMANDE)
-  let leftTextY = ticketY + 40
+  const leftTextY = ticketY + 40
 
   page.drawText('EN SÉRIE', {
     x: leftX + 20,
