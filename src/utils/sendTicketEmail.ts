@@ -508,12 +508,8 @@ async function generateTicketPdf(params: {
   }
 
   // Date + heure
-  drawRightLine(`samedi ${formattedDate}`, { size: 11 })
-  drawRightLine(`Les portes ouvrent à ${event.openingTime ?? '16 h 00'}`, {
-    size: 10,
-    color: rgb(0.4, 0.4, 0.4),
-    gap: 16,
-  })
+  drawRightLine(` ${formattedDate}`, { size: 11 })
+
 
   infoY -= 6
 
