@@ -316,7 +316,7 @@ async function generateTicketPdf(params: {
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-  const margin = 30
+  const margin = 10
 
   // ---------- HEADER (haut de page) ----------
   const headerY = height - margin - 10
