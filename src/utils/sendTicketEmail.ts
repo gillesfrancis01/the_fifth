@@ -1,6 +1,7 @@
 'use server'
 
-import { chromium } from 'playwright'
+import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer-core'
 
 import type { events, Ticket } from '@/types'
 import { formatEventDateTime } from './eventDate'
@@ -300,14 +301,16 @@ async function generateTicketPdf(params: {
   const templateData = prepareTicketTemplateData(params)
   const html = buildTicketTemplate(templateData)
 
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  const browser = await puppeteer.launch({
+    args: [...chromium.args, '--disable-dev-shm-usage'],
+    defaultViewport: { width: 900, height: 1400 },
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
   })
 
   try {
-    const page = await browser.newPage({ viewport: { width: 900, height: 1400 } })
-    await page.setContent(html, { waitUntil: 'networkidle' })
+    const page = await browser.newPage()
+    await page.setContent(html, { waitUntil: 'networkidle0' })
 
     return await page.pdf({
       format: 'A4',
