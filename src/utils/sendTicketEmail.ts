@@ -1,7 +1,6 @@
 'use server'
 
-import chromium from '@sparticuz/chromium'
-import puppeteer from 'puppeteer-core'
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
 import type { events, Ticket } from '@/types'
 import { formatEventDateTime } from './eventDate'
@@ -297,34 +296,238 @@ async function generateTicketPdf(params: {
   ticket: Ticket
   reservationId: string
   qrCodeUrl: string
-}) {
+}): Promise<Buffer> {
   const templateData = prepareTicketTemplateData(params)
-  const html = buildTicketTemplate(templateData)
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([595, 842])
+  const { width, height } = page.getSize()
 
-  const browser = await puppeteer.launch({
-    args: [...chromium.args, '--disable-dev-shm-usage'],
-    defaultViewport: { width: 900, height: 1400 },
-    executablePath: await chromium.executablePath(),
-    headless: true,
+  const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+
+  const margin = 36
+  const containerPadding = 16
+  const containerX = margin
+  const containerY = margin
+  const containerWidth = width - margin * 2
+  const containerHeight = height - margin * 2
+
+  page.drawRectangle({
+    x: containerX,
+    y: containerY,
+    width: containerWidth,
+    height: containerHeight,
+    color: rgb(0.97, 0.98, 0.99),
+    borderWidth: 1.5,
+    borderColor: rgb(0.8, 0.82, 0.85),
   })
 
-  try {
-    const page = await browser.newPage()
-    await page.setContent(html, { waitUntil: 'networkidle0' })
+  const contentX = containerX + containerPadding
+  const contentWidth = containerWidth - containerPadding * 2
+  const contentTop = containerY + containerHeight - containerPadding
 
-    return await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '12mm',
-        bottom: '12mm',
-        left: '10mm',
-        right: '10mm',
-      },
-    })
-  } finally {
-    await browser.close()
+  const headerY = contentTop - 20
+  page.drawText('Ceci est votre billet', {
+    x: contentX,
+    y: headerY,
+    size: 13,
+    font: boldFont,
+    color: rgb(0.33, 0.33, 0.33),
+  })
+
+  const subheaderY = headerY - 22
+  page.drawText(`${templateData.eventName}`, {
+    x: contentX,
+    y: subheaderY,
+    size: 24,
+    font: boldFont,
+    color: rgb(0.07, 0.07, 0.07),
+  })
+
+  const detailsY = subheaderY - 24
+  page.drawText(`${templateData.formattedDate}  •  Portes : ${templateData.openingTime}`, {
+    x: contentX,
+    y: detailsY,
+    size: 12,
+    font: regularFont,
+    color: rgb(0.25, 0.25, 0.25),
+  })
+
+  const qrSectionWidth = 210
+  const leftColumnX = contentX
+  const rightColumnX = contentX + qrSectionWidth + 20
+  const sectionTop = detailsY - 30
+  const sectionBottom = containerY + 150
+
+  page.drawLine({
+    start: { x: contentX + qrSectionWidth, y: sectionBottom },
+    end: { x: contentX + qrSectionWidth, y: sectionTop },
+    thickness: 1,
+    color: rgb(0.83, 0.83, 0.83),
+  })
+
+  let qrImage
+  try {
+    const response = await fetch(templateData.qrCodeUrl)
+    if (!response.ok) {
+      throw new Error(`Impossible de récupérer le QR code (statut ${response.status})`)
+    }
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    qrImage = await pdfDoc.embedJpg(bytes)
+  } catch (error) {
+    console.warn('Impossible de charger le QR code pour le billet PDF', error)
   }
+
+  const qrSize = 170
+  if (qrImage) {
+    const { width: qrWidth, height: qrHeight } = qrImage
+    const scale = Math.min(qrSize / qrWidth, qrSize / qrHeight)
+    const finalWidth = qrWidth * scale
+    const finalHeight = qrHeight * scale
+    const qrX = leftColumnX + (qrSectionWidth - finalWidth) / 2
+    const qrY = sectionTop - finalHeight - 10
+    page.drawImage(qrImage, {
+      x: qrX,
+      y: qrY,
+      width: finalWidth,
+      height: finalHeight,
+    })
+  }
+
+  const labelColor = rgb(0.38, 0.38, 0.38)
+  const valueColor = rgb(0.08, 0.08, 0.08)
+
+  const drawLabelValue = (
+    label: string,
+    value: string,
+    x: number,
+    startY: number,
+    options?: { lineHeight?: number }
+  ) => {
+    const lineHeight = options?.lineHeight ?? 15
+    page.drawText(label.toUpperCase(), {
+      x,
+      y: startY,
+      size: 9,
+      font: boldFont,
+      color: labelColor,
+    })
+    const lines = value.split('\n')
+    lines.forEach((line, index) => {
+      page.drawText(line, {
+        x,
+        y: startY - 13 - index * lineHeight,
+        size: 12,
+        font: regularFont,
+        color: valueColor,
+      })
+    })
+    return startY - 13 - lines.length * lineHeight - 14
+  }
+
+  let leftColumnY = sectionTop - 10
+  leftColumnY = drawLabelValue('En série', templateData.serialNumber, leftColumnX, leftColumnY)
+  leftColumnY = drawLabelValue(
+    'Numéro de commande',
+    templateData.reservationId,
+    leftColumnX,
+    leftColumnY
+  )
+
+  let rightColumnY = sectionTop - 10
+  rightColumnY = drawLabelValue('Délivré à', templateData.fullName, rightColumnX, rightColumnY)
+  rightColumnY = drawLabelValue(
+    'Coordonnées de contact',
+    `${templateData.phone}`,
+    rightColumnX,
+    rightColumnY
+  )
+  rightColumnY = drawLabelValue(
+    "Adresse de l'événement",
+    `${templateData.eventAddress}`,
+    rightColumnX,
+    rightColumnY
+  )
+  rightColumnY = drawLabelValue(
+    'Type de billet',
+    'Admission générale',
+    rightColumnX,
+    rightColumnY
+  )
+  rightColumnY = drawLabelValue(
+    'Montant payé',
+    templateData.formattedPrice,
+    rightColumnX,
+    rightColumnY
+  )
+
+  const locationY = Math.min(leftColumnY, rightColumnY) - 10
+  page.drawLine({
+    start: { x: contentX, y: locationY },
+    end: { x: contentX + contentWidth, y: locationY },
+    thickness: 1,
+    color: rgb(0.87, 0.87, 0.87),
+  })
+
+  const locationBlockY = locationY - 18
+  page.drawText(templateData.locationName, {
+    x: contentX,
+    y: locationBlockY,
+    size: 13,
+    font: boldFont,
+    color: valueColor,
+  })
+  page.drawText(templateData.locationFullAddress, {
+    x: contentX,
+    y: locationBlockY - 16,
+    size: 11,
+    font: regularFont,
+    color: valueColor,
+  })
+  if (templateData.phone) {
+    page.drawText(`Téléphone : ${templateData.phone}`.trim(), {
+      x: contentX,
+      y: locationBlockY - 32,
+      size: 11,
+      font: regularFont,
+      color: valueColor,
+    })
+  }
+
+  const wrapText = (text: string, maxChars: number) => {
+    const words = text.split(' ')
+    const lines: string[] = []
+    let currentLine = ''
+    words.forEach((word) => {
+      if ((currentLine + word).length > maxChars) {
+        lines.push(currentLine.trim())
+        currentLine = `${word} `
+      } else {
+        currentLine += `${word} `
+      }
+    })
+    if (currentLine.trim()) {
+      lines.push(currentLine.trim())
+    }
+    return lines
+  }
+
+  const legalText =
+    "Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, veuillez confirmer titre, heure et lieu de l'événement."
+  const legalLines = wrapText(legalText, 110)
+  const legalStartY = containerY + 60
+  legalLines.forEach((line, index) => {
+    page.drawText(line, {
+      x: contentX,
+      y: legalStartY - index * 12,
+      size: 9,
+      font: regularFont,
+      color: rgb(0.35, 0.35, 0.35),
+    })
+  })
+
+  const pdfBytes = await pdfDoc.save()
+  return Buffer.from(pdfBytes)
 }
 
 function buildEmailHtml(params: {
@@ -385,7 +588,7 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
       attachments: [
         {
           filename: `${payload.event.name}-ticket.pdf`,
-          content: Buffer.from(pdfBuffer).toString('base64'),
+          content: pdfBuffer.toString('base64'),
           type: 'application/pdf',
         },
       ],
