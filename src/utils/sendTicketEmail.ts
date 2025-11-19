@@ -305,7 +305,7 @@ async function generateTicketPdf(params: {
     args: [...chromium.args, '--disable-dev-shm-usage'],
     defaultViewport: { width: 900, height: 1400 },
     executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
+    headless: true,
   })
 
   try {
