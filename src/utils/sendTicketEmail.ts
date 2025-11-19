@@ -196,56 +196,155 @@ function buildEmailHtml({
   const formattedPrice = formatCurrency(ticket.price)
 
   return `
-   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc; padding:24px; font-family:Arial, sans-serif; color:#0f172a;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" 
+  style="background-color:#e5e7eb; padding:24px; font-family:Arial, sans-serif; color:#000;">
   <tr>
-    <td>
+    <td align="center">
 
-      <h1 style="color:#4f46e5; margin:0 0 16px 0;">Hello ${fullName},</h1>
+      <!-- OUTER WRAPPER -->
+      <table width="720" cellpadding="0" cellspacing="0" border="0" 
+        style="background:#ffffff; border:1px solid #cfcfcf; border-radius:12px; overflow:hidden;">
 
-      <p style="margin:0 0 16px 0;">
-        Thank you for your reservation. Your ticket for 
-        <strong>${event.name}</strong> is attached to this email as a PDF.
-      </p>
-
-      <p style="margin:0 0 16px 0;">
-        You can also find the key details below for quick reference:
-      </p>
-
-      <!-- Ticket Info Box -->
-      <table width="100%" cellpadding="12" cellspacing="0" border="0" style="background-color:#1e293b; color:#f8fafc; margin-bottom:24px;">
+        <!-- TOP CUT EFFECT -->
         <tr>
-          <td style="font-size:16px;">
-            <p style="margin:0 0 8px 0;"><strong>Event:</strong> ${event.name}</p>
-            <p style="margin:0 0 8px 0;"><strong>Date:</strong> ${formattedDate}</p>
-            <p style="margin:0 0 8px 0;"><strong>Location:</strong> ${event.adresse}</p>
-            <p style="margin:0 0 8px 0;"><strong>Ticket:</strong> ${ticket.name}</p>
-            <p style="margin:0 0 8px 0;"><strong>Price:</strong> ${formattedPrice}</p>
-            <p style="margin:0 0 8px 0;"><strong>Reservation ID:</strong> ${reservationId}</p>
-            <p style="margin:0;"><strong>Payment reference:</strong> ${paymentIntent}</p>
+          <td style="padding:0;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="50%" height="20" 
+                  style="border-bottom:1px dashed #ccc; border-right:1px dashed #ccc;">
+                </td>
+                <td width="50%" height="20" style="border-bottom:1px dashed #ccc;"></td>
+              </tr>
+            </table>
           </td>
         </tr>
-      </table>
 
-      <p style="margin:0 0 16px 0;">
-        Present the QR code below at the event entrance to validate your ticket.
-      </p>
-
-      <!-- QR Code -->
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="text-align:center; margin-bottom:16px;">
+        <!-- HEADER -->
         <tr>
-          <td>
-            <img src="${qrCodeUrl}" alt="Ticket QR code" width="220" height="220" style="display:block; margin:auto;" />
+          <td style="padding:12px 20px; font-size:14px; color:#444; border-bottom:1px solid #e5e5e5;">
+            Ceci est votre billet
           </td>
         </tr>
+
+        <!-- MAIN TICKET BODY -->
+        <tr>
+          <td style="padding:0;">
+
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+
+                <!-- LEFT SIDE -->
+                <td width="38%" valign="top" 
+                  style="padding:24px; border-right:2px dashed #cccccc;">
+
+                  <!-- QR -->
+                  <table width="100%">
+                    <tr>
+                      <td align="center" style="padding-bottom:16px;">
+                        <img src="${qrCodeUrl}" alt="QR Code" width="190" height="190"
+                          style="display:block; border:1px solid #ddd; padding:4px;" />
+                      </td>
+                    </tr>
+
+                    <!-- SERIAL + ORDER -->
+                    <tr>
+                      <td align="center" style="font-size:12px; color:#444; line-height:1.4;">
+                        <span style="font-size:11px; color:#666;">EN SÉRIE</span><br>
+
+                        <span style="font-size:11px; color:#666;">NUMÉRO DE COMMANDE</span><br>
+                        <span style="font-size:17px; font-weight:bold; color:#111;">
+                          ${reservationId}
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+
+                <!-- RIGHT SIDE -->
+                <td width="62%" valign="top" style="padding:24px;">
+
+                  <!-- DATE -->
+                  <p style="margin:0 0 14px 0; font-size:14px; color:#000; line-height:1.5;">
+                    📅 <strong>${formattedDate}</strong><br>
+                  </p>
+
+                  <!-- EVENT NAME -->
+                  <p style="margin:0 0 18px 0; font-size:22px; line-height:1.25; font-weight:bold; color:#000;">
+                    ${event.name}
+                  </p>
+
+                  <!-- INFO BLOCK -->
+                  <p style="margin:0; font-size:15px; color:#000; line-height:1.6;">
+                    <strong>BILLET RÉGULIER</strong><br>
+                    👤 Délivré à : <strong>${fullName}</strong><br>
+                    📍 ${event.adresse}<br>
+                    💵 ${formattedPrice}
+                  </p>
+
+                  <br>
+
+                  <!-- TICKET TYPE -->
+                  <p style="margin:0; font-size:15px; color:#000;">
+                    <strong>TYPE DE BILLET</strong><br>
+                    ADMISSION GÉNÉRALE
+                  </p>
+
+                </td>
+
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <!-- LOCATION FOOTER -->
+        <tr>
+          <td style="padding:24px; font-size:14px; color:#111; border-top:1px solid #e5e5e5;">
+            <strong>${event.adresse}</strong><br>
+            ${event.adresse}<br><br>
+            
+          </td>
+        </tr>
+
+        <!-- LEGAL -->
+        <tr>
+          <td style="padding:22px; background:#f7f7f7; font-size:12px; color:#555; line-height:1.5;">
+            Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés.
+            Dans le cas d'une annulation d'événement sans date de report, un remboursement complet 
+            sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat.
+            En achetant un billet pour cet événement, vous acceptez cette politique d'achat.
+            <br><br>
+            Avant d'acheter vos billets, veuillez confirmer titre, heure et lieu de l'événement.
+            Sous réserve des termes et conditions trouvés sur www.tixr.com.
+          </td>
+        </tr>
+
+        <!-- BOTTOM CUT EFFECT -->
+        <tr>
+          <td style="padding:0;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="50%" height="20" 
+                  style="border-top:1px dashed #ccc; border-right:1px dashed #ccc;">
+                </td>
+                <td width="50%" height="20" style="border-top:1px dashed #ccc;"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
       </table>
 
-      <p style="font-size:14px; color:#475569; margin:0;">
-        Keep this email for your records. If you have any questions, reply directly to this message.
+      <!-- WHITE PAGE NOTE -->
+      <p style="margin-top:20px; font-size:12px; color:#999;">
+        ==== Cette page est intentionnellement laissée vide ====
       </p>
 
     </td>
   </tr>
 </table>
+
 
   `
 }
