@@ -249,8 +249,8 @@ function buildEmailHtml({
                     <!-- SERIAL + ORDER -->
                     <tr>
                       <td align="center" style="font-size:12px; color:#444; line-height:1.4;">
-                        <span style="font-size:11px; color:#666;">EN SÉRIE</span><br>
-
+                        <span style="font-size:11px; color:#666;">Numero de Paiement</span><br>
+                        ${paymentIntent}<br><br>
                         <span style="font-size:11px; color:#666;">NUMÉRO DE COMMANDE</span><br>
                         <span style="font-size:17px; font-weight:bold; color:#111;">
                           ${reservationId}
