@@ -316,7 +316,7 @@ async function generateTicketPdf(params: {
   const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-  const margin = 40
+  const margin = 30
 
   // ---------- HEADER (haut de page) ----------
   const headerY = height - margin - 10
@@ -351,10 +351,10 @@ async function generateTicketPdf(params: {
   })
 
   // "TIXR" en haut à droite
-  const tixrLabel = 'TIXR'
-  const tixrWidth = boldFont.widthOfTextAtSize(tixrLabel, 16)
-  page.drawText(tixrLabel, {
-    x: width - margin - tixrWidth,
+  const thefifthLabel = 'THE FIFTH'
+  const thefifthWidth = boldFont.widthOfTextAtSize(thefifthLabel, 16)
+  page.drawText(thefifthLabel, {
+    x: width - margin - thefifthWidth,
     y: headerY,
     size: 16,
     font: boldFont,
@@ -532,7 +532,7 @@ async function generateTicketPdf(params: {
   // Type de billet
   infoY -= 4
   drawRightLine('TYPE DE BILLET', { size: 10, bold: true, color: rgb(0.45, 0.45, 0.45), gap: 14 })
-  drawRightLine('ADMISSION GÉNÉRALE', { size: 11 })
+  drawRightLine(ticket.name, { size: 11 })
 
   // ---------- BAS DE PAGE : affiches + infos lieu + QR ----------
   // Zone des affiches
@@ -597,14 +597,6 @@ async function generateTicketPdf(params: {
   })
   venueY -= 16
 
-  page.drawText(locationAddress, {
-    x: infoRightX,
-    y: venueY,
-    size: 10,
-    font: regularFont,
-    color: rgb(0.18, 0.18, 0.18),
-  })
-  venueY -= 16
 
   if (locationPhone) {
     page.drawText(locationPhone, {
@@ -653,7 +645,7 @@ async function generateTicketPdf(params: {
   }
 
   const legalText =
-    "NOS CONDITIONS JURIDIQUES ET SERVICES - Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, nous vous invitons à confirmer le titre, l'heure et le lieu de l'événement. Sous réserve des termes et conditions trouvés sur www.tixr.com."
+    "NOS CONDITIONS JURIDIQUES ET SERVICES - Tous les billets sont en vente finale et ne peuvent être ni échangés ni remboursés. Dans le cas d'une annulation d'événement sans date de report, un remboursement complet sera automatiquement émis à chaque client sur la carte de crédit utilisée pour l'achat. En achetant un billet pour cet événement, vous acceptez cette politique d'achat. Avant d'acheter vos billets, nous vous invitons à confirmer le titre, l'heure et le lieu de l'événement."
   const legalLines = wrapText(legalText, 115)
 
   let legalY = posterY - 26
