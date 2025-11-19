@@ -480,7 +480,7 @@ async function generateTicketPdf(params: {
 
   rightColumnY = drawLabelValue(
     'Type de billet',
-    'Admission générale',
+    ticket.name,
     rightColumnX,
     rightColumnY
   )
