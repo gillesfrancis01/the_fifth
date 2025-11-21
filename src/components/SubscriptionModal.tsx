@@ -12,10 +12,11 @@ export default function SubscriptionModal() {
   const [state, formAction] = useActionState(addCustomer, {})
   const modalRef = useRef<HTMLDivElement>(null)
 
+  // Affichage après délai (newsletter classique)
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const TEN_MINUTES_MS = 5 * 1000
+    const DELAY = 5000 // 5 sec pour test
     const modalAlreadyShown = localStorage.getItem('newsletterModalShown')
 
     if (modalAlreadyShown) return
@@ -24,7 +25,7 @@ export default function SubscriptionModal() {
     const now = Date.now()
     const parsedScheduledTime = scheduledAt ? parseInt(scheduledAt, 10) : NaN
     const scheduledTime = Number.isNaN(parsedScheduledTime) ? now : parsedScheduledTime
-    const remainingDelay = Math.max(TEN_MINUTES_MS - (now - scheduledTime), 0)
+    const remainingDelay = Math.max(DELAY - (now - scheduledTime), 0)
 
     if (!scheduledAt) {
       localStorage.setItem('newsletterModalScheduledAt', now.toString())
@@ -38,15 +39,17 @@ export default function SubscriptionModal() {
     return () => clearTimeout(timer)
   }, [])
 
+  // Gestion states success/error
   useEffect(() => {
     if (state?.error) toast.error(state.error)
     if (state?.success) {
       toast.success('Inscription réussie')
       setIsSubmitted(true)
-      setTimeout(() => setIsFirstVisit(false), 2000) // Ferme le modal après 2 secondes
+      setTimeout(() => setIsFirstVisit(false), 2000)
     }
   }, [state])
 
+  // Fermeture en cliquant dehors
   const handleClickOutside = (e: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       setIsFirstVisit(false)
@@ -56,38 +59,44 @@ export default function SubscriptionModal() {
   useEffect(() => {
     if (isFirstVisit) {
       window.addEventListener('mousedown', handleClickOutside)
-      return () => {
-        window.removeEventListener('mousedown', handleClickOutside)
-      }
+      return () => window.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isFirstVisit])
 
   if (!isFirstVisit) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#171717] bg-opacity-95 backdrop-blur-sm text-white p-4 sm:p-6">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div
         ref={modalRef}
-        className="bg-[#171717] text-white p-6 rounded-2xl shadow-xl max-w-md w-full modal-slide-up"
+        className="bg-[#171717] text-white p-8 rounded-2xl shadow-2xl max-w-md w-full transform animate-scaleFade"
       >
         {!isSubmitted ? (
-          <form action={formAction} className="flex flex-col space-y-4">
-            <h2 className="text-xl font-semibold">Unlock exclusive access • Accédez aux privilèges exclusifs</h2>
+          <form action={formAction} className="flex flex-col space-y-5">
+            <h2 className="text-2xl font-semibold leading-tight text-center">
+              Unlock exclusive access  
+              <br />
+              <span className="text-gray-300 text-base">
+                Accédez aux privilèges exclusifs
+              </span>
+            </h2>
+
             <input
               type="email"
               required
-              id='email'
-              name='email'
+              id="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Votre adresse email"
               className="border border-gray-600 bg-transparent text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             />
+
             <button
               type="submit"
               className="bg-main text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
             >
-              S inscrire
+              S'inscrire
             </button>
           </form>
         ) : (
@@ -95,6 +104,7 @@ export default function SubscriptionModal() {
             <p className="text-green-400 font-semibold">Merci pour votre inscription !</p>
           </div>
         )}
+
         <ToastContainer position="bottom-right" />
       </div>
     </div>
