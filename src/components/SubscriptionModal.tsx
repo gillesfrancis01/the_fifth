@@ -15,7 +15,7 @@ export default function SubscriptionModal() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const TEN_MINUTES_MS = 10 * 60 * 1000
+    const TEN_MINUTES_MS = 5 * 1000
     const modalAlreadyShown = localStorage.getItem('newsletterModalShown')
 
     if (modalAlreadyShown) return
