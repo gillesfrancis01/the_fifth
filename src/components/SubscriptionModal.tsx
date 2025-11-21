@@ -69,8 +69,17 @@ export default function SubscriptionModal() {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div
         ref={modalRef}
-        className="bg-[#171717] text-white p-8 rounded-2xl shadow-2xl max-w-md w-full transform animate-scaleFade"
+        className="relative bg-[#171717] text-white p-8 rounded-2xl shadow-2xl max-w-md w-full transform animate-scaleFade"
       >
+        {/* Croix de fermeture */}
+        <button
+          onClick={() => setIsFirstVisit(false)}
+          className="absolute top-3 right-3 text-gray-400 hover:text-white hover:scale-110 transition"
+          aria-label="Fermer"
+        >
+          &#10005; {/* symbole X */}
+        </button>
+  
         {!isSubmitted ? (
           <form action={formAction} className="flex flex-col space-y-5">
             <h2 className="text-2xl font-semibold leading-tight text-center">
@@ -80,7 +89,7 @@ export default function SubscriptionModal() {
                 Accédez aux privilèges exclusifs
               </span>
             </h2>
-
+  
             <input
               type="email"
               required
@@ -91,7 +100,7 @@ export default function SubscriptionModal() {
               placeholder="Votre adresse email"
               className="border border-gray-600 bg-transparent text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             />
-
+  
             <button
               type="submit"
               className="bg-main text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
@@ -104,9 +113,10 @@ export default function SubscriptionModal() {
             <p className="text-green-400 font-semibold">Merci pour votre inscription !</p>
           </div>
         )}
-
+  
         <ToastContainer position="bottom-right" />
       </div>
     </div>
   )
+  
 }
