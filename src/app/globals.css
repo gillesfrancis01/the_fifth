@@ -111,6 +111,22 @@ textarea {
   @apply translate-x-0;
 }
 
+@keyframes modal-slide-up {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-slide-up {
+  animation: modal-slide-up 0.35s ease-out;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #050505;
