@@ -13,13 +13,29 @@ export default function SubscriptionModal() {
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hasVisited = localStorage.getItem('hasVisited')
-      if (!hasVisited) {
-        setIsFirstVisit(true)
-        localStorage.setItem('hasVisited', 'true')
-      }
+    if (typeof window === 'undefined') return
+
+    const TEN_MINUTES_MS = 10 * 60 * 1000
+    const modalAlreadyShown = localStorage.getItem('newsletterModalShown')
+
+    if (modalAlreadyShown) return
+
+    const scheduledAt = localStorage.getItem('newsletterModalScheduledAt')
+    const now = Date.now()
+    const parsedScheduledTime = scheduledAt ? parseInt(scheduledAt, 10) : NaN
+    const scheduledTime = Number.isNaN(parsedScheduledTime) ? now : parsedScheduledTime
+    const remainingDelay = Math.max(TEN_MINUTES_MS - (now - scheduledTime), 0)
+
+    if (!scheduledAt) {
+      localStorage.setItem('newsletterModalScheduledAt', now.toString())
     }
+
+    const timer = setTimeout(() => {
+      setIsFirstVisit(true)
+      localStorage.setItem('newsletterModalShown', 'true')
+    }, remainingDelay)
+
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -49,8 +65,11 @@ export default function SubscriptionModal() {
   if (!isFirstVisit) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#171717] bg-opacity-95 backdrop-blur-sm text-white">
-      <div ref={modalRef} className="bg-[#171717] text-white p-6 rounded-2xl shadow-xl max-w-md w-full">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 text-white p-4 sm:p-6">
+      <div
+        ref={modalRef}
+        className="bg-[#171717] text-white p-6 rounded-2xl shadow-xl max-w-md w-full"
+      >
         {!isSubmitted ? (
           <form action={formAction} className="flex flex-col space-y-4">
             <h2 className="text-xl font-semibold">Unlock exclusive access • Accédez aux privilèges exclusifs</h2>
