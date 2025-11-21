@@ -96,7 +96,7 @@ export default function SubscriptionModal() {
               type="submit"
               className="bg-main text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
             >
-              S'inscrire
+              S&#39;inscrire
             </button>
           </form>
         ) : (
