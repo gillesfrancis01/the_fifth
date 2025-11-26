@@ -18,9 +18,10 @@ export default function SuccessClient() {
     const phone = searchParams.get('phone')
     const ticketId = searchParams.get('ticketId')
     const eventId = searchParams.get('eventId')
+    const quantity = Number(searchParams.get('quantity') ?? '1')
     const paymentIntent = searchParams.get('paymentIntent')
 
-    if (!fullName || !email || !phone || !ticketId || !eventId || !paymentIntent) {
+    if (!fullName || !email || !phone || !ticketId || !eventId || !paymentIntent || Number.isNaN(quantity)) {
       setError('Données client ou ticket incomplètes.')
       setLoading(false)
       return
@@ -34,7 +35,8 @@ export default function SuccessClient() {
           phone,
           ticketId,
           paymentIntent,
-          eventId
+          eventId,
+          quantity,
         })
       } catch (err) {
         console.error('Appwrite error:', err)

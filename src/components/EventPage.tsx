@@ -35,9 +35,11 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [ticketQuantity, setTicketQuantity] = useState(1)
 
   const handleGetTicket = (ticket: TicketWithAvailability) => {
     setSelectedTicket(ticket)
+    setTicketQuantity(1)
     setShowModal(true)
   }
 
@@ -113,29 +115,30 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
     return () => ctx.revert()
   }, [])
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (!selectedTicket) return
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedTicket) return
 
-  const res = await fetch('/actions/create-payment-intent', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      email,
-      phone,
-      ticket: selectedTicket,
-    }),
-  })
+    const res = await fetch('/actions/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        ticket: selectedTicket,
+        quantity: ticketQuantity,
+      }),
+    })
 
-  const data = await res.json()
+    const data = await res.json()
 
-  if (data.clientSecret) {
-    setClientSecret(data.clientSecret)
-  } else {
-    alert('Erreur lors de la création du paiement.')
+    if (data.clientSecret) {
+      setClientSecret(data.clientSecret)
+    } else {
+      alert('Erreur lors de la création du paiement.')
+    }
   }
-}
 
 
   return (
@@ -267,6 +270,24 @@ const handleSubmit = async (e: React.FormEvent) => {
                   onChange={(e) => setPhone(e.target.value)}
                   className="border p-2 rounded-md"
                 />
+                <label className="text-sm font-medium text-white">
+                  Quantité
+                  <input
+                    type="number"
+                    min={1}
+                    max={selectedTicket?.remaining ?? 1}
+                    value={ticketQuantity}
+                    onChange={(e) =>
+                      setTicketQuantity(Math.min(Math.max(1, Number(e.target.value)), selectedTicket?.remaining ?? 1))
+                    }
+                    className="mt-1 w-full border p-2 rounded-md bg-transparent"
+                  />
+                </label>
+                {selectedTicket && (
+                  <p className="text-white text-sm">
+                    Total : ${(selectedTicket.price * ticketQuantity).toFixed(2)}
+                  </p>
+                )}
                 <button
                   type="submit"
                   className="bg-main text-white py-2 px-4 rounded-md hover:bg-opacity-80"
@@ -291,6 +312,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   fullName={name}
   email={email}
   phone={phone}
+  quantity={ticketQuantity}
   ticketId={selectedTicket.$id}
   eventId={event.$id}
 />
