@@ -13,6 +13,7 @@ interface CustomerInfo {
   eventId: string
   ticketId: string
   paymentIntent: string
+  quantity: number
 }
 
 export async function upsertAppwriteCustomer({
@@ -22,6 +23,7 @@ export async function upsertAppwriteCustomer({
   eventId,
   ticketId,
   paymentIntent,
+  quantity,
 }: CustomerInfo) {
   const { databases } = await createAdminClient()
 
@@ -54,27 +56,29 @@ export async function upsertAppwriteCustomer({
     customerId = newCustomer.$id
   }
 
-  const newReservation = await databases.createDocument(dbId, reservationCol, ID.unique(), {
-    customer_ID: customerId,
-    event_ID: eventId,
-    ticket_ID: ticketId,
-    paymentIntent,
-    available: true,
-  })
-
   const eventDoc = (await databases.getDocument(dbId, eventCol, eventId)) as unknown as events
   const ticketDoc = (await databases.getDocument(dbId, ticketCol, ticketId)) as unknown as Ticket
 
-  await sendTicketConfirmationEmail({
-    customerId,
-    reservationId: newReservation.$id,
-    fullName,
-    email,
-    phone,
-    event: eventDoc,
-    ticket: ticketDoc,
-    paymentIntent,
-  })
+  for (let i = 0; i < Math.max(1, quantity); i += 1) {
+    const newReservation = await databases.createDocument(dbId, reservationCol, ID.unique(), {
+      customer_ID: customerId,
+      event_ID: eventId,
+      ticket_ID: ticketId,
+      paymentIntent,
+      available: true,
+    })
 
-  console.log('Réservation créée avec succès :', newReservation.$id)
+    await sendTicketConfirmationEmail({
+      customerId,
+      reservationId: newReservation.$id,
+      fullName,
+      email,
+      phone,
+      event: eventDoc,
+      ticket: ticketDoc,
+      paymentIntent,
+    })
+
+    console.log('Réservation créée avec succès :', newReservation.$id)
+  }
 }

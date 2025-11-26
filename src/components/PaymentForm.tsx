@@ -12,6 +12,7 @@ export default function PaymentForm({
   fullName,
   email,
   phone,
+  quantity,
   ticketId,
   eventId,
 }: {
@@ -19,6 +20,7 @@ export default function PaymentForm({
   fullName: string
   email: string
   phone: string
+  quantity: number
   ticketId: string
   eventId: string
 }) {
@@ -40,7 +42,7 @@ export default function PaymentForm({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/success?name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&ticketId=${encodeURIComponent(ticketId)}&eventId=${eventId}&paymentIntent=${clientSecret.split('_secret')[0]}`,
+        return_url: `${window.location.origin}/success?name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&ticketId=${encodeURIComponent(ticketId)}&eventId=${eventId}&quantity=${quantity}&paymentIntent=${clientSecret.split('_secret')[0]}`,
       },
     })
 
