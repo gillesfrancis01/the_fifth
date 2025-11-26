@@ -272,16 +272,19 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                 />
                 <label className="text-sm font-medium text-white">
                   Quantité
-                  <input
-                    type="number"
-                    min={1}
-                    max={selectedTicket?.remaining ?? 1}
+                  <select
                     value={ticketQuantity}
-                    onChange={(e) =>
-                      setTicketQuantity(Math.min(Math.max(1, Number(e.target.value)), selectedTicket?.remaining ?? 1))
-                    }
+                    onChange={(e) => setTicketQuantity(Number(e.target.value))}
                     className="mt-1 w-full border p-2 rounded-md bg-transparent"
-                  />
+                  >
+                    {Array.from({ length: Math.max(1, selectedTicket?.remaining ?? 1) }, (_, index) => index + 1).map(
+                      (value) => (
+                        <option key={value} value={value} className="bg-[#171717]">
+                          {value}
+                        </option>
+                      )
+                    )}
+                  </select>
                 </label>
                 {selectedTicket && (
                   <p className="text-white text-sm">
