@@ -32,7 +32,7 @@ const Page = ({ params }) => {
       </h1>
       <div className='flex flex-col gap-28 lg:flex-row'>
         <div>
-      <p className="text-lg text-center mt-6 max-w-2xl mx-auto text-gray-300">
+      <p className="text-lg  mt-6 max-w-2xl mx-auto text-gray-300">
         {item.description}
       </p>
 
@@ -44,7 +44,7 @@ const Page = ({ params }) => {
             <h2 className="text-xl lg:text-2xl text-main font-semibold mb-3">
               {section.title}
             </h2>
-            <p className="text-gray-300 leading-relaxed text-center md:text-left">{section.content}</p>
+            <p className="text-gray-300 leading-relaxed text-center ">{section.content}</p>
           </div>
         ))}
       </div>
