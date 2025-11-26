@@ -9,7 +9,7 @@ export default function AboutPage() {
       <p className='mt-10 leading-8 max-w-3xl mx-auto'>
        Join us as we take you behind the scenes of our spectacular events, showcasing the magic we create from concept to execution. From elegant weddings to corporate galas and everything in between, our channel offers expert tips, creative inspiration, and captivating event recaps that will leave you inspired to host your own unforgettable gatherings.
       </p>
-      <div >
+      <div className='text-left'>
       <p className='mt-6 leading-8 max-w-3xl mx-auto'>
       The Fifth Event is more than an event platform it’s a movement. A celebration of bold talent, cultural fusion, and unforgettable nights.
       </p>
