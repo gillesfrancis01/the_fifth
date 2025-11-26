@@ -44,7 +44,7 @@ const Page = ({ params }) => {
             <h2 className="text-xl lg:text-2xl text-main font-semibold mb-3">
               {section.title}
             </h2>
-            <p className="text-gray-300 leading-relaxed text-center ">{section.content}</p>
+            <p className="text-gray-300 leading-relaxed ">{section.content}</p>
           </div>
         ))}
       </div>
