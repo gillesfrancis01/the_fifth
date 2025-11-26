@@ -64,7 +64,7 @@ export const Services = ({ item }: { item: service }) => {
       <h3 ref={textRef} className="text-3xl lg:text-left lg:w-[20%]">{item.title}</h3>
       <p className="mt-3 text-xl lg:w-[30%]">{item.description}</p>
 
-      <span className="inline-block ml-2 p-2 rounded-full bg-main">
+      <span className="inline-block ml-2 p-2 rounded-full bg-main mt-3">
             <Image
               src="/bi_arrow-right-black.svg"
               width={18}
