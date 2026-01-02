@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 
 import type { Reservation, Ticket, events } from '@/types'
 import { createAdminClient } from '../../../config/appwrite'
-import { getReservationConfig, setReservationAvailability } from '../actions/updateReservationAvailability'
+import { getReservationConfig } from '@/utils/config'
+import { setReservationAvailability } from '../actions/updateReservationAvailability'
 
 export const metadata: Metadata = {
   title: 'Validation du billet | The Fifth',
@@ -237,9 +238,8 @@ export default async function CheckInPage({
                 <div>
                   <dt className="font-medium text-slate-500">Statut</dt>
                   <dd
-                    className={`mt-1 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                      isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                    }`}
+                    className={`mt-1 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                      }`}
                   >
                     {isAvailable ? 'Billet valide' : 'Billet déjà utilisé'}
                   </dd>
