@@ -1,4 +1,7 @@
+
+import ExportButton from '@/components/admin/ExportButton'
 import ReservationsTable from '@/components/admin/ReservationsTable'
+import AdminRealtimeSync from '@/components/admin/AdminRealtimeSync'
 import { fetchAdminCoreData, fetchTicketsForEvents, buildReservationsWithDetails } from '../loaders'
 import { formatReservationTimestamp } from '@/utils/reservations'
 
@@ -16,8 +19,22 @@ export default async function AdminReservationsPage() {
     .filter((value): value is string => Boolean(value))
     .sort((a, b) => Date.parse(b) - Date.parse(a))[0]
 
+  // Prepare export data (flatten objects)
+  const exportData = reservationsWithDetails.map(r => ({
+    ID: r.reservation.$id,
+    Date: new Date(r.reservation.$createdAt ?? '').toLocaleString('fr-FR'),
+    Client: r.customer?.fullName ?? 'Inconnu',
+    Email: r.customer?.email ?? '',
+    Evenement: r.event?.name ?? 'Inconnu',
+    Ticket: r.ticket?.name ?? 'Inconnu',
+    Prix: r.ticket?.price ?? 0,
+    Statut: r.reservation.status,
+    Paiement: r.reservation.paymentIntent
+  }))
+
   return (
     <div className="space-y-10">
+      <AdminRealtimeSync />
       <section className="space-y-6 rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-950/70 to-zinc-950/95 p-8 shadow-[0_35px_90px_-45px_rgba(0,0,0,0.9)]">
         <div className="flex flex-col gap-3">
           <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">Réservations</p>
@@ -35,13 +52,16 @@ export default async function AdminReservationsPage() {
       </section>
 
       <section className="space-y-6 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-semibold text-white">Historique détaillé</h3>
             <p className="text-sm text-zinc-400">Consultez l’ensemble des réservations et leurs informations associées.</p>
           </div>
-          <div className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
-            Dernière réservation : {lastReservation ? formatReservationTimestamp(lastReservation) : '—'}
+          <div className="flex items-center gap-3">
+            <ExportButton data={exportData} filename="reservations_globales" />
+            <div className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
+              Dernière réservation : {lastReservation ? formatReservationTimestamp(lastReservation) : '—'}
+            </div>
           </div>
         </div>
         <ReservationsTable reservations={reservationsWithDetails} />

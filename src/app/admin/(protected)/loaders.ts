@@ -1,6 +1,6 @@
 import getAllEvents from '@/app/actions/getAllEvent'
 import getAllReservations from '@/app/actions/getAllReservations'
-import getAllCustomers from '@/app/actions/getAllCustomers'
+import getCustomersByIds from '@/app/actions/getCustomersByIds'
 import getAllTickets from '@/app/actions/getAllTickets'
 import type { events as Event, Reservation, Customer, TicketWithAvailability } from '@/types'
 import type { ReservationWithDetails, TicketWithEvent } from '@/types/admin-dashboard'
@@ -15,17 +15,20 @@ export async function fetchReservations(): Promise<Reservation[]> {
   return reservations ?? []
 }
 
-export async function fetchCustomers(): Promise<Customer[]> {
-  const customers = await getAllCustomers()
-  return customers ?? []
-}
-
 export async function fetchAdminCoreData() {
-  const [events, reservations, customers] = await Promise.all([
+  // 1. Fetch Events and Reservations in parallel
+  const [events, reservations] = await Promise.all([
     fetchEvents(),
     fetchReservations(),
-    fetchCustomers(),
   ])
+
+  // 2. Extract unique Customer IDs from reservations
+  const customerIds = reservations
+    .map((r) => r.customer_ID)
+    .filter((id): id is string => Boolean(id))
+
+  // 3. Fetch ONLY the relevant customers
+  const customers = await getCustomersByIds(customerIds)
 
   return { events, reservations, customers }
 }

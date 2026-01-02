@@ -112,6 +112,12 @@ export default async function AdminEventsPage() {
                         {formatEventDateTime(event.date, 'fr-FR')}
                       </span>
                       <span>{event.adresse || 'Adresse à confirmer'}</span>
+                      <a
+                        href={`/admin/events/${event.$id}/reservations`}
+                        className="mt-1 text-[10px] uppercase tracking-widest text-main hover:text-white hover:underline"
+                      >
+                        Voir réservations →
+                      </a>
                     </div>
                   </div>
                 </li>

@@ -1,4 +1,4 @@
-export interface events{
+export interface events {
     $id: string,
     name: string,
     description: string,
@@ -20,16 +20,17 @@ export interface Ticket {
     available: boolean
     quantity: number
     event?: string
-  }
+}
 export interface TicketWithAvailability extends Ticket {
     sold: number
     remaining: number
-  }
+}
 export interface Customer {
     $id: string
     fullName: string
     email: string
     phone: string
+    $createdAt: string
 }
 export interface Reservation {
     status: string
@@ -47,16 +48,16 @@ export interface service {
     description: string,
 }
 export interface portfolio {
-    id:number,
-    name:string,
-    image:string,
-    client:string,
-    description:string
+    id: number,
+    name: string,
+    image: string,
+    client: string,
+    description: string
 }
 export interface testimonial {
     id: number,
-    userImg:string,
+    userImg: string,
     userName: string,
-    rate:string,
-    userMessage:string,
+    rate: string,
+    userMessage: string,
 }

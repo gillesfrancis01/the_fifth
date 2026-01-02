@@ -13,9 +13,10 @@ import Image from 'next/image'
 const links = [
   { href: '/admin/dashboard', label: 'Vue d’ensemble', icon: PiChartLineUp },
   { href: '/admin/events', label: 'Événements', icon: PiMaskHappy },
-  { href: '/admin/tickets', label: 'Tickets & réservations', icon: PiTicket },
-  { href: '/admin/reservations', label: 'Clients & invités', icon: PiUsersThree },
-  { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiCalendarBlank },
+  { href: '/admin/tickets', label: 'Tickets', icon: PiTicket },
+  { href: '/admin/reservations', label: 'Réservations', icon: PiCalendarBlank },
+  { href: '/admin/customers', label: 'Clients & invités', icon: PiUsersThree },
+  { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiChartLineUp },
 
 ] as const
 
@@ -27,7 +28,7 @@ export default function AdminSidebar() {
       <div className="absolute inset-0 rounded-3xl border border-white/5 [mask-image:radial-gradient(circle_at_top,black,transparent_70%)]" />
       <div className="relative space-y-5">
         <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-black/60 px-4 py-3">
-        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link>
+          <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100} /></Link>
         </div>
         <div className="space-y-2">
           <h2 className="font-heading text-2xl text-white">Ambiance & Direction</h2>
@@ -40,24 +41,22 @@ export default function AdminSidebar() {
       <div className="relative h-[1px] w-full bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
       <nav className="relative space-y-2">
-        {links.map(({ href, label, icon: Icon}) => {
+        {links.map(({ href, label, icon: Icon }) => {
           const isActive = pathname ? pathname === href || pathname.startsWith(`${href}/`) : false
 
           return (
             <Link
               key={href}
-              href={ href}
-              className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 transition-all duration-300 ${
-                isActive
+              href={href}
+              className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 transition-all duration-300 ${isActive
                   ? 'border-[rgba(201,161,77,0.45)] bg-[rgba(201,161,77,0.08)] text-white shadow-[0_20px_35px_-25px_rgba(201,161,77,0.7)]'
                   : 'border-white/5 text-white/60 hover:border-[rgba(201,161,77,0.35)] hover:text-white'
-              } `}
+                } `}
             >
               <span className="absolute inset-0 translate-x-[-100%] bg-[radial-gradient(circle_at_left,rgba(201,161,77,0.16),transparent_70%)] transition duration-500 group-hover:translate-x-0" />
               <span
-                className={`relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/50 text-[rgba(201,161,77,0.85)] transition-all duration-300 ${
-                  isActive ? 'border-[rgba(201,161,77,0.6)] bg-[rgba(201,161,77,0.1)] text-[rgba(201,161,77,1)]' : 'group-hover:border-[rgba(201,161,77,0.45)] group-hover:text-[rgba(201,161,77,1)]'
-                }`}
+                className={`relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/50 text-[rgba(201,161,77,0.85)] transition-all duration-300 ${isActive ? 'border-[rgba(201,161,77,0.6)] bg-[rgba(201,161,77,0.1)] text-[rgba(201,161,77,1)]' : 'group-hover:border-[rgba(201,161,77,0.45)] group-hover:text-[rgba(201,161,77,1)]'
+                  }`}
               >
                 <Icon className="h-5 w-5" />
               </span>

@@ -396,9 +396,9 @@ function StatCard({ label, value, helper, icon: Icon }: { label: string; value: 
           <Icon className="h-5 w-5" />
         </span>
       </div>
-      <p className="relative mt-4 text-[11px] uppercase tracking-[0.45em] text-white/50">{label}</p>
-      <p className="relative mt-2 text-3xl font-semibold text-white">{value}</p>
-      {helper ? <p className="relative mt-2 text-xs text-white/55">{helper}</p> : null}
+      <p className="relative mt-4 truncate text-[10px] uppercase tracking-[0.2em] text-white/50" title={label}>{label}</p>
+      <p className="relative mt-2 truncate text-lg font-semibold text-white" title={value}>{value}</p>
+      {helper ? <p className="relative mt-2 truncate text-[10px] text-white/55" title={helper}>{helper}</p> : null}
     </div>
   )
 }
