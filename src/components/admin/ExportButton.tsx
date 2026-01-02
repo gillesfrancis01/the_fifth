@@ -2,19 +2,19 @@
 
 import { PiDownloadSimple } from "react-icons/pi"
 
-interface ExportButtonProps {
-    data: any[]
+interface ExportButtonProps<T> {
+    data: T[]
     filename?: string
     label?: string
     headers?: { key: string; label: string }[]
 }
 
-export default function ExportButton({
+export default function ExportButton<T>({
     data,
     filename = 'export',
     label = 'Exporter CSV',
     headers
-}: ExportButtonProps) {
+}: ExportButtonProps<T>) {
 
     const handleExport = () => {
         if (!data || data.length === 0) {
