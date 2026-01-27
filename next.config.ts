@@ -5,13 +5,23 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol:'https',
+        protocol: 'https',
         hostname: 'cloud.appwrite.io',
-        pathname:'**'
+        pathname: '**'
       },
       {
         protocol: 'https',
         hostname: 'fra.cloud.appwrite.io',
+        pathname: '**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+        pathname: '**'
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
         pathname: '**'
       }
     ]

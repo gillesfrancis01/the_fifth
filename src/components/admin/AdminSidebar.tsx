@@ -8,12 +8,14 @@ import {
   PiMaskHappy,
   PiTicket,
   PiUsersThree,
+  PiTag,
 } from 'react-icons/pi'
 import Image from 'next/image'
 const links = [
   { href: '/admin/dashboard', label: 'Vue d’ensemble', icon: PiChartLineUp },
   { href: '/admin/events', label: 'Événements', icon: PiMaskHappy },
   { href: '/admin/tickets', label: 'Tickets', icon: PiTicket },
+  { href: '/admin/promo-codes', label: 'Codes Promo', icon: PiTag },
   { href: '/admin/reservations', label: 'Réservations', icon: PiCalendarBlank },
   { href: '/admin/customers', label: 'Clients & invités', icon: PiUsersThree },
   { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiChartLineUp },
@@ -49,8 +51,8 @@ export default function AdminSidebar() {
               key={href}
               href={href}
               className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 transition-all duration-300 ${isActive
-                  ? 'border-[rgba(201,161,77,0.45)] bg-[rgba(201,161,77,0.08)] text-white shadow-[0_20px_35px_-25px_rgba(201,161,77,0.7)]'
-                  : 'border-white/5 text-white/60 hover:border-[rgba(201,161,77,0.35)] hover:text-white'
+                ? 'border-[rgba(201,161,77,0.45)] bg-[rgba(201,161,77,0.08)] text-white shadow-[0_20px_35px_-25px_rgba(201,161,77,0.7)]'
+                : 'border-white/5 text-white/60 hover:border-[rgba(201,161,77,0.35)] hover:text-white'
                 } `}
             >
               <span className="absolute inset-0 translate-x-[-100%] bg-[radial-gradient(circle_at_left,rgba(201,161,77,0.16),transparent_70%)] transition duration-500 group-hover:translate-x-0" />

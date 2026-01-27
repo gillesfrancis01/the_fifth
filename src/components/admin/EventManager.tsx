@@ -126,11 +126,10 @@ export default function EventManager({ events }: EventManagerProps) {
 
       {banner && (
         <p
-          className={`rounded-2xl border px-4 py-3 text-sm ${
-            banner.type === 'success'
-              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-              : 'border-red-500/40 bg-red-500/10 text-red-200'
-          }`}
+          className={`rounded-2xl border px-4 py-3 text-sm ${banner.type === 'success'
+            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+            : 'border-red-500/40 bg-red-500/10 text-red-200'
+            }`}
         >
           {banner.message}
         </p>
@@ -297,7 +296,7 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
       {event.description_sections.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {event.description_sections.map((section) => (
-            <span key={section} className="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/55">
+            <span key={section} className="rounded-2xl border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/55 whitespace-pre-wrap break-words max-w-full">
               {section}
             </span>
           ))}
@@ -341,11 +340,11 @@ function InfoRow({ label, value, isLink, full }: InfoRowProps) {
     <p className={`flex flex-col gap-1 text-white/60 ${full ? 'sm:col-span-2' : ''}`}>
       <span className="text-[11px] uppercase tracking-[0.35em] text-white/45">{label}</span>
       {isLink ? (
-        <a href={value} target="_blank" rel="noopener noreferrer" className="text-sm text-main underline decoration-dotted underline-offset-4">
+        <a href={value} target="_blank" rel="noopener noreferrer" className="text-sm text-main underline decoration-dotted underline-offset-4 break-all">
           {value}
         </a>
       ) : (
-        <span className="text-sm text-white/70">{value}</span>
+        <span className="text-sm text-white/70 whitespace-pre-wrap break-words">{value}</span>
       )}
     </p>
   )

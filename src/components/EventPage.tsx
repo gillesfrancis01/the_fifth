@@ -11,6 +11,9 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import PaymentForm from './PaymentForm'
 
+import { verifyPromoCode } from '@/app/actions/promo'
+import { PromoCode } from '@/types'
+
 gsap.registerPlugin(ScrollTrigger)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -21,12 +24,11 @@ interface EventPageProps {
 }
 
 const EventPage = ({ event, tickets }: EventPageProps) => {
-  const imageRef = useRef<HTMLImageElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const descRef = useRef<HTMLParagraphElement>(null)
-  const ticketsRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<HTMLDivElement>(null)
-  const shineRef = useRef<HTMLDivElement>(null)
 
   const [selectedTicket, setSelectedTicket] = useState<TicketWithAvailability | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -37,72 +39,91 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const [phone, setPhone] = useState('')
   const [ticketQuantity, setTicketQuantity] = useState(1)
 
+  // Promo Code State
+  const [promoCode, setPromoCode] = useState('')
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null)
+  const [promoError, setPromoError] = useState('')
+  const [isVerifyingPromo, setIsVerifyingPromo] = useState(false)
+
+  const handleApplyPromo = async () => {
+    if (!promoCode) return
+    setIsVerifyingPromo(true)
+    setPromoError('')
+    setAppliedPromo(null)
+
+    const result = await verifyPromoCode(promoCode.toUpperCase())
+    if (result.success && result.promo) {
+      setAppliedPromo(result.promo)
+    } else {
+      setPromoError(result.error || 'Code invalide')
+    }
+    setIsVerifyingPromo(false)
+  }
+
+  const calculateTotal = () => {
+    if (!selectedTicket) return 0
+    let total = selectedTicket.price * ticketQuantity
+
+    if (appliedPromo) {
+      if (appliedPromo.type === 'percentage') {
+        total = total - (total * (appliedPromo.value / 100))
+      } else {
+        total = Math.max(0, total - appliedPromo.value)
+      }
+    }
+    return total
+  }
+
   const handleGetTicket = (ticket: TicketWithAvailability) => {
     setSelectedTicket(ticket)
     setTicketQuantity(1)
+    setPromoCode('')
+    setAppliedPromo(null)
+    setPromoError('')
     setShowModal(true)
   }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to(imageRef.current, {
-        y: -100,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: imageRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
-      })
-
+      // Hero Animation
       gsap.fromTo(
-        [titleRef.current, descRef.current],
-        { opacity: 0, y: 40 },
+        heroRef.current,
+        { scale: 1.1, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1.5, ease: 'power2.out' }
+      )
+
+      // Title Animation
+      gsap.fromTo(
+        titleRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, delay: 0.5, ease: 'power3.out' }
+      )
+
+      // Cards Animation
+      gsap.fromTo(
+        cardsRef.current?.children ?? [],
+        { y: 50, opacity: 0 },
         {
-          opacity: 1,
           y: 0,
-          duration: 1.2,
-          stagger: 0.3,
-          ease: 'power3.out',
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: 'power2.out',
           scrollTrigger: {
-            trigger: titleRef.current,
+            trigger: cardsRef.current,
             start: 'top 85%',
           },
         }
       )
 
-      gsap.to(shineRef.current, {
-        xPercent: 100,
-        duration: 2,
-        ease: 'power1.inOut',
-        repeat: -1,
-        yoyo: true,
-      })
-
-      gsap.fromTo(
-        ticketsRef.current?.children,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          stagger: 0.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: ticketsRef.current,
-            start: 'top 90%',
-          },
-        }
-      )
-
+      // Map Animation
       gsap.fromTo(
         mapRef.current,
-        { opacity: 0, scale: 0.95 },
+        { y: 50, opacity: 0 },
         {
+          y: 0,
           opacity: 1,
-          scale: 1,
-          duration: 1.5,
+          duration: 1,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: mapRef.current,
@@ -110,7 +131,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
           },
         }
       )
-    })
+    }, containerRef)
 
     return () => ctx.revert()
   }, [])
@@ -128,6 +149,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
         phone,
         ticket: selectedTicket,
         quantity: ticketQuantity,
+        promoCode: appliedPromo ? appliedPromo.code : null
       }),
     })
 
@@ -140,188 +162,279 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
     }
   }
 
-
   return (
-    <div>
-      <div className="relative overflow-hidden">
-        <img
-          ref={imageRef}
-          src={event.image}
-          className="m-auto mt-10 w-[90vw] h-[500px] max-md:rounded-xl object-cover rounded-lg shadow-lg"
-          alt="event"
-        />
+    <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white selection:bg-main selection:text-black">
+      {/* Immersive Hero Section */}
+      <div className="relative w-full h-[70vh] overflow-hidden">
+        <div ref={heroRef} className="absolute inset-0 w-full h-full">
+          <Image
+            src={event.image}
+            alt={event.name}
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-[#0a0a0a]" />
+        </div>
+
+        <div className="absolute bottom-0 left-0 w-full p-8 lg:p-16 z-10 flex flex-col items-center lg:items-start text-center lg:text-left">
+          <h1 ref={titleRef} className="text-4xl lg:text-7xl font-Josefin font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 drop-shadow-2xl">
+            {event.name}
+          </h1>
+        </div>
       </div>
 
-      <h1
-        ref={titleRef}
-        className="text-3xl text-center uppercase font-extrabold text-main mt-5 font-Josefin lg:text-left lg:w-[90vw] lg:m-auto lg:my-10 relative overflow-hidden"
-      >
-        {event.name}
-        <div
-          ref={shineRef}
-          className="absolute top-0 left-0 w-20 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
-          style={{ transform: 'translateX(-100%)', mixBlendMode: 'screen' }}
-        />
-      </h1>
-      <p className='text-center'>French description will Follow</p>
-      {event.description_sections.map((e,id) => (
-         <p
-         ref={descRef}
-         key={id}
-         className="text-center my-10 lg:w-[90vw] lg:m-auto lg:mt-10 lg:text-left mt-5"
-       >
-         {e}
-       </p>
-      ))}
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-6 py-16 space-y-24">
 
+        {/* Description */}
+        <div className="space-y-8 max-w-4xl mx-auto text-center lg:text-left">
+          <p className="text-gray-400 italic text-sm uppercase tracking-widest">
+            Event Description
+          </p>
+          <div className="space-y-6 text-lg lg:text-xl text-gray-300 font-light leading-relaxed">
+            {event.description_sections.map((section, idx) => (
+              <p key={idx}>{section}</p>
+            ))}
+          </div>
+          <p className='text-xs text-gray-500 italic mt-4'>French description will Follow</p>
+        </div>
 
-      <h2 className="text-main text-center text-2xl font-Josefin">Tickets</h2>
-      <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt="arrows" />
-      <h3 className="uppercase text-2xl font-Josefin text-main font-bold text-center">
-        Get your Ticket now
-      </h3>
+        {/* Tickets Section */}
+        <div className="relative">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-Josefin font-bold text-main">Get Your Tickets</h2>
+            <div className="w-24 h-1 bg-main mx-auto rounded-full" />
+            <p className="text-gray-400">Secure your spot for an unforgettable experience</p>
+          </div>
 
-      <div ref={ticketsRef} className="lg:flex justify-center gap-10 flex-wrap mt-8">
-        {tickets.map((item) => (
-          <div
-            key={item.$id}
-            className="flex flex-col w-[70vw] max-w-[300px] border-2 border-main p-8 mt-10 rounded-lg shadow-md transition-transform hover:scale-105 hover:shadow-xl cursor-pointer"
-          >
-            <h3 className="text-3xl uppercase font-extrabold text-main font-Josefin">
-              {item.name}
-            </h3>
-            <ul>
-              {item.advantages.map((ad) => (
-                <li
-                  key={ad}
-                  className="flex gap-3 items-center mt-5 font-extralight"
-                >
-                  <GrStatusGood className="text-yellow-400" />
-                  {ad}
-                </li>
-              ))}
-            </ul>
-            <div className="flex mt-10 gap-4 items-center justify-between">
-              <h3 className="font-extrabold text-2xl">${item.price}</h3>
-              {item.available && item.remaining > 0 ? (
-                <button
-                  className="flex gap-1 items-center border-main border p-2 text-main rounded-md shadow-md transition-transform hover:scale-110 hover:rotate-1 hover:shadow-yellow-400/50"
-                  onClick={() => handleGetTicket(item)}
-                >
-                  Get Ticket <FaLongArrowAltRight className="text-yellow-400" />
-                </button>
-              ) : (
-                <p className="text-red-500 font-semibold">Not Available</p>
-              )}
+          <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-stretch">
+            {tickets.map((ticket) => (
+              <div
+                key={ticket.$id}
+                className="group relative flex flex-col p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-main/10 ring-1 ring-white/5"
+              >
+                {/* Card Glow Effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col h-full">
+                  <h3 className="text-2xl font-Josefin font-bold uppercase tracking-wide text-white mb-2">
+                    {ticket.name}
+                  </h3>
+                  <div className="w-12 h-0.5 bg-gray-500 mb-6 group-hover:bg-main transition-colors duration-300" />
+
+                  <ul className="flex-1 space-y-4 mb-8">
+                    {ticket.advantages.map((ad, i) => (
+                      <li key={i} className="flex items-start gap-3 text-gray-300 font-light text-sm">
+                        <GrStatusGood className="text-main w-5 h-5 flex-shrink-0 mt-0.5" />
+                        <span className='leading-snug'>{ad}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-auto border-t border-white/10 pt-6">
+                    <div className="flex items-end justify-between mb-6">
+                      <span className="text-gray-400 text-sm">Price</span>
+                      <span className="text-3xl font-bold text-white">${ticket.price}</span>
+                    </div>
+
+                    {ticket.available && ticket.remaining > 0 ? (
+                      <button
+                        onClick={() => handleGetTicket(ticket)}
+                        className="w-full group/btn relative overflow-hidden bg-transparent border border-[#B78418] text-[#B78418] font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-[#B78418] hover:text-black flex items-center justify-center gap-2"
+                      >
+                        <span className="relative z-10">Get Ticket</span>
+                        <FaLongArrowAltRight className="relative z-10 transform group-hover/btn:translate-x-1 transition-transform" />
+                      </button>
+                    ) : (
+                      <button disabled className="w-full bg-red-500/10 border border-red-500/50 text-red-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed">
+                        Sold Out
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Map Section */}
+        <div ref={mapRef} className="mt-24 w-full h-[400px] rounded-2xl overflow-hidden shadow-2xl border border-white/10 grayscale hover:grayscale-0 transition-all duration-700">
+          <iframe
+            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBmOnXwk6UJGZrviERljANNWizRXjccyM8&q=${encodeURIComponent(
+              event.adresse
+            )}`}
+            width="100%"
+            height="100%"
+            loading="lazy"
+            allowFullScreen
+            className="w-full h-full border-0"
+          />
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#171717] border border-white/10 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center">
+              <h2 className="text-xl font-bold font-Josefin text-white">
+                Checkout: <span className="text-main">{selectedTicket?.name}</span>
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
             </div>
 
-          </div>
-        ))}
-      </div>
+            <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+              {!clientSecret ? (
+                <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main focus:ring-1 focus:ring-main transition-all"
+                      required
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main focus:ring-1 focus:ring-main transition-all"
+                      required
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone Number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main focus:ring-1 focus:ring-main transition-all"
+                      required
+                    />
 
-      <div
-        ref={mapRef}
-        className="mt-10 w-full h-[200px] rounded-xl overflow-hidden shadow-lg"
-      >
-        <iframe
-          src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBmOnXwk6UJGZrviERljANNWizRXjccyM8&q=${encodeURIComponent(
-            event.adresse
-          )}`}
-          width="100%"
-          height="100%"
-          loading="lazy"
-          allowFullScreen
-          className="rounded-xl"
-        />
-      </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-400">Quantity</label>
+                      <select
+                        value={ticketQuantity}
+                        onChange={(e) => setTicketQuantity(Number(e.target.value))}
+                        className="w-full bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main transition-all appearance-none cursor-pointer"
+                      >
+                        {Array.from({ length: Math.max(1, selectedTicket?.remaining ?? 1) }, (_, index) => index + 1).map(
+                          (value) => (
+                            <option key={value} value={value} className="bg-[#171717] text-white">
+                              {value}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 overflow-scroll">
-          <div className="bg-[#171717] p-8 rounded-lg w-[90vw] max-w-md relative shadow-xl">
-            <button
-              className="absolute top-2 right-2 text-red-500 font-bold"
-              onClick={() => setShowModal(false)}
-            >
-              ✕
-            </button>
-            <h2 className="text-2xl font-bold text-main mb-4">
-              Ticket for: {selectedTicket?.name}
-            </h2>
-            {!clientSecret ? (
-              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="Nom Complet"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="border p-2 rounded-md"
-                />
-                <input
-                  type="email"
-                  placeholder="Courriel"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="border p-2 rounded-md"
-                />
-                <input
-                  type="tel"
-                  placeholder="Numéro de Téléphone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="border p-2 rounded-md"
-                />
-                <label className="text-sm font-medium text-white">
-                  Quantité
-                  <select
-                    value={ticketQuantity}
-                    onChange={(e) => setTicketQuantity(Number(e.target.value))}
-                    className="mt-1 w-full border p-2 rounded-md bg-transparent"
+                    {/* Promo Code Section */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-400">Promo Code</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter Code"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          className="flex-1 bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main transition-all placeholder:text-gray-600"
+                          disabled={!!appliedPromo}
+                        />
+                        {appliedPromo ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppliedPromo(null)
+                              setPromoCode('')
+                            }}
+                            className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 rounded-lg hover:bg-red-500/20 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleApplyPromo}
+                            disabled={!promoCode || isVerifyingPromo}
+                            className="bg-white/10 border border-white/10 text-white px-4 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isVerifyingPromo ? '...' : 'Apply'}
+                          </button>
+                        )}
+                      </div>
+                      {promoError && <p className="text-red-400 text-xs">{promoError}</p>}
+                      {appliedPromo && (
+                        <p className="text-green-400 text-xs">
+                          Code applied: {appliedPromo.type === 'percentage' ? `-${appliedPromo.value}%` : `-$${appliedPromo.value}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {selectedTicket && (
+                    <div className="flex flex-col gap-2 bg-white/5 p-4 rounded-lg mt-2 border border-white/5">
+                      <div className="flex justify-between items-center text-sm text-gray-400">
+                        <span>Subtotal</span>
+                        <span>${(selectedTicket.price * ticketQuantity).toFixed(2)}</span>
+                      </div>
+                      {appliedPromo && (
+                        <div className="flex justify-between items-center text-sm text-green-400">
+                          <span>Discount</span>
+                          <span>-${((selectedTicket.price * ticketQuantity) - calculateTotal()).toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center pt-2 border-t border-white/10 mt-2">
+                        <span className="text-gray-300 font-bold">Total Amount</span>
+                        <span className="text-xl font-bold text-main">
+                          ${calculateTotal().toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full bg-main text-black font-bold py-3 px-6 rounded-lg hover:bg-main/90 transition-colors mt-2"
                   >
-                    {Array.from({ length: Math.max(1, selectedTicket?.remaining ?? 1) }, (_, index) => index + 1).map(
-                      (value) => (
-                        <option key={value} value={value} className="bg-[#171717]">
-                          {value}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </label>
-                {selectedTicket && (
-                  <p className="text-white text-sm">
-                    Total : ${(selectedTicket.price * ticketQuantity).toFixed(2)}
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  className="bg-main text-white py-2 px-4 rounded-md hover:bg-opacity-80"
-                >
-                  Confirmer l achat
-                </button>
-              </form>
-            ) : (
-              <Elements stripe={stripePromise} options={{ clientSecret,appearance: {
-                theme: 'night',
-                variables: {
-                  colorPrimary: '#FFD700',
-                  colorBackground: '#171717',
-                  colorText: '#ffffff',
-                  colorDanger: '#ff4d4f',
-                  spacingUnit: '4px',
-                  borderRadius: '8px',
-                },
-              }, }}>
-<PaymentForm
-  clientSecret={clientSecret}
-  fullName={name}
-  email={email}
-  phone={phone}
-  quantity={ticketQuantity}
-  ticketId={selectedTicket.$id}
-  eventId={event.$id}
-/>
-
-              </Elements>
-            )}
+                    Proceed to Payment
+                  </button>
+                </form>
+              ) : (
+                <div className="animate-in slide-in-from-right duration-300">
+                  <Elements stripe={stripePromise} options={{
+                    clientSecret, appearance: {
+                      theme: 'night',
+                      variables: {
+                        colorPrimary: '#FFD700',
+                        colorBackground: '#171717',
+                        colorText: '#ffffff',
+                        colorDanger: '#ff4d4f',
+                        spacingUnit: '4px',
+                        borderRadius: '8px',
+                      },
+                    },
+                  }}>
+                    <PaymentForm
+                      clientSecret={clientSecret}
+                      fullName={name}
+                      email={email}
+                      phone={phone}
+                      quantity={ticketQuantity}
+                      ticketId={selectedTicket!.$id}
+                      eventId={event.$id}
+                    />
+                  </Elements>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -61,3 +61,17 @@ export interface testimonial {
     rate: string,
     userMessage: string,
 }
+
+export interface Gallery {
+    $id: string
+    event: string
+    images: string[]
+}
+
+export interface PromoCode {
+    $id: string
+    code: string
+    type: 'percentage' | 'fixed'
+    value: number
+    active: boolean
+}
