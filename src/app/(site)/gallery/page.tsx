@@ -8,7 +8,20 @@ import Modal from '@/components/ui/Modal'
 import HeicImage from '@/components/ui/HeicImage'
 
 const transformImageURL = (url: string) => {
-  return url
+  if (url.startsWith('http')) {
+    return url;
+  }
+  // Construct the Appwrite storage URL
+  // We use the event bucket by default as per the plan, assuming images resolve there
+  const endpoint = process.env.NEXT_PUBLIC_ENDPOINT;
+  const bucketId = process.env.NEXT_PUBLIC_APPWRITE_BUCKETS_EVENT;
+  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT;
+
+  if (endpoint && bucketId && projectId) {
+    return `${endpoint}/storage/buckets/${bucketId}/files/${url}/view?project=${projectId}&mode=admin`;
+  }
+
+  return url;
 }
 
 export default function GalleryPage() {

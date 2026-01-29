@@ -85,18 +85,42 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero Animation
-      gsap.fromTo(
+      // Hero Animation - Cinematic Entrance + Parallax
+      const tl = gsap.timeline();
+
+      // Initial Reveal (Fade + Scale Down)
+      tl.fromTo(
         heroRef.current,
-        { scale: 1.1, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 1.5, ease: 'power2.out' }
-      )
+        { scale: 1.2, opacity: 0 },
+        { scale: 1.1, opacity: 1, duration: 1.8, ease: 'power2.out' }
+      );
+
+      // Parallax Effect on Scroll
+      gsap.to(heroRef.current, {
+        yPercent: 20, // Moves image down slightly as user scrolls down
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+
+      // Continuous Cinematic Zoom (Ken Burns)
+      gsap.to(heroRef.current, {
+        scale: 1.0,
+        duration: 20,
+        ease: 'none',
+        repeat: -1,
+        yoyo: true, // Slowly zooms in and out
+      });
 
       // Title Animation
       gsap.fromTo(
         titleRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, delay: 0.5, ease: 'power3.out' }
+        { y: "100%" },
+        { y: "0%", duration: 1.2, delay: 0.5, ease: 'power4.out' }
       )
 
       // Cards Animation
@@ -174,14 +198,17 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
             className="object-cover"
             priority
           />
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-[#0a0a0a]" />
+          {/* Gradient Overlay - Enhanced for Cinematic Feel */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-[#0a0a0a]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#0a0a0a_120%)] opacity-60" /> {/* Vignette */}
         </div>
 
         <div className="absolute bottom-0 left-0 w-full p-8 lg:p-16 z-10 flex flex-col items-center lg:items-start text-center lg:text-left">
-          <h1 ref={titleRef} className="text-4xl lg:text-7xl font-Josefin font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 drop-shadow-2xl">
-            {event.name}
-          </h1>
+          <div className="overflow-hidden pb-4"> {/* Added padding-bottom to ensure descenders/shadows aren't clipped */}
+            <h1 ref={titleRef} className="text-4xl lg:text-7xl font-Josefin font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#B78418] via-[#E6C55D] to-[#B78418] drop-shadow-2xl transform translate-y-full"> {/* Initial state accessible if JS fails, though GSAP handles it */}
+              {event.name}
+            </h1>
+          </div>
         </div>
       </div>
 
@@ -193,12 +220,13 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
           <p className="text-gray-400 italic text-sm uppercase tracking-widest">
             Event Description
           </p>
+          <p className='text-xs text-gray-500 italic mt-4'>French description will Follow</p>
+
           <div className="space-y-6 text-lg lg:text-xl text-gray-300 font-light leading-relaxed">
             {event.description_sections.map((section, idx) => (
               <p key={idx}>{section}</p>
             ))}
           </div>
-          <p className='text-xs text-gray-500 italic mt-4'>French description will Follow</p>
         </div>
 
         {/* Tickets Section */}
@@ -213,8 +241,9 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
             {tickets.map((ticket) => (
               <div
                 key={ticket.$id}
-                className="group relative flex flex-col p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-main/10 ring-1 ring-white/5"
+                className="group relative flex flex-col p-8 rounded-2xl bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-main/10 border border-[#B78418]"
               >
+                {/* Card Glow Effect */}
                 {/* Card Glow Effect */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
@@ -222,7 +251,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                   <h3 className="text-2xl font-Josefin font-bold uppercase tracking-wide text-white mb-2">
                     {ticket.name}
                   </h3>
-                  <div className="w-12 h-0.5 bg-gray-500 mb-6 group-hover:bg-main transition-colors duration-300" />
+                  <div className="w-12 h-0.5 bg-main mb-6 group-hover:bg-main transition-colors duration-300" />
 
                   <ul className="flex-1 space-y-4 mb-8">
                     {ticket.advantages.map((ad, i) => (
@@ -248,7 +277,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                         <FaLongArrowAltRight className="relative z-10 transform group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     ) : (
-                      <button disabled className="w-full bg-red-500/10 border border-red-500/50 text-red-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed">
+                      <button disabled className="w-full bg-red-500/10 border border-red-500/50 text-red-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed uppercase tracking-wider">
                         Sold Out
                       </button>
                     )}
