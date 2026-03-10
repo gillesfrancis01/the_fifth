@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { FaCheckCircle } from 'react-icons/fa'
 import Link from 'next/link'
-import { upsertAppwriteCustomer } from '@/app/actions/upsertAppwriteCustomer'
+
 
 
 export default function SuccessClient() {
@@ -13,40 +13,8 @@ export default function SuccessClient() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const fullName = searchParams.get('name')
-    const email = searchParams.get('email')
-    const phone = searchParams.get('phone')
-    const ticketId = searchParams.get('ticketId')
-    const eventId = searchParams.get('eventId')
-    const quantity = Number(searchParams.get('quantity') ?? '1')
-    const paymentIntent = searchParams.get('paymentIntent')
-
-    if (!fullName || !email || !phone || !ticketId || !eventId || !paymentIntent || Number.isNaN(quantity)) {
-      setError('Données client ou ticket incomplètes.')
-      setLoading(false)
-      return
-    }
-
-    const runUpsert = async () => {
-      try {
-        await upsertAppwriteCustomer({
-          fullName,
-          email,
-          phone,
-          ticketId,
-          paymentIntent,
-          eventId,
-          quantity,
-        })
-      } catch (err) {
-        console.error('Appwrite error:', err)
-        setError("Erreur lors de l'enregistrement du client ou de l'envoi du courriel.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    runUpsert()
+    // Ticket generation is now handled via Stripe Webhook
+    setLoading(false)
   }, [])
 
   if (loading) {

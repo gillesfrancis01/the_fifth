@@ -7,7 +7,7 @@ import { PromoCode } from "@/types"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string,)
 
 export async function POST(req: NextRequest) {
-  const { ticket, name, email, phone, quantity, promoCode } = await req.json()
+  const { ticket, name, email, phone, quantity, promoCode, eventId } = await req.json()
   const ticketQuantity = Math.max(1, Number(quantity ?? 1))
 
   let finalAmount = ticket.price * ticketQuantity
@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     currency: 'cad',
     metadata: {
       ticketId: ticket.$id,
+      eventId,
       name,
       phone,
       quantity: ticketQuantity,

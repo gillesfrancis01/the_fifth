@@ -17,7 +17,7 @@ export interface Ticket {
     name: string
     advantages: string[]
     price: number
-    available: boolean
+    available: boolean | null
     quantity: number
     event?: string
 }

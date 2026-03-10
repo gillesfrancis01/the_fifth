@@ -173,7 +173,8 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
         phone,
         ticket: selectedTicket,
         quantity: ticketQuantity,
-        promoCode: appliedPromo ? appliedPromo.code : null
+        promoCode: appliedPromo ? appliedPromo.code : null,
+        eventId: event.$id
       }),
     })
 
@@ -268,7 +269,11 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       <span className="text-3xl font-bold text-white">${ticket.price}</span>
                     </div>
 
-                    {ticket.available && ticket.remaining > 0 ? (
+                    {ticket.available === null ? (
+                      <button disabled className="w-full bg-gray-500/10 border border-gray-500/50 text-gray-400 font-bold py-3 px-6 rounded-lg cursor-not-allowed uppercase tracking-wider text-sm">
+                        Not Yet Available
+                      </button>
+                    ) : ticket.available && ticket.remaining > 0 ? (
                       <button
                         onClick={() => handleGetTicket(ticket)}
                         className="w-full group/btn relative overflow-hidden bg-transparent border border-[#B78418] text-[#B78418] font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-[#B78418] hover:text-black flex items-center justify-center gap-2"

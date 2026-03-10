@@ -59,18 +59,26 @@ export async function upsertAppwriteCustomer({
   const eventDoc = (await databases.getDocument(dbId, eventCol, eventId)) as unknown as events
   const ticketDoc = (await databases.getDocument(dbId, ticketCol, ticketId)) as unknown as Ticket
 
+  const reservationPromises = []
   for (let i = 0; i < Math.max(1, quantity); i += 1) {
-    const newReservation = await databases.createDocument(dbId, reservationCol, ID.unique(), {
-      customer_ID: customerId,
-      event_ID: eventId,
-      ticket_ID: ticketId,
-      paymentIntent,
-      available: true,
-    })
+    reservationPromises.push(
+      databases.createDocument(dbId, reservationCol, ID.unique(), {
+        customer_ID: customerId,
+        event_ID: eventId,
+        ticket_ID: ticketId,
+        paymentIntent,
+        available: true,
+      })
+    )
+  }
 
-    await sendTicketConfirmationEmail({
+  const reservations = await Promise.all(reservationPromises)
+  console.log(`Created ${reservations.length} reservations`)
+
+  const emailPromises = reservations.map((reservation) =>
+    sendTicketConfirmationEmail({
       customerId,
-      reservationId: newReservation.$id,
+      reservationId: reservation.$id,
       fullName,
       email,
       phone,
@@ -78,7 +86,8 @@ export async function upsertAppwriteCustomer({
       ticket: ticketDoc,
       paymentIntent,
     })
+  )
 
-    console.log('Réservation créée avec succès :', newReservation.$id)
-  }
+  await Promise.allSettled(emailPromises)
+  console.log('All confirmation emails processed')
 }

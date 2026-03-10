@@ -1,6 +1,7 @@
 'use server'
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import QRCode from 'qrcode'
 
 import type { events, Ticket } from '@/types'
 import { formatEventDateTime } from './eventDate'
@@ -48,28 +49,13 @@ function ensureJpegFormat(url: string) {
   }
 }
 
-function buildQrCodeUrl(payload: string) {
-  const configured = process.env.TICKETING_QR_BASE_URL
-  const encodedPayload = encodeURIComponent(payload)
-  const defaultBase = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=jpg&data='
-
-  if (!configured) {
-    return `${defaultBase}${encodedPayload}`
+async function generateQrCodeDataUrl(payload: string) {
+  try {
+    return await QRCode.toDataURL(payload)
+  } catch (err) {
+    console.error('Error generating QR code', err)
+    return ''
   }
-
-  if (configured.includes('{DATA}')) {
-    return ensureJpegFormat(configured.replace('{DATA}', encodedPayload))
-  }
-
-  if (configured.endsWith('=')) {
-    return ensureJpegFormat(`${configured}${encodedPayload}`)
-  }
-
-  const hasQuery = configured.includes('?')
-  const needsTrailingSeparator = configured.endsWith('?') || configured.endsWith('&')
-  const separator = hasQuery ? (needsTrailingSeparator ? '' : '&') : '?'
-
-  return ensureJpegFormat(`${configured}${separator}data=${encodedPayload}`)
 }
 
 function formatCurrency(amount: number) {
@@ -418,16 +404,20 @@ async function generateTicketPdf(params: {
   // ---------- QR CODE (colonne gauche) ----------
   let qrImage
   try {
-    const qrResponse = await fetch(qrCodeUrl)
-    if (!qrResponse.ok) {
-      throw new Error(`QR fetch failed with status ${qrResponse.status}`)
-    }
-    const qrBytes = new Uint8Array(await qrResponse.arrayBuffer())
-    // On essaye JPG puis PNG au cas où
-    try {
-      qrImage = await pdfDoc.embedJpg(qrBytes)
-    } catch {
-      qrImage = await pdfDoc.embedPng(qrBytes)
+    if (qrCodeUrl.startsWith('data:')) {
+      qrImage = await pdfDoc.embedPng(qrCodeUrl)
+    } else {
+      const qrResponse = await fetch(qrCodeUrl)
+      if (!qrResponse.ok) {
+        throw new Error(`QR fetch failed with status ${qrResponse.status}`)
+      }
+      const qrBytes = new Uint8Array(await qrResponse.arrayBuffer())
+      // On essaye JPG puis PNG au cas où
+      try {
+        qrImage = await pdfDoc.embedJpg(qrBytes)
+      } catch {
+        qrImage = await pdfDoc.embedPng(qrBytes)
+      }
     }
   } catch (e) {
     console.warn('Impossible de charger le QR code pour le billet PDF', e)
@@ -694,7 +684,7 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
     paymentIntent: payload.paymentIntent,
   })
 
-  const qrCodeUrl = buildQrCodeUrl(qrPayload)
+  const qrCodeUrl = await generateQrCodeDataUrl(qrPayload)
 
   const html = buildEmailHtml({
     fullName: payload.fullName,
