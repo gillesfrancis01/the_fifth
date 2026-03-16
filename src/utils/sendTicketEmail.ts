@@ -180,7 +180,7 @@ function buildTicketTemplate(data: TicketTemplateData) {
                   <!-- TICKET TYPE -->
                   <p style="margin:0; font-size:15px; color:#000;">
                     <strong>TYPE DE BILLET</strong><br>
-                    ADMISSION GÉNÉRALE
+                    <strong>${data.ticketName}</strong><br>
                   </p>
 
                 </td>
@@ -516,10 +516,6 @@ async function generateTicketPdf(params: {
   drawRightLine(locationName, { size: 10 })
   drawRightLine(locationAddress, { size: 10 })
   drawRightLine(formattedPrice, { size: 10, gap: 18 })
-
-  // Type de billet
-  infoY -= 4
-  drawRightLine('TYPE DE BILLET', { size: 10, bold: true, color: rgb(0.45, 0.45, 0.45), gap: 14 })
 
   // ---------- BAS DE PAGE : affiches + infos lieu + QR ----------
   // Zone des affiches
