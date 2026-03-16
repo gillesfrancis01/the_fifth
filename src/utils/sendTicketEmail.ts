@@ -83,6 +83,7 @@ interface TicketTemplateData {
   locationName: string
   locationFullAddress: string
   phone: string
+  ticketName: string
 }
 
 function buildTicketTemplate(data: TicketTemplateData) {
@@ -168,7 +169,7 @@ function buildTicketTemplate(data: TicketTemplateData) {
 
                   <!-- INFO BLOCK -->
                   <p style="margin:0; font-size:15px; color:#000; line-height:1.6;">
-                    <strong>BILLET RÉGULIER</strong><br>
+                    <strong>${data.ticketName}</strong><br>
                     👤 Délivré à : <strong>${data.fullName}</strong><br>
                     📍 ${data.eventAddress}<br>
                     💵 ${data.formattedPrice}
@@ -208,7 +209,7 @@ function buildTicketTemplate(data: TicketTemplateData) {
             En achetant un billet pour cet événement, vous acceptez cette politique d'achat.
             <br><br>
             Avant d'acheter vos billets, veuillez confirmer titre, heure et lieu de l'événement.
-            Sous réserve des termes et conditions trouvés sur www.tixr.com.
+            Sous réserve des termes et conditions trouvés sur www.thefifthevent.com.
           </td>
         </tr>
 
@@ -270,6 +271,7 @@ function prepareTicketTemplateData({
     locationName: event.locationName ?? event.name,
     locationFullAddress: event.locationFullAddress ?? event.adresse,
     phone: event.phone ?? phone,
+    ticketName: ticket.name,
   }
 }
 
@@ -509,7 +511,7 @@ async function generateTicketPdf(params: {
   infoY -= 4
 
   // Bloc "Billet régulier"
-  drawRightLine('BILLET RÉGULIER', { size: 11, bold: true, gap: 16 })
+  drawRightLine(ticket.name, { size: 11, bold: true, gap: 16 })
   drawRightLine(`Délivré à : ${fullName}`, { size: 10 })
   drawRightLine(locationName, { size: 10 })
   drawRightLine(locationAddress, { size: 10 })
@@ -518,7 +520,6 @@ async function generateTicketPdf(params: {
   // Type de billet
   infoY -= 4
   drawRightLine('TYPE DE BILLET', { size: 10, bold: true, color: rgb(0.45, 0.45, 0.45), gap: 14 })
-  drawRightLine(ticket.name, { size: 11 })
 
   // ---------- BAS DE PAGE : affiches + infos lieu + QR ----------
   // Zone des affiches
