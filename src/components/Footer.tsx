@@ -24,7 +24,7 @@ export const Footer = () => {
        <Link href="https://www.facebook.com/profile.php?id=61555262770004" className='p-2  bg-white text-black rounded-full '>  <FaFacebookF /></Link> 
        <Link href='https://www.instagram.com/the_fifth_event/' className='p-2  bg-white/10  rounded-full'> <FaInstagram /></Link> 
 
-       <Link href="https://www.youtube.com/@FJaysEvents" className='p-2  bg-white text-black rounded-full'> <BsYoutube /> </Link> 
+       <Link href="https://www.youtube.com/@THEFIFTHEVENT" className='p-2  bg-white text-black rounded-full'> <BsYoutube /> </Link> 
 
        </div>
       </div>

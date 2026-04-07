@@ -24,6 +24,16 @@ const transformImageURL = (url: string) => {
   return url;
 }
 
+const getYouTubeEmbedUrl = (url: string) => {
+  if (!url) return '';
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([^&?]+)/);
+  if (match && match[1]) {
+    // Add autoplay, mute (required for autoplay), and loop
+    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1&loop=1&playlist=${match[1]}&rel=0`;
+  }
+  return url; // return as-is if it doesn't match
+}
+
 export default function GalleryPage() {
   const [allGalleries, setAllGalleries] = useState<Gallery[]>([])
   const [activeGalleryId, setActiveGalleryId] = useState<string>('all')
@@ -35,7 +45,7 @@ export default function GalleryPage() {
   useEffect(() => {
     async function fetchGallery() {
       const data = await getGallery()
-      setAllGalleries(data)
+      setAllGalleries(data || [])
     }
     fetchGallery()
   }, [])
@@ -49,6 +59,20 @@ export default function GalleryPage() {
     } else {
       const gallery = allGalleries.find(g => g.$id === activeGalleryId)
       return gallery ? gallery.images.map(img => ({ url: img, event: gallery.event })) : []
+    }
+  }, [activeGalleryId, allGalleries])
+
+  // Get videos for banner based on selection
+  const displayedVideos = React.useMemo(() => {
+    if (activeGalleryId === 'all') {
+      return allGalleries
+        .filter(g => g.video && g.video.trim() !== '')
+        .map(g => ({ url: getYouTubeEmbedUrl(g.video!), name: g.event }))
+    } else {
+      const gallery = allGalleries.find(g => g.$id === activeGalleryId)
+      return gallery && gallery.video && gallery.video.trim() !== '' 
+        ? [{ url: getYouTubeEmbedUrl(gallery.video), name: gallery.event }] 
+        : []
     }
   }, [activeGalleryId, allGalleries])
 
@@ -75,9 +99,33 @@ export default function GalleryPage() {
 
 
   return (
-    <div className='min-h-screen py-10 relative pb-32'>
+    <div className='min-h-screen relative pb-32'>
 
-      <div className="text-center mb-10">
+      {/* YouTube Video Banner */}
+      {displayedVideos.length > 0 && (
+        <div className="w-full mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-main text-center text-3xl md:text-4xl font-Josefin font-bold tracking-widest uppercase">
+              Event Highlight
+            </h2>
+          </div>
+          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory bg-black">
+            {displayedVideos.map((video, idx) => (
+              <div key={idx} className="flex-none snap-center snap-always w-full h-[50vh] relative">
+                <iframe
+                  className="absolute inset-0 w-full h-full border-none"
+                  src={video.url}
+                  title={`Event Highlight ${video.name}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="text-center mb-10 mt-16 pt-10">
         <h2 className='text-main text-center text-2xl font-Josefin'>Our Data</h2>
         <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows' />
         <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>Inspirations</h3>

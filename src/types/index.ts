@@ -66,6 +66,7 @@ export interface Gallery {
     $id: string
     event: string
     images: string[]
+    video?: string | null
 }
 
 export interface PromoCode {

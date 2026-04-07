@@ -4,8 +4,8 @@ import useConstants from '@/hooks/useConstants'
 import Image from 'next/image'
 import ContactCard from '@/components/ContactCard'
 
-const Page = ({ params }) => {
-  const { id } = params
+const Page = ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = React.use(params)
   const { services } = useConstants()
   const item = services.find((el) => el.id === id)
 
