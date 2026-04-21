@@ -1,0 +1,12 @@
+
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+    return NextResponse.json({
+        NEXT_PUBLIC_APPWRITE_PROJECT: process.env.NEXT_PUBLIC_APPWRITE_PROJECT,
+        NEXT_PUBLIC_ENDPOINT: process.env.NEXT_PUBLIC_ENDPOINT,
+        NEXT_PUBLIC_DATABASE: process.env.NEXT_PUBLIC_DATABASE,
+        NEXT_PUBLIC_APPWRITE_COLLECTION_RESERVATION: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_RESERVATION,
+        NEXT_PUBLIC_APPWRITE_COLLECTION_TICKET: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TICKET,
+    });
+}
