@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Mot de passe requis.' }, { status: 400 })
   }
 
-  if (password !== process.env.ADMIN_PASSWORD) {
+  console.log(process.env); if (password !== process.env.ADMIN_PASSWORD) {
     return NextResponse.json({ message: 'Identifiants incorrects.' }, { status: 401 })
   }
 
