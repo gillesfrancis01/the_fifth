@@ -12,11 +12,14 @@ const RESEND_API_URL = 'https://api.resend.com/emails'
 
 export async function sendProviderStatusEmail(payload: ProviderEmailPayload) {
   const apiKey = process.env.RESEND_API_KEY
-  const fromEmail = process.env.TICKETING_EMAIL_FROM || 'info@thefifthevent.com'
+  const fromEmail = process.env.TICKETING_EMAIL_FROM
 
   if (!apiKey) {
-    console.warn("RESEND_API_KEY n'est pas défini dans l'environnement. Notification e-mail ignorée.")
-    return
+    throw new Error("La clé d'API Resend (RESEND_API_KEY) n'est pas configurée dans les variables d'environnement.")
+  }
+
+  if (!fromEmail) {
+    throw new Error("L'adresse e-mail d'expédition (TICKETING_EMAIL_FROM) n'est pas configurée dans les variables d'environnement.")
   }
 
   const isAccepted = payload.status === 'accepted'
@@ -114,11 +117,12 @@ export async function sendProviderStatusEmail(payload: ProviderEmailPayload) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Erreur d'envoi du mail via Resend: ${errorText}`)
+      throw new Error(`Erreur Resend (${response.status}): ${errorText}`)
     } else {
       console.log(`E-mail de notification (${payload.status}) envoyé avec succès à ${payload.email}`)
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Exception lors de l'envoi de l'e-mail Resend`, error)
+    throw new Error(error.message || "Erreur de connexion au serveur d'envoi d'e-mail (Resend).")
   }
 }

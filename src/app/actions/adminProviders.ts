@@ -126,8 +126,9 @@ export async function updateProviderApplicationStatus(
           eventName,
           status,
         })
-      } catch (emailError) {
+      } catch (emailError: any) {
         console.error("Failed to send status email to provider:", emailError)
+        return { success: false, error: `Statut mis à jour en base, mais l'envoi de l'e-mail a échoué : ${emailError.message}` }
       }
     }
 
