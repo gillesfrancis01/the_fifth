@@ -76,3 +76,16 @@ export interface PromoCode {
     value: number
     active: boolean
 }
+
+export interface Provider {
+    $id: string
+    name: string
+    email: string
+    phone: string
+    specialty: string
+    portfolio: string
+    eventId?: string | null
+    message?: string | null
+    status: 'pending' | 'accepted' | 'rejected'
+    $createdAt?: string
+}

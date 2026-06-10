@@ -10,6 +10,7 @@ import {
   PiUsersThree,
   PiTag,
   PiImage,
+  PiBriefcase,
 } from 'react-icons/pi'
 import Image from 'next/image'
 const links = [
@@ -20,6 +21,7 @@ const links = [
   { href: '/admin/reservations', label: 'Réservations', icon: PiCalendarBlank },
   { href: '/admin/customers', label: 'Clients & invités', icon: PiUsersThree },
   { href: '/admin/gallery', label: 'Galerie', icon: PiImage },
+  { href: '/admin/providers', label: 'Prestataires', icon: PiBriefcase },
   { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiChartLineUp },
 
 ] as const
