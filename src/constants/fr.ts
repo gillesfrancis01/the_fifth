@@ -235,5 +235,10 @@ export const SideBarMenu = [
         name: 'Portfolio',
         link: '/portfolio'
 
+    },
+    {
+        id: 6,
+        name: 'JoinUs',
+        link: '/devenir-prestataire'
     }
 ]

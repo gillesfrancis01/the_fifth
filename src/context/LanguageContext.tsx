@@ -41,7 +41,8 @@ const translations: Record<Language, Record<string, string>> = {
     whatWeDo: 'What we do',
     fullServiceEventProduction: 'Full-service event production',
     nextEvent: 'Next Event',
-    noNextEvent: 'No next event'
+    noNextEvent: 'No next event',
+    JoinUs: 'Join as Artist'
   },
   fr: {
     Home: 'Accueil',
@@ -73,7 +74,8 @@ const translations: Record<Language, Record<string, string>> = {
     whatWeDo: 'Ce que nous faisons',
     fullServiceEventProduction: "Production d'\u00E9v\u00E9nements cl\u00E9s en main",
     nextEvent: 'Prochain \u00E9v\u00E9nement',
-    noNextEvent: "Aucun \u00E9v\u00E9nement \u00E0 venir"
+    noNextEvent: "Aucun \u00E9v\u00E9nement \u00E0 venir",
+    JoinUs: 'Devenir Prestataire'
   },
   es: {
     Home: 'Inicio',
@@ -105,7 +107,8 @@ const translations: Record<Language, Record<string, string>> = {
     whatWeDo: 'Lo que hacemos',
     fullServiceEventProduction: 'Producci\u00F3n de eventos integral',
     nextEvent: 'Pr\u00F3ximo evento',
-    noNextEvent: 'No hay pr\u00F3ximo evento'
+    noNextEvent: 'No hay pr\u00F3ximo evento',
+    JoinUs: 'Unirse como Artista'
   }
 }
 

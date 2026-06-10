@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ID, Query } from 'node-appwrite'
 import { createAdminClient } from '../../../config/appwrite'
 import type { Provider } from '@/types'
+import { sendProviderStatusEmail } from '@/utils/sendProviderEmail'
 
 interface ProviderPayload {
   name: string
@@ -99,9 +100,36 @@ export async function updateProviderApplicationStatus(
   try {
     const { databases } = await createAdminClient()
 
-    await databases.updateDocument(config.databaseId, config.collectionId, providerId, {
+    const updatedDocument = await databases.updateDocument(config.databaseId, config.collectionId, providerId, {
       status,
     })
+
+    // Send email via Resend if accepted or rejected
+    if (status === 'accepted' || status === 'rejected') {
+      try {
+        let eventName = 'Candidature spontanée'
+        if (updatedDocument.eventId) {
+          const eventDoc = await databases.getDocument(
+            config.databaseId,
+            process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS!,
+            updatedDocument.eventId
+          )
+          if (eventDoc && eventDoc.name) {
+            eventName = eventDoc.name
+          }
+        }
+
+        await sendProviderStatusEmail({
+          name: updatedDocument.name,
+          email: updatedDocument.email,
+          specialty: updatedDocument.specialty,
+          eventName,
+          status,
+        })
+      } catch (emailError) {
+        console.error("Failed to send status email to provider:", emailError)
+      }
+    }
 
     revalidateProviderPaths()
     return { success: true }
