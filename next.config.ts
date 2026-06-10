@@ -25,9 +25,13 @@ const nextConfig: NextConfig = {
         pathname: '**'
       }
     ]
-  }
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
   /* config options here */
-
 };
 const withNextIntl = createNextIntlPlugin();
 

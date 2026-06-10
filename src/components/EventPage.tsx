@@ -224,9 +224,13 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
           <p className='text-xs text-gray-500 italic mt-4'>French description will Follow</p>
 
           <div className="space-y-6 text-lg lg:text-xl text-gray-300 font-light leading-relaxed">
-            {event.description_sections.map((section, idx) => (
-              <p key={idx}>{section}</p>
-            ))}
+            {event.description_sections ? (
+              event.description_sections.map((section, idx) => (
+                <p key={idx}>{section}</p>
+              ))
+            ) : event.description ? (
+              <p>{event.description}</p>
+            ) : null}
           </div>
         </div>
 

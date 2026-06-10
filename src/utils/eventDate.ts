@@ -29,15 +29,19 @@ export function parseEventDate(rawValue: string | null | undefined): Date | null
   const value = String(rawValue).trim()
   if (!value) return null
 
-  const directDate = new Date(value)
-  if (!Number.isNaN(directDate.getTime())) {
-    return directDate
+  const hasTimezone = /[Zz]|[+-]\d{2}:?\d{2}$/.test(value)
+
+  if (hasTimezone) {
+    const directDate = new Date(value)
+    if (!Number.isNaN(directDate.getTime())) {
+      return directDate
+    }
   }
 
   const isoMatch = value.match(ISO_STYLE_REGEX)
   if (isoMatch) {
     const { year, month, day, hour, minute } = parseDateParts(isoMatch, 'ymd')
-    const candidate = new Date(year, month, day, hour, minute)
+    const candidate = new Date(Date.UTC(year, month, day, hour, minute))
     if (!Number.isNaN(candidate.getTime())) {
       return candidate
     }
@@ -46,10 +50,26 @@ export function parseEventDate(rawValue: string | null | undefined): Date | null
   const euroMatch = value.match(EUROPEAN_STYLE_REGEX)
   if (euroMatch) {
     const { year, month, day, hour, minute } = parseDateParts(euroMatch, 'dmy')
-    const candidate = new Date(year, month, day, hour, minute)
+    const candidate = new Date(Date.UTC(year, month, day, hour, minute))
     if (!Number.isNaN(candidate.getTime())) {
       return candidate
     }
+  }
+
+  const fallbackDate = new Date(value)
+  if (!Number.isNaN(fallbackDate.getTime())) {
+    if (!hasTimezone) {
+      return new Date(Date.UTC(
+        fallbackDate.getFullYear(),
+        fallbackDate.getMonth(),
+        fallbackDate.getDate(),
+        fallbackDate.getHours(),
+        fallbackDate.getMinutes(),
+        fallbackDate.getSeconds(),
+        fallbackDate.getMilliseconds()
+      ))
+    }
+    return fallbackDate
   }
 
   return null
@@ -77,10 +97,10 @@ export function formatEventDate(rawValue: string): string {
     'December',
   ]
 
-  const weekday = weekdays[date.getDay()]
-  const day = date.getDate()
-  const month = months[date.getMonth()]
-  const year = date.getFullYear()
+  const weekday = weekdays[date.getUTCDay()]
+  const day = date.getUTCDate()
+  const month = months[date.getUTCMonth()]
+  const year = date.getUTCFullYear()
 
   return `${weekday}, ${month} ${day}, ${year}`
 }
@@ -91,8 +111,8 @@ export function formatEventHour(rawValue: string): string {
     return rawValue
   }
 
-  let hours = date.getHours()
-  const minutes = String(date.getMinutes()).padStart(2, '0')
+  let hours = date.getUTCHours()
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
   const ampm = hours >= 12 ? 'PM' : 'AM'
 
   hours = hours % 12 || 12
@@ -120,6 +140,7 @@ export function formatEventDateTime(rawValue: string, locale = 'fr-CA'): string 
     return new Intl.DateTimeFormat(locale, {
       dateStyle: 'full',
       timeStyle: 'short',
+      timeZone: 'UTC',
     }).format(date)
   } catch {
     return date.toISOString()

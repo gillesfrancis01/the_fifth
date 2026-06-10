@@ -9,6 +9,7 @@ import {
   PiTicket,
   PiUsersThree,
   PiTag,
+  PiImage,
 } from 'react-icons/pi'
 import Image from 'next/image'
 const links = [
@@ -18,6 +19,7 @@ const links = [
   { href: '/admin/promo-codes', label: 'Codes Promo', icon: PiTag },
   { href: '/admin/reservations', label: 'Réservations', icon: PiCalendarBlank },
   { href: '/admin/customers', label: 'Clients & invités', icon: PiUsersThree },
+  { href: '/admin/gallery', label: 'Galerie', icon: PiImage },
   { href: '/admin/dashboard#stats', label: 'Statistiques', icon: PiChartLineUp },
 
 ] as const
