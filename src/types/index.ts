@@ -89,3 +89,13 @@ export interface Provider {
     status: 'pending' | 'accepted' | 'rejected'
     $createdAt?: string
 }
+
+export interface ContactMessage {
+    $id: string
+    name: string
+    email: string
+    phone?: string | null
+    subject?: string | null
+    message: string
+    $createdAt?: string
+}
