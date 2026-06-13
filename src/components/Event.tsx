@@ -6,6 +6,7 @@ import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { events } from '@/types' // Assure-toi que ce type est bien défini
+import { formatHour } from '@/app/actions/dateFormat'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -47,7 +48,7 @@ export const Event = ({ event, date}: EventProps) => {
           <FaCalendarAlt className='text-black' />
         </div>
 
-        <h2 className='inline-block ml-3'>{date}</h2>
+        <h2 className='inline-block ml-3'>{date} - {formatHour(event.date)}</h2>
         <h1 className='text-2xl lg:font-Josefin lg:capitalize lg:w-[70%]'>{event.name}</h1>
         <h2 className='text-xl'>{event.adresse}</h2>
         <p className='mt-5'>{event.teaser}</p>

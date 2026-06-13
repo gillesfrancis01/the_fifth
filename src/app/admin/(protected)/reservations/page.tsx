@@ -11,10 +11,11 @@ export default async function AdminReservationsPage() {
 
   const reservationsWithDetails = buildReservationsWithDetails(reservations, events, customers, ticketMapById)
 
-  const revenue = reservationsWithDetails.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
-  const uniqueCustomers = new Set(reservationsWithDetails.map(({ customer }) => customer?.$id).filter(Boolean)).size
-  const conversionRate = totalTickets > 0 ? Math.round((reservationsWithDetails.length / totalTickets) * 100) : 0
-  const lastReservation = reservationsWithDetails
+  const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+  const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
+  const uniqueCustomers = new Set(completedReservations.map(({ customer }) => customer?.$id).filter(Boolean)).size
+  const conversionRate = totalTickets > 0 ? Math.round((completedReservations.length / totalTickets) * 100) : 0
+  const lastReservation = completedReservations
     .map((item) => item.reservation.$createdAt)
     .filter((value): value is string => Boolean(value))
     .sort((a, b) => Date.parse(b) - Date.parse(a))[0]
@@ -44,7 +45,7 @@ export default async function AdminReservationsPage() {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ReservationMetric label="Réservations" value={reservationsWithDetails.length} helper="Confirmées sur la plateforme" />
+          <ReservationMetric label="Réservations" value={completedReservations.length} helper="Confirmées sur la plateforme" />
           <ReservationMetric label="Clients uniques" value={uniqueCustomers} helper="Contacts qualifiés" />
           <ReservationMetric label="Revenus estimés" value={new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'CAD' }).format(revenue)} helper="Basés sur le prix des tickets" />
           <ReservationMetric label="Conversion" value={`${conversionRate}%`} helper="Réservations / tickets publiés" />

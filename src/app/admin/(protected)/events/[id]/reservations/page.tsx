@@ -49,8 +49,9 @@ export default async function EventReservationsPage({ params }: { params: Promis
         ticketMapById
     )
 
-    const revenue = reservationsWithDetails.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
-    const soldCount = reservationsWithDetails.length
+    const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+    const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
+    const soldCount = completedReservations.length
 
     // Prepare export data
     const exportData = reservationsWithDetails.map(r => ({

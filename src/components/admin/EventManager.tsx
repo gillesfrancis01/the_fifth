@@ -333,12 +333,18 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
       </div>
 
       {event.description_sections && event.description_sections.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {event.description_sections.map((section, idx) => (
-            <span key={idx} className="rounded-2xl border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/55 whitespace-pre-wrap break-words max-w-full">
-              {section}
-            </span>
-          ))}
+        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
+          <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Sections de description</p>
+          <div className="space-y-2">
+            {event.description_sections.map((section, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/70 whitespace-pre-wrap break-words"
+              >
+                {section}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -378,16 +384,16 @@ interface InfoRowProps {
 
 function InfoRow({ label, value, isLink, full }: InfoRowProps) {
   return (
-    <p className={`flex flex-col gap-1 text-white/60 ${full ? 'sm:col-span-2' : ''}`}>
+    <div className={`flex flex-col gap-1 text-white/60 min-w-0 w-full ${full ? 'sm:col-span-2' : ''}`}>
       <span className="text-[11px] uppercase tracking-[0.35em] text-white/45">{label}</span>
       {isLink ? (
-        <a href={value} target="_blank" rel="noopener noreferrer" className="text-sm text-main underline decoration-dotted underline-offset-4 break-all">
+        <a href={value} target="_blank" rel="noopener noreferrer" className="text-sm text-main underline decoration-dotted underline-offset-4 break-all block w-full">
           {value}
         </a>
       ) : (
-        <span className="text-sm text-white/70 whitespace-pre-wrap break-words">{value}</span>
+        <span className="text-sm text-white/70 whitespace-pre-wrap break-words block w-full">{value}</span>
       )}
-    </p>
+    </div>
   )
 }
 

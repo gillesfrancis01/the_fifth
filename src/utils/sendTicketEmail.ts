@@ -59,6 +59,7 @@ async function generateQrCodeDataUrl(payload: string) {
 }
 
 function formatCurrency(amount: number) {
+  if (amount === 0) return 'Gratuit'
   try {
     return new Intl.NumberFormat('en-CA', {
       style: 'currency',

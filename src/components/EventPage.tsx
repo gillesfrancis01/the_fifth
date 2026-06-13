@@ -13,10 +13,60 @@ import PaymentForm from './PaymentForm'
 
 import { verifyPromoCode } from '@/app/actions/promo'
 import { PromoCode } from '@/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+const PROVINCES = [
+  { code: 'QC', name: 'Québec (14.975%)', rate: 0.14975 },
+  { code: 'ON', name: 'Ontario (13%)', rate: 0.13 },
+  { code: 'BC', name: 'Colombie-Britannique (12%)', rate: 0.12 },
+  { code: 'AB', name: 'Alberta (5%)', rate: 0.05 },
+  { code: 'MB', name: 'Manitoba (12%)', rate: 0.12 },
+  { code: 'NB', name: 'Nouveau-Brunswick (15%)', rate: 0.15 },
+  { code: 'NL', name: 'Terre-Neuve-et-Labrador (15%)', rate: 0.15 },
+  { code: 'NS', name: 'Nouvelle-Écosse (15%)', rate: 0.15 },
+  { code: 'PE', name: 'Île-du-Prince-Édouard (15%)', rate: 0.15 },
+  { code: 'SK', name: 'Saskatchewan (11%)', rate: 0.11 },
+  { code: 'NT', name: 'Territoires du Nord-Ouest (5%)', rate: 0.05 },
+  { code: 'NU', name: 'Nunavut (5%)', rate: 0.05 },
+  { code: 'YT', name: 'Yukon (5%)', rate: 0.05 },
+]
+
+function getProvinceFromPostalCode(postalCode: string): string {
+  const cleanCode = postalCode.trim().toUpperCase().replace(/\s+/g, '')
+  if (!cleanCode) return 'QC'
+
+  const firstLetter = cleanCode.charAt(0)
+  switch (firstLetter) {
+    case 'A': return 'NL'
+    case 'B': return 'NS'
+    case 'C': return 'PE'
+    case 'E': return 'NB'
+    case 'G':
+    case 'H':
+    case 'J': return 'QC'
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'P': return 'ON'
+    case 'R': return 'MB'
+    case 'S': return 'SK'
+    case 'T': return 'AB'
+    case 'V': return 'BC'
+    case 'Y': return 'YT'
+    case 'X':
+      if (cleanCode.startsWith('X0A') || cleanCode.startsWith('X0B') || cleanCode.startsWith('X0C')) {
+        return 'NU'
+      }
+      return 'NT'
+    default:
+      return 'QC'
+  }
+}
 
 interface EventPageProps {
   event: events
@@ -24,6 +74,9 @@ interface EventPageProps {
 }
 
 const EventPage = ({ event, tickets }: EventPageProps) => {
+  const { t } = useLanguage()
+  const [postalCode, setPostalCode] = useState('')
+  const selectedProvince = getProvinceFromPostalCode(postalCode)
   const containerRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -60,7 +113,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
     setIsVerifyingPromo(false)
   }
 
-  const calculateTotal = () => {
+  const calculateTotalBeforeTax = () => {
     if (!selectedTicket) return 0
     let total = selectedTicket.price * ticketQuantity
 
@@ -74,12 +127,26 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
     return total
   }
 
+  const getTaxRate = () => {
+    const province = PROVINCES.find((p) => p.code === selectedProvince)
+    return province ? province.rate : 0
+  }
+
+  const calculateTax = () => {
+    return calculateTotalBeforeTax() * getTaxRate()
+  }
+
+  const calculateGrandTotal = () => {
+    return calculateTotalBeforeTax() + calculateTax()
+  }
+
   const handleGetTicket = (ticket: TicketWithAvailability) => {
     setSelectedTicket(ticket)
     setTicketQuantity(1)
     setPromoCode('')
     setAppliedPromo(null)
     setPromoError('')
+    setPostalCode('')
     setShowModal(true)
   }
 
@@ -174,7 +241,8 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
         ticket: selectedTicket,
         quantity: ticketQuantity,
         promoCode: appliedPromo ? appliedPromo.code : null,
-        eventId: event.$id
+        eventId: event.$id,
+        province: selectedProvince
       }),
     })
 
@@ -269,8 +337,10 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
 
                   <div className="mt-auto border-t border-white/10 pt-6">
                     <div className="flex items-end justify-between mb-6">
-                      <span className="text-gray-400 text-sm">Price</span>
-                      <span className="text-3xl font-bold text-white">${ticket.price}</span>
+                      <span className="text-gray-400 text-sm">{t('price')}</span>
+                      <span className="text-3xl font-bold text-white">
+                        {ticket.price === 0 ? t('free') : `$${ticket.price}`}
+                      </span>
                     </div>
 
                     {ticket.available === null ? (
@@ -357,6 +427,16 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       required
                     />
 
+                    <input
+                      type="text"
+                      placeholder="Postal Code (ex: H3Z 2B1)"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      className="w-full bg-black/30 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-main focus:ring-1 focus:ring-main transition-all placeholder:text-gray-600"
+                      required
+                      maxLength={7}
+                    />
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-400">Quantity</label>
                       <select
@@ -426,13 +506,17 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       {appliedPromo && (
                         <div className="flex justify-between items-center text-sm text-green-400">
                           <span>Discount</span>
-                          <span>-${((selectedTicket.price * ticketQuantity) - calculateTotal()).toFixed(2)}</span>
+                          <span>-${((selectedTicket.price * ticketQuantity) - calculateTotalBeforeTax()).toFixed(2)}</span>
                         </div>
                       )}
+                      <div className="flex justify-between items-center text-sm text-gray-400 border-t border-white/5 pt-2">
+                        <span>Taxes ({ (getTaxRate() * 100).toFixed(3).replace(/\.?0+$/, '') }%)</span>
+                        <span>${calculateTax().toFixed(2)}</span>
+                      </div>
                       <div className="flex justify-between items-center pt-2 border-t border-white/10 mt-2">
                         <span className="text-gray-300 font-bold">Total Amount</span>
                         <span className="text-xl font-bold text-main">
-                          ${calculateTotal().toFixed(2)}
+                          ${calculateGrandTotal().toFixed(2)}
                         </span>
                       </div>
                     </div>

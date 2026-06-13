@@ -570,6 +570,7 @@ function parseLines(value: string) {
 }
 
 function formatCurrency(value: number) {
+  if (value === 0) return 'Gratuit'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'CAD',

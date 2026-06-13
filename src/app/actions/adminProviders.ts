@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ID, Query } from 'node-appwrite'
 import { createAdminClient } from '../../../config/appwrite'
 import type { Provider } from '@/types'
-import { sendProviderStatusEmail } from '@/utils/sendProviderEmail'
+import { sendProviderStatusEmail, sendProviderSubmissionEmails } from '@/utils/sendProviderEmail'
 
 interface ProviderPayload {
   name: string
@@ -56,6 +56,38 @@ export async function createProviderApplication(payload: ProviderPayload): Promi
       message: payload.message || null,
       status: 'pending',
     })
+
+    // Fetch event name if eventId is provided
+    let eventName = 'Candidature spontanée'
+    if (payload.eventId) {
+      try {
+        const eventDoc = await databases.getDocument(
+          config.databaseId,
+          process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS!,
+          payload.eventId
+        )
+        if (eventDoc && eventDoc.name) {
+          eventName = eventDoc.name
+        }
+      } catch (eventErr) {
+        console.error('Failed to fetch event name for provider email', eventErr)
+      }
+    }
+
+    // Send emails (confirmation to provider & notification to admin)
+    try {
+      await sendProviderSubmissionEmails({
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        specialty: payload.specialty,
+        portfolio: payload.portfolio,
+        eventName,
+        message: payload.message,
+      })
+    } catch (emailErr) {
+      console.error('Failed to send provider application submission emails', emailErr)
+    }
 
     revalidateProviderPaths()
     return { success: true }

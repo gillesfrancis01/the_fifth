@@ -6,8 +6,24 @@ import { PromoCode } from "@/types"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string,)
 
+const PROV_TAX_RATES: Record<string, number> = {
+  QC: 0.14975,
+  ON: 0.13,
+  BC: 0.12,
+  AB: 0.05,
+  MB: 0.12,
+  NB: 0.15,
+  NL: 0.15,
+  NS: 0.15,
+  PE: 0.15,
+  SK: 0.11,
+  NT: 0.05,
+  NU: 0.05,
+  YT: 0.05,
+}
+
 export async function POST(req: NextRequest) {
-  const { ticket, name, email, phone, quantity, promoCode, eventId } = await req.json()
+  const { ticket, name, email, phone, quantity, promoCode, eventId, province } = await req.json()
   const ticketQuantity = Math.max(1, Number(quantity ?? 1))
 
   let finalAmount = ticket.price * ticketQuantity
@@ -37,6 +53,11 @@ export async function POST(req: NextRequest) {
       console.error("Promo validation error in payment intent", error)
     }
   }
+
+  // Calculate and apply taxes
+  const taxRate = PROV_TAX_RATES[province as string] ?? 0.0
+  const taxAmount = finalAmount * taxRate
+  finalAmount = finalAmount + taxAmount
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(finalAmount * 100), // Stripe expects integers

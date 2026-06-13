@@ -68,6 +68,7 @@ export async function upsertAppwriteCustomer({
         ticket_ID: ticketId,
         paymentIntent,
         available: true,
+        status: 'pending',
       })
     )
   }
@@ -75,18 +76,32 @@ export async function upsertAppwriteCustomer({
   const reservations = await Promise.all(reservationPromises)
   console.log(`Created ${reservations.length} reservations`)
 
-  const emailPromises = reservations.map((reservation) =>
-    sendTicketConfirmationEmail({
-      customerId,
-      reservationId: reservation.$id,
-      fullName,
-      email,
-      phone,
-      event: eventDoc,
-      ticket: ticketDoc,
-      paymentIntent,
-    })
-  )
+  const emailPromises = reservations.map(async (reservation) => {
+    try {
+      await sendTicketConfirmationEmail({
+        customerId,
+        reservationId: reservation.$id,
+        fullName,
+        email,
+        phone,
+        event: eventDoc,
+        ticket: ticketDoc,
+        paymentIntent,
+      })
+      await databases.updateDocument(dbId, reservationCol, reservation.$id, {
+        status: 'completed',
+      })
+    } catch (err) {
+      console.error(`Failed to send email/update status for reservation ${reservation.$id}:`, err)
+      try {
+        await databases.updateDocument(dbId, reservationCol, reservation.$id, {
+          status: 'failed_email',
+        })
+      } catch (updateErr) {
+        console.error(`Failed to update status to failed_email:`, updateErr)
+      }
+    }
+  })
 
   await Promise.allSettled(emailPromises)
   console.log('All confirmation emails processed')

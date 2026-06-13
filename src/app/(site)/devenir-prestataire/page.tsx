@@ -98,7 +98,7 @@ export default function DevenirPrestatairePage() {
             Devenir Prestataire
           </h3>
           <p className="mt-4 text-sm text-white/60 max-w-xl mx-auto leading-relaxed">
-            DJ, artiste live, performeur ou créateur visuel : intégrez la direction artistique de nos événements after-dark d’exception.
+            Prestataires, artistes, partenaires et collaborateurs : intégrez l’organisation de nos événements d’exception.
           </p>
         </div>
 
@@ -128,11 +128,11 @@ export default function DevenirPrestatairePage() {
                 <label className="flex flex-col gap-2">
                   <span className="text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-1.5">
                     <PiUser className="h-4 w-4 text-main" />
-                    Nom ou Nom de Scène *
+                    Nom, Nom de Scène ou Nom d'entreprise *
                   </span>
                   <input
                     type="text"
-                    placeholder="Ex: DJ Golden / Stephane Sam"
+                    placeholder="Ex: DJ Golden / Traiteur Gourmet / Photographe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none transition focus:border-main placeholder:text-white/20"
@@ -148,7 +148,7 @@ export default function DevenirPrestatairePage() {
                   </span>
                   <input
                     type="email"
-                    placeholder="Ex: artiste@thefifth.com"
+                    placeholder="Ex: prestataire@thefifth.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none transition focus:border-main placeholder:text-white/20"
@@ -178,7 +178,7 @@ export default function DevenirPrestatairePage() {
                 <label className="flex flex-col gap-2">
                   <span className="text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-1.5">
                     <PiMusicNotes className="h-4 w-4 text-main" />
-                    Spécialité Artistique *
+                    Spécialité / Métier *
                   </span>
                   <select
                     value={specialty}
@@ -199,11 +199,11 @@ export default function DevenirPrestatairePage() {
               <label className="flex flex-col gap-2">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-1.5">
                   <PiGlobe className="h-4 w-4 text-main" />
-                  Lien Portfolio / Instagram / Soundcloud *
+                  Lien Site Web / Portfolio / Réseaux Sociaux *
                 </span>
                 <input
                   type="url"
-                  placeholder="Ex: https://instagram.com/mon_profil_artiste"
+                  placeholder="Ex: https://thefifth.com/mon_profil_prestataire"
                   value={portfolio}
                   onChange={(e) => setPortfolio(e.target.value)}
                   className="w-full border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none transition focus:border-main placeholder:text-white/20"
@@ -258,7 +258,7 @@ export default function DevenirPrestatairePage() {
                   className="mt-1 accent-main h-4 w-4 rounded border-white/10"
                 />
                 <label htmlFor="agreement" className="text-xs text-white/60 leading-relaxed cursor-pointer select-none">
-                  J'accepte que les données soumises soient collectées et stockées par la direction de l'établissement dans le but d'analyser ma candidature artistique.
+                  J'accepte que les données soumises soient collectées et stockées par la direction de l'établissement dans le but d'analyser ma candidature de partenariat.
                 </label>
               </div>
 

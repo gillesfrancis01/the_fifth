@@ -22,25 +22,27 @@ export default async function AdminDashboardPage() {
   const upcomingEvent = sortedEvents.find((event) => new Date(event.date).getTime() >= now.getTime()) ?? sortedEvents[0]
   const upcomingEventsCount = sortedEvents.filter((event) => new Date(event.date).getTime() >= now.getTime()).length
 
-  const occupancyRate = totalTickets > 0 ? Math.round((reservationsWithDetails.length / totalTickets) * 100) : 0
-  const revenue = reservationsWithDetails.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
-  const averageTicketPrice = reservationsWithDetails.length > 0 ? revenue / reservationsWithDetails.length : 0
+  const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+
+  const occupancyRate = totalTickets > 0 ? Math.round((completedReservations.length / totalTickets) * 100) : 0
+  const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
+  const averageTicketPrice = completedReservations.length > 0 ? revenue / completedReservations.length : 0
 
   const reservationCountByCustomer = new Map<string, number>()
-  reservationsWithDetails.forEach(({ customer }) => {
+  completedReservations.forEach(({ customer }) => {
     if (!customer) return
     reservationCountByCustomer.set(customer.$id, (reservationCountByCustomer.get(customer.$id) ?? 0) + 1)
   })
   const loyalCustomers = [...reservationCountByCustomer.values()].filter((count) => count > 1).length
-  const vipGuests = reservationsWithDetails.filter(({ ticket }) => ticket?.name?.toLowerCase().includes('vip')).length
+  const vipGuests = completedReservations.filter(({ ticket }) => ticket?.name?.toLowerCase().includes('vip')).length
 
   const upcomingEventReservations = upcomingEvent
-    ? reservationsWithDetails.filter((item) => item.event?.$id === upcomingEvent.$id)
+    ? completedReservations.filter((item) => item.event?.$id === upcomingEvent.$id)
     : []
 
-  const heatmapData = buildWeeklyHeatmap(reservationsWithDetails)
+  const heatmapData = buildWeeklyHeatmap(completedReservations)
   const recentReservations = getRecentReservations(reservationsWithDetails)
-  const eventPerformances = computeEventPerformances(reservationsWithDetails, ticketsByEvent, events)
+  const eventPerformances = computeEventPerformances(completedReservations, ticketsByEvent, events)
 
   return (
     <div className="space-y-12">
@@ -61,7 +63,7 @@ export default async function AdminDashboardPage() {
               />
               <StatCard
                 label="Réservations confirmées"
-                value={reservationsWithDetails.length.toString()}
+                value={completedReservations.length.toString()}
                 helper={`${customers.length} clients · ${loyalCustomers} fidèles`}
                 icon={FiTrendingUp}
               />
@@ -147,15 +149,16 @@ export default async function AdminDashboardPage() {
                 {sortedEvents.slice(0, 4).map((event) => (
                   <div
                     key={event.$id}
-                    className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/35 px-4 py-3 text-xs text-white/70"
+                    className="flex flex-col gap-2 rounded-2xl border border-white/5 bg-black/35 px-4 py-3 text-xs text-white/70 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex flex-col">
                       <span className="font-medium text-white">{event.name}</span>
-                      <span>{formatEventDateTime(event.date, 'fr-FR')}</span>
+                      <span className="text-[11px] text-white/45">{formatEventDateTime(event.date, 'fr-FR')}</span>
                     </div>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.35em] text-white/50">
-                      {event.adresse || 'À définir'}
-                    </span>
+                    <div className="flex items-center gap-1.5 text-[11px] text-white/50 sm:max-w-[50%] sm:justify-end">
+                      <FiMapPin className="h-3 w-3 flex-shrink-0 text-main" />
+                      <span className="break-words text-left sm:text-right">{event.adresse || 'À définir'}</span>
+                    </div>
                   </div>
                 ))}
                 {sortedEvents.length === 0 && (
@@ -389,16 +392,16 @@ function CapacityInsight({ label, value }: { label: string; value: number }) {
 
 function StatCard({ label, value, helper, icon: Icon }: { label: string; value: string; helper?: string; icon: IconType }) {
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/35 p-5 transition hover:border-[rgba(201,161,77,0.45)]">
-      <div className="absolute inset-0 translate-y-full bg-[radial-gradient(circle_at_top,rgba(201,161,77,0.12),transparent_70%)] opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100" />
+    <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/35 p-5 transition hover:border-[rgba(201,161,77,0.45)] min-w-0">
+      <div className="absolute inset-0 translate-y-full bg-[radial-gradient(circle_at_top,rgba(201,161,77,0.12),transparent_70%)] opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 pointer-events-none" />
       <div className="relative flex items-center justify-between">
         <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/45 text-[rgba(201,161,77,0.85)] transition group-hover:border-[rgba(201,161,77,0.55)] group-hover:text-[rgba(201,161,77,1)]">
           <Icon className="h-5 w-5" />
         </span>
       </div>
-      <p className="relative mt-4 truncate text-[10px] uppercase tracking-[0.2em] text-white/50" title={label}>{label}</p>
-      <p className="relative mt-2 truncate text-lg font-semibold text-white" title={value}>{value}</p>
-      {helper ? <p className="relative mt-2 truncate text-[10px] text-white/55" title={helper}>{helper}</p> : null}
+      <p className="relative mt-4 text-[10px] uppercase tracking-wider text-white/50 leading-tight break-words" title={label}>{label}</p>
+      <p className="relative mt-2 text-xl font-bold text-white break-all" title={value}>{value}</p>
+      {helper ? <p className="relative mt-1 text-[10px] text-white/40 break-words leading-normal" title={helper}>{helper}</p> : null}
     </div>
   )
 }
