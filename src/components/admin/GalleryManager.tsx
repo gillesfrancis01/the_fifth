@@ -51,6 +51,10 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [banner, setBanner] = useState<FeedbackState | null>(null)
 
+  // Drag and drop states
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+
   useEffect(() => {
     if (!banner) return
     const timeout = window.setTimeout(() => setBanner(null), 4000)
@@ -209,6 +213,68 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
     })
   }
 
+  const handleDeleteSingleImage = (gallery: Gallery, imgIndex: number) => {
+    if (gallery.images.length <= 1) {
+      alert("Une galerie doit contenir au moins une image. Pour supprimer toute la galerie, utilisez le bouton 'Supprimer' principal.")
+      return
+    }
+
+    if (!window.confirm("Voulez-vous vraiment supprimer cette photo de la galerie ?")) {
+      return
+    }
+
+    startTransition(async () => {
+      const updatedImages = gallery.images.filter((_, idx) => idx !== imgIndex)
+      const result = await updateGallery(gallery.$id, {
+        event: gallery.event,
+        video: gallery.video,
+        images: updatedImages,
+      })
+
+      if (result.success) {
+        setBanner({ type: 'success', message: 'Photo supprimée de la galerie avec succès.' })
+        router.refresh()
+      } else {
+        setBanner({ type: 'error', message: result.error || 'Erreur lors de la suppression de la photo.' })
+      }
+    })
+  }
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', index.toString())
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (draggedIndex === null) return
+    setDragOverIndex(index)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === targetIndex) {
+      setDraggedIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+
+    const updated = [...galleryImages]
+    const [draggedImg] = updated.splice(draggedIndex, 1)
+    updated.splice(targetIndex, 0, draggedImg)
+    setGalleryImages(updated)
+
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+  }
+
   return (
     <section className="space-y-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(10,10,10,0.9),rgba(5,5,5,0.78))] p-6 shadow-[0_40px_90px_-60px_rgba(0,0,0,0.85)]">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -281,14 +347,27 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
             {gallery.images && gallery.images.length > 0 && (
               <div className="flex flex-wrap gap-2 overflow-x-auto py-2">
                 {gallery.images.slice(0, 8).map((img, idx) => (
-                  <div key={idx} className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-white/10 bg-neutral-900">
+                  <div key={idx} className="group relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-white/10 bg-neutral-900">
                     <img
                       src={transformImageURL(img)}
                       alt={`Preview ${idx}`}
                       className="h-full w-full object-cover"
                     />
+                    
+                    {/* Delete button overlay on hover */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSingleImage(gallery, idx)}
+                        className="rounded-full bg-red-600/90 p-1.5 text-white hover:bg-red-500 transition shadow-lg"
+                        title="Supprimer cette photo"
+                      >
+                        <PiTrash className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
                     {idx === 7 && gallery.images.length > 8 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white group-hover:hidden">
                         +{gallery.images.length - 8}
                       </div>
                     )}
@@ -402,11 +481,23 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
               </span>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {galleryImages.map((img, idx) => (
-                  <div key={idx} className="group relative aspect-[3/2] overflow-hidden rounded-xl border border-white/10 bg-neutral-900 shadow">
+                  <div
+                    key={idx}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, idx)}
+                    onDragOver={(e) => handleDragOver(e, idx)}
+                    onDrop={(e) => handleDrop(e, idx)}
+                    onDragEnd={handleDragEnd}
+                    className={`group relative aspect-[3/2] overflow-hidden rounded-xl border bg-neutral-900 shadow cursor-grab active:cursor-grabbing transition-all duration-200 ${
+                      draggedIndex === idx ? 'opacity-40 border-dashed border-white/20' : 'border-white/10'
+                    } ${
+                      dragOverIndex === idx ? 'border-main scale-105 ring-2 ring-main/30' : ''
+                    }`}
+                  >
                     <img
                       src={transformImageURL(img)}
                       alt={`Gallery thumbnail ${idx}`}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105 pointer-events-none"
                     />
                     
                     {/* Controls overlay */}

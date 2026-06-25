@@ -42,7 +42,7 @@ const translations: Record<Language, Record<string, string>> = {
     fullServiceEventProduction: 'Full-service event production',
     nextEvent: 'Next Event',
     noNextEvent: 'No next event',
-    JoinUs: 'Join as Partner',
+    JoinUs: 'Join as a Provider',
     free: 'Free',
     price: 'Price'
   },

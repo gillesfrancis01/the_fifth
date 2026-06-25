@@ -190,6 +190,11 @@ export default function DevenirPrestatairePage() {
                     <option value="Performeur">Performeur / Danseur</option>
                     <option value="Photographe / Vidéaste">Photographe / Vidéaste</option>
                     <option value="Hôte / Hôtesse">Hôte / Hôtesse VIP</option>
+                    <option value="Traiteur / Mixologue / Barman">Traiteur / Mixologue / Barman</option>
+                    <option value="Technicien (Son, Lumière, Scène)">Technicien (Son, Lumière, Scène)</option>
+                    <option value="Décorateur / Designer Floral">Décorateur / Designer Floral</option>
+                    <option value="Sécurité / Logistique">Sécurité / Logistique</option>
+                    <option value="Maquilleur / Coiffeur / Styliste">Maquilleur / Coiffeur / Styliste</option>
                     <option value="Autre">Autre spécialité</option>
                   </select>
                 </label>
