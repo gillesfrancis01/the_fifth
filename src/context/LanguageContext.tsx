@@ -44,7 +44,8 @@ const translations: Record<Language, Record<string, string>> = {
     noNextEvent: 'No next event',
     JoinUs: 'Join as a Provider',
     free: 'Free',
-    price: 'Price'
+    price: 'Price',
+    getTickets: 'Get Tickets'
   },
   fr: {
     Home: 'Accueil',
@@ -79,7 +80,8 @@ const translations: Record<Language, Record<string, string>> = {
     noNextEvent: "Aucun événement à venir",
     JoinUs: 'Devenir Prestataire',
     free: 'Gratuit',
-    price: 'Prix'
+    price: 'Prix',
+    getTickets: 'Acheter des billets'
   },
   es: {
     Home: 'Inicio',
@@ -91,13 +93,13 @@ const translations: Record<Language, Record<string, string>> = {
     menu: 'Menú',
     heroTitle: 'VIVE EVENTOS COMO NUNCA ANTES.',
     heroSubtitle:
-      'Bienvenido a The Fifth Event Agency, donde la innovación se une a la excelencia en la planificación de eventos. Nos enorgullece crear momentos extraordinarios adaptados a su visión.',
+      'Bienvenido a The Fifth Event Agency, où la innovación se une a la excelencia en la planificación de eventos. Nos enorgullece crear momentos extraordinarios adaptados a su visión.',
     heroButton: 'Nuestros eventos',
     aboutTitle: 'Sobre nosotros',
     aboutSubtitle:
       'Eventos inspiradores, impresiones duraderas, escribamos su historia',
     aboutDescription:
-      'Acompáñanos tras bambalinas de nuestros espectaculares eventos y descubre la magia que creamos desde el concept hasta la ejecución. Desde bodas elegantes hasta galas corporativas, encuentra consejos e inspiración para organizar tus propias celebraciones inolvidables.',
+      'Acompáñanos tras bambalinas de nuestros espectaculares eventos y descubre la magie que creamos desde el concept hasta la ejecución. Desde bodas elegantes hasta galas corporativas, encuentra consejos e inspiración para organizar tus propias celebraciones inolvidables.',
     learnMore: 'Aprender más',
     subscribeTitle: 'Suscríbete al boletín',
     subscribePlaceholder: 'Tu correo aquí',
@@ -114,7 +116,8 @@ const translations: Record<Language, Record<string, string>> = {
     noNextEvent: 'No hay próximo evento',
     JoinUs: 'Unirse como Colaborador',
     free: 'Gratis',
-    price: 'Precio'
+    price: 'Precio',
+    getTickets: 'Entradas'
   }
 }
 

@@ -82,6 +82,30 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const cardsRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<HTMLDivElement>(null)
+  const ticketsRef = useRef<HTMLDivElement>(null)
+
+  const scrollToTickets = () => {
+    ticketsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const [showFloatingBtn, setShowFloatingBtn] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const ticketsSection = ticketsRef.current
+      if (!ticketsSection) return
+
+      const rect = ticketsSection.getBoundingClientRect()
+      const scrolledPastHero = window.scrollY > 200
+      const ticketsSectionVisible = rect.top < window.innerHeight && rect.bottom > 0
+
+      setShowFloatingBtn(scrolledPastHero && !ticketsSectionVisible)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const [selectedTicket, setSelectedTicket] = useState<TicketWithAvailability | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -278,6 +302,13 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
               {event.name}
             </h1>
           </div>
+          <button
+            onClick={scrollToTickets}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#B78418] bg-black/40 backdrop-blur-md px-8 py-3 text-xs font-semibold uppercase tracking-widest text-[#B78418] hover:bg-[#B78418] hover:text-black transition-all duration-300 shadow-lg hover:shadow-[#B78418]/20"
+          >
+            <span>{t('getTickets')}</span>
+            <FaLongArrowAltRight className="rotate-90" />
+          </button>
         </div>
       </div>
 
@@ -300,10 +331,20 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
               <p>{event.description}</p>
             ) : null}
           </div>
+
+          <div className="pt-6 flex justify-center lg:justify-start">
+            <button
+              onClick={scrollToTickets}
+              className="inline-flex items-center gap-2 rounded-full border border-[#B78418] bg-transparent px-8 py-3 text-sm font-semibold uppercase tracking-widest text-[#B78418] hover:bg-[#B78418] hover:text-black transition-all duration-300"
+            >
+              <span>{t('getTickets')}</span>
+              <FaLongArrowAltRight className="rotate-90" />
+            </button>
+          </div>
         </div>
 
         {/* Tickets Section */}
-        <div className="relative">
+        <div ref={ticketsRef} className="relative">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-3xl lg:text-4xl font-Josefin font-bold text-main">Get Your Tickets</h2>
             <div className="w-24 h-1 bg-main mx-auto rounded-full" />
@@ -560,6 +601,17 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
           </div>
         </div>
       )}
+
+      {/* Floating Tickets Button */}
+      <button
+        onClick={scrollToTickets}
+        className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-[#B78418] to-[#E6C55D] text-black px-6 py-3.5 text-xs font-bold uppercase tracking-widest transition-all duration-500 shadow-[0_8px_30px_rgba(183,132,24,0.3)] hover:shadow-[#B78418]/50 hover:scale-105 active:scale-95 ${
+          showFloatingBtn ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-4 scale-90 pointer-events-none'
+        }`}
+      >
+        <span>{t('getTickets')}</span>
+        <FaLongArrowAltRight className="rotate-90 animate-bounce" />
+      </button>
     </div>
   )
 }
