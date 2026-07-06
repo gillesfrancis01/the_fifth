@@ -16,7 +16,7 @@ export default function DevenirPrestatairePage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [specialty, setSpecialty] = useState('DJ')
+  const [specialty, setSpecialty] = useState('DJ (House, Deep House, Afro, Tech, Open Format, etc.)')
   const [portfolio, setPortfolio] = useState('')
   const [selectedEventId, setSelectedEventId] = useState('')
   const [message, setMessage] = useState('')
@@ -183,19 +183,45 @@ export default function DevenirPrestatairePage() {
                   <select
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value)}
-                    className="w-full border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none transition focus:border-main bg-neutral-950"
+                    className="w-full border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none transition focus:border-main bg-neutral-950 animate-in fade-in duration-300"
                   >
-                    <option value="DJ">DJ (Deep House, Tech, Afro...)</option>
-                    <option value="Artiste Live">Artiste Live (Chanteur, Musicien...)</option>
-                    <option value="Performeur">Performeur / Danseur</option>
-                    <option value="Photographe / Vidéaste">Photographe / Vidéaste</option>
-                    <option value="Hôte / Hôtesse">Hôte / Hôtesse VIP</option>
-                    <option value="Traiteur / Mixologue / Barman">Traiteur / Mixologue / Barman</option>
-                    <option value="Technicien (Son, Lumière, Scène)">Technicien (Son, Lumière, Scène)</option>
-                    <option value="Décorateur / Designer Floral">Décorateur / Designer Floral</option>
-                    <option value="Sécurité / Logistique">Sécurité / Logistique</option>
-                    <option value="Maquilleur / Coiffeur / Styliste">Maquilleur / Coiffeur / Styliste</option>
-                    <option value="Autre">Autre spécialité</option>
+                    <option value="DJ (House, Deep House, Afro, Tech, Open Format, etc.)">DJ (House, Deep House, Afro, Tech, Open Format, etc.)</option>
+                    <option value="Chanteur / Chanteuse">Chanteur / Chanteuse</option>
+                    <option value="Musicien Live (Saxophone, Violon, Percussion, Piano, Guitariste, etc.)">Musicien Live (Saxophone, Violon, Percussion, Piano, Guitariste, etc.)</option>
+                    <option value="Groupe de musique">Groupe de musique</option>
+                    <option value="MC / Animateur">MC / Animateur</option>
+                    <option value="Performeur / Danseur">Performeur / Danseur</option>
+                    <option value="Danseur de feu / Acrobate / Artiste aérien">Danseur de feu / Acrobate / Artiste aérien</option>
+                    <option value="Magicien / Mentaliste">Magicien / Mentaliste</option>
+                    <option value="Designer de mode">Designer de mode</option>
+                    <option value="Modèle">Modèle</option>
+                    <option value="Styliste / Maquilleur / Coiffeur / Barbier">Styliste / Maquilleur / Coiffeur / Barbier</option>
+                    <option value="Artiste peintre">Artiste peintre</option>
+                    <option value="Sculpteur / Artisan / Illustrateur">Sculpteur / Artisan / Illustrateur</option>
+                    <option value="Créateur de contenu">Créateur de contenu</option>
+                    <option value="Photographe">Photographe</option>
+                    <option value="Vidéaste">Vidéaste</option>
+                    <option value="Opérateur Drone">Opérateur Drone</option>
+                    <option value="Influenceur">Influenceur</option>
+                    <option value="Journaliste / Média">Journaliste / Média</option>
+                    <option value="Relationniste de presse">Relationniste de presse</option>
+                    <option value="Entreprise exposante">Entreprise exposante</option>
+                    <option value="Commanditaire / Partenaire">Commanditaire / Partenaire</option>
+                    <option value="Traiteur">Traiteur</option>
+                    <option value="Chef privé">Chef privé</option>
+                    <option value="Mixologue / Barman">Mixologue / Barman</option>
+                    <option value="Pâtissier / Chocolatier">Pâtissier / Chocolatier</option>
+                    <option value="Décorateur / Designer événementiel">Décorateur / Designer événementiel</option>
+                    <option value="Designer floral / Fleuriste">Designer floral / Fleuriste</option>
+                    <option value="Location de mobilier / Équipement">Location de mobilier / Équipement</option>
+                    <option value="Technicien (Son, Lumière, Vidéo, LED, Scène)">Technicien (Son, Lumière, Vidéo, LED, Scène)</option>
+                    <option value="Hôte / Hôtesse VIP">Hôte / Hôtesse VIP</option>
+                    <option value="Coordinateur événementiel">Coordinateur événementiel</option>
+                    <option value="Sécurité">Sécurité</option>
+                    <option value="Logistique">Logistique</option>
+                    <option value="Voiturier / Chauffeur privé">Voiturier / Chauffeur privé</option>
+                    <option value="Photobooth / Expérience interactive">Photobooth / Expérience interactive</option>
+                    <option value="Autre (précisez)">Autre (précisez)</option>
                   </select>
                 </label>
               </div>
