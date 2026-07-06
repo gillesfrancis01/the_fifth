@@ -11,7 +11,7 @@ export default async function AdminReservationsPage() {
 
   const reservationsWithDetails = buildReservationsWithDetails(reservations, events, customers, ticketMapById)
 
-  const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+  const completedReservations = reservationsWithDetails
   const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
   const uniqueCustomers = new Set(completedReservations.map(({ customer }) => customer?.$id).filter(Boolean)).size
   const conversionRate = totalTickets > 0 ? Math.round((completedReservations.length / totalTickets) * 100) : 0
@@ -29,7 +29,7 @@ export default async function AdminReservationsPage() {
     Evenement: r.event?.name ?? 'Inconnu',
     Ticket: r.ticket?.name ?? 'Inconnu',
     Prix: r.ticket?.price ?? 0,
-    Statut: r.reservation.status,
+    Statut: r.reservation.available !== false ? 'Disponible' : 'Utilisé',
     Paiement: r.reservation.paymentIntent
   }))
 

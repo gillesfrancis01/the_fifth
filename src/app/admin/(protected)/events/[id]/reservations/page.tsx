@@ -49,7 +49,7 @@ export default async function EventReservationsPage({ params }: { params: Promis
         ticketMapById
     )
 
-    const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+    const completedReservations = reservationsWithDetails
     const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
     const soldCount = completedReservations.length
 
@@ -61,7 +61,7 @@ export default async function EventReservationsPage({ params }: { params: Promis
         Email: r.customer?.email ?? '',
         Ticket: r.ticket?.name ?? 'Inconnu',
         Prix: r.ticket?.price ?? 0,
-        Statut: r.reservation.status
+        Statut: r.reservation.available !== false ? 'Disponible' : 'Utilisé'
     }))
 
     return (

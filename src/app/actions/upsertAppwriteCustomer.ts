@@ -68,7 +68,6 @@ export async function upsertAppwriteCustomer({
         ticket_ID: ticketId,
         paymentIntent,
         available: true,
-        status: 'pending',
       })
     )
   }
@@ -88,18 +87,8 @@ export async function upsertAppwriteCustomer({
         ticket: ticketDoc,
         paymentIntent,
       })
-      await databases.updateDocument(dbId, reservationCol, reservation.$id, {
-        status: 'completed',
-      })
     } catch (err) {
-      console.error(`Failed to send email/update status for reservation ${reservation.$id}:`, err)
-      try {
-        await databases.updateDocument(dbId, reservationCol, reservation.$id, {
-          status: 'failed_email',
-        })
-      } catch (updateErr) {
-        console.error(`Failed to update status to failed_email:`, updateErr)
-      }
+      console.error(`Failed to send email for reservation ${reservation.$id}:`, err)
     }
   })
 

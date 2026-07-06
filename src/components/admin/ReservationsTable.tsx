@@ -59,8 +59,8 @@ export default function ReservationsTable({ reservations, emptyMessage }: Reserv
               <td className="px-4 py-3 align-top text-xs text-zinc-400">
                 <div className="flex flex-col gap-1 break-all">
                   <span className="font-medium text-zinc-200">{reservation.paymentIntent}</span>
-                  <span className="text-[11px] uppercase tracking-wide text-zinc-500">
-                    {reservation.status ?? 'Statut non défini'}
+                  <span className={`text-[11px] uppercase tracking-wide font-semibold ${reservation.available !== false ? 'text-emerald-500' : 'text-zinc-500'}`}>
+                    {reservation.available !== false ? 'Disponible' : 'Utilisé'}
                   </span>
                 </div>
               </td>

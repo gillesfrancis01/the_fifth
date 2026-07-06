@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
   const upcomingEvent = sortedEvents.find((event) => new Date(event.date).getTime() >= now.getTime()) ?? sortedEvents[0]
   const upcomingEventsCount = sortedEvents.filter((event) => new Date(event.date).getTime() >= now.getTime()).length
 
-  const completedReservations = reservationsWithDetails.filter((r) => r.reservation.status === 'completed' || !r.reservation.status)
+  const completedReservations = reservationsWithDetails
 
   const occupancyRate = totalTickets > 0 ? Math.round((completedReservations.length / totalTickets) * 100) : 0
   const revenue = completedReservations.reduce((total, { ticket }) => total + (ticket?.price ?? 0), 0)
