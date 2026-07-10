@@ -5,6 +5,7 @@ import { ID, Query } from 'node-appwrite'
 import { createAdminClient } from '../../../config/appwrite'
 import type { Provider } from '@/types'
 import { sendProviderStatusEmail, sendProviderSubmissionEmails } from '@/utils/sendProviderEmail'
+import { requireAdminSession } from '@/utils/adminAuth'
 
 interface ProviderPayload {
   name: string
@@ -98,6 +99,10 @@ export async function createProviderApplication(payload: ProviderPayload): Promi
 }
 
 export async function getProviderApplications(): Promise<Provider[]> {
+  if (!(await requireAdminSession())) {
+    return []
+  }
+
   const config = getProvidersConfig()
   if ('error' in config) {
     console.error(config.error)
@@ -124,6 +129,10 @@ export async function updateProviderApplicationStatus(
   providerId: string,
   status: 'pending' | 'accepted' | 'rejected'
 ): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getProvidersConfig()
   if ('error' in config) {
     return { success: false, error: config.error }
@@ -173,6 +182,10 @@ export async function updateProviderApplicationStatus(
 }
 
 export async function deleteProviderApplication(providerId: string): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getProvidersConfig()
   if ('error' in config) {
     return { success: false, error: config.error }

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ID } from 'node-appwrite'
 import { InputFile } from 'node-appwrite/file'
 import { createAdminClient } from '../../../config/appwrite'
+import { requireAdminSession } from '@/utils/adminAuth'
 
 interface GalleryPayload {
   event: string
@@ -33,6 +34,10 @@ function revalidateGalleryPaths() {
 }
 
 export async function createGallery(payload: GalleryPayload): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getGalleryConfig()
   if ('error' in config) {
     return { success: false, error: config.error }
@@ -56,6 +61,10 @@ export async function createGallery(payload: GalleryPayload): Promise<ActionResu
 }
 
 export async function updateGallery(galleryId: string, payload: Partial<GalleryPayload>): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getGalleryConfig()
   if ('error' in config) {
     return { success: false, error: config.error }
@@ -79,6 +88,10 @@ export async function updateGallery(galleryId: string, payload: Partial<GalleryP
 }
 
 export async function deleteGallery(galleryId: string): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getGalleryConfig()
   if ('error' in config) {
     return { success: false, error: config.error }
@@ -98,6 +111,10 @@ export async function deleteGallery(galleryId: string): Promise<ActionResult> {
 }
 
 export async function uploadGalleryImage(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const file = formData.get('file') as File | null
   if (!file) {
     return { success: false, error: 'Aucun fichier fourni.' }

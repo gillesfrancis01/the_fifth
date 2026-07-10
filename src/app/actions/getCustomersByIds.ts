@@ -2,10 +2,15 @@
 
 import { Customer } from '@/types'
 import { createAdminClient } from '../../../config/appwrite'
+import { requireAdminSession } from '@/utils/adminAuth'
 import { Query } from 'node-appwrite'
 
 export default async function getCustomersByIds(ids: string[]): Promise<Customer[]> {
     if (ids.length === 0) {
+        return []
+    }
+
+    if (!(await requireAdminSession())) {
         return []
     }
 

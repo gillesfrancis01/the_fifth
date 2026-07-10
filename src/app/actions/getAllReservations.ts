@@ -2,10 +2,15 @@
 
 import { Reservation } from '@/types'
 import { createAdminClient } from '../../../config/appwrite'
+import { requireAdminSession } from '@/utils/adminAuth'
 
 import { Query } from 'node-appwrite'
 
 export default async function getAllReservations(): Promise<Reservation[]> {
+  if (!(await requireAdminSession())) {
+    return []
+  }
+
   try {
     const { databases } = await createAdminClient()
 

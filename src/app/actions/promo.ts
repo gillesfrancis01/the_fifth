@@ -3,10 +3,15 @@
 import { createAdminClient } from "../../../config/appwrite"
 import { PromoCode } from "@/types"
 import { ID, Query } from "node-appwrite"
+import { requireAdminSession } from "@/utils/adminAuth"
 
 const PROMO_COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_PROMO_CODES
 
 export async function getPromoCodes() {
+    if (!(await requireAdminSession())) {
+        return []
+    }
+
     try {
         const { databases } = await createAdminClient()
         if (!PROMO_COLLECTION_ID) return []
@@ -25,6 +30,10 @@ export async function getPromoCodes() {
 }
 
 export async function createPromoCode(data: Omit<PromoCode, '$id' | 'active'>) {
+    if (!(await requireAdminSession())) {
+        return { success: false, error: "Non autorisé" }
+    }
+
     try {
         const { databases } = await createAdminClient()
         if (!PROMO_COLLECTION_ID) throw new Error("Collection ID not found")
@@ -58,6 +67,10 @@ export async function createPromoCode(data: Omit<PromoCode, '$id' | 'active'>) {
 }
 
 export async function togglePromoCode(id: string, currentStatus: boolean) {
+    if (!(await requireAdminSession())) {
+        return { success: false, error: "Non autorisé" }
+    }
+
     try {
         const { databases } = await createAdminClient()
         if (!PROMO_COLLECTION_ID) throw new Error("Collection ID not found")
@@ -76,6 +89,10 @@ export async function togglePromoCode(id: string, currentStatus: boolean) {
 }
 
 export async function deletePromoCode(id: string) {
+    if (!(await requireAdminSession())) {
+        return { success: false, error: "Non autorisé" }
+    }
+
     try {
         const { databases } = await createAdminClient()
         if (!PROMO_COLLECTION_ID) throw new Error("Collection ID not found")

@@ -5,6 +5,7 @@ import { ID } from 'node-appwrite'
 import { InputFile } from 'node-appwrite/file'
 
 import { createAdminClient } from '../../../config/appwrite'
+import { requireAdminSession } from '@/utils/adminAuth'
 
 interface EventPayload {
   name: string
@@ -41,6 +42,10 @@ function revalidateEventPaths() {
 }
 
 export async function createEvent(payload: EventPayload): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getEventConfig()
 
   if ('error' in config) {
@@ -75,6 +80,10 @@ export async function createEvent(payload: EventPayload): Promise<ActionResult> 
 }
 
 export async function updateEvent(eventId: string, payload: Partial<EventPayload>): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getEventConfig()
 
   if ('error' in config) {
@@ -104,6 +113,10 @@ export async function updateEvent(eventId: string, payload: Partial<EventPayload
 }
 
 export async function deleteEvent(eventId: string): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getEventConfig()
 
   if ('error' in config) {
@@ -125,6 +138,10 @@ export async function deleteEvent(eventId: string): Promise<ActionResult> {
 }
 
 export async function uploadEventImage(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const file = formData.get('file') as File | null
   if (!file) {
     return { success: false, error: 'Aucun fichier fourni.' }

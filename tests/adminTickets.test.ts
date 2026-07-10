@@ -27,6 +27,12 @@ vi.mock('next/cache', () => {
   }
 })
 
+// These actions are admin-only; simulate an authenticated admin session so
+// the tests exercise the underlying business logic.
+vi.mock('@/utils/adminAuth', () => ({
+  requireAdminSession: () => Promise.resolve(true),
+}))
+
 describe('adminTickets actions', () => {
   const originalEnv = process.env
 

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { ID } from 'node-appwrite'
 
 import { createAdminClient } from '../../../config/appwrite'
+import { requireAdminSession } from '@/utils/adminAuth'
 
 interface TicketPayload {
   name: string
@@ -37,6 +38,10 @@ function revalidateTicketPaths() {
 }
 
 export async function createTicket(payload: TicketPayload): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getTicketConfig()
 
   if ('error' in config) {
@@ -58,6 +63,10 @@ export async function createTicket(payload: TicketPayload): Promise<ActionResult
 }
 
 export async function updateTicket(ticketId: string, payload: Partial<TicketPayload>): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getTicketConfig()
 
   if ('error' in config) {
@@ -79,6 +88,10 @@ export async function updateTicket(ticketId: string, payload: Partial<TicketPayl
 }
 
 export async function deleteTicket(ticketId: string): Promise<ActionResult> {
+  if (!(await requireAdminSession())) {
+    return { success: false, error: 'Non autorisé.' }
+  }
+
   const config = getTicketConfig()
 
   if ('error' in config) {

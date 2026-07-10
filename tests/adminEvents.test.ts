@@ -39,6 +39,12 @@ vi.mock('node-appwrite/file', () => {
   }
 })
 
+// These actions are admin-only; simulate an authenticated admin session so
+// the tests exercise the underlying business logic.
+vi.mock('@/utils/adminAuth', () => ({
+  requireAdminSession: () => Promise.resolve(true),
+}))
+
 // Mock NextJS cache revalidatePath
 const mockRevalidatePath = vi.fn()
 vi.mock('next/cache', () => {
