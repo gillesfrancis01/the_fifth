@@ -42,6 +42,18 @@ export interface Reservation {
     available?: boolean
     $createdAt?: string
 }
+
+export interface Scanner {
+    $id: string
+    name: string
+    username: string
+    passwordHash: string
+    passwordSalt: string
+    eventId: string
+    active: boolean
+    $createdAt?: string
+}
+
 export interface service {
     id: string,
     title: string,
