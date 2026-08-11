@@ -100,10 +100,18 @@ describe('adminScanners actions', () => {
   })
 
   describe('getScanners', () => {
-    it('returns the scanner list', async () => {
-      mockListDocuments.mockResolvedValueOnce({ documents: [{ $id: 'scanner-1' }] })
+    it('returns the scanner list without password hash/salt', async () => {
+      mockListDocuments.mockResolvedValueOnce({
+        documents: [
+          { $id: 'scanner-1', name: 'Porte 1', username: 'porte1', passwordHash: 'secret-hash', passwordSalt: 'secret-salt', eventId: 'event-1', active: true },
+        ],
+      })
 
-      expect(await getScanners()).toEqual([{ $id: 'scanner-1' }])
+      const result = await getScanners()
+
+      expect(result).toEqual([{ $id: 'scanner-1', name: 'Porte 1', username: 'porte1', eventId: 'event-1', active: true }])
+      expect(result[0]).not.toHaveProperty('passwordHash')
+      expect(result[0]).not.toHaveProperty('passwordSalt')
     })
 
     it('returns an empty array on failure', async () => {

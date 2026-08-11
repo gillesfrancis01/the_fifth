@@ -7,7 +7,7 @@ import { createAdminClient } from '../../../config/appwrite'
 import { requireAdminSession } from '@/utils/adminAuth'
 import { hashPassword } from '@/utils/scannerAuth'
 import { getScannerConfig } from '@/utils/config'
-import type { Scanner } from '@/types'
+import type { Scanner, ScannerSummary } from '@/types'
 
 interface ActionResult {
   success: boolean
@@ -67,7 +67,7 @@ export async function createScanner(input: CreateScannerInput): Promise<ActionRe
   }
 }
 
-export async function getScanners(): Promise<Scanner[]> {
+export async function getScanners(): Promise<ScannerSummary[]> {
   if (!(await requireAdminSession())) {
     return []
   }
@@ -82,7 +82,7 @@ export async function getScanners(): Promise<Scanner[]> {
     const { documents } = await databases.listDocuments(config.databaseId, config.collectionId, [
       Query.orderDesc('$createdAt'),
     ])
-    return documents as unknown as Scanner[]
+    return (documents as unknown as Scanner[]).map(({ passwordHash, passwordSalt, ...rest }) => rest)
   } catch (error) {
     console.error('Failed to list scanners', error)
     return []

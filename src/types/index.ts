@@ -54,6 +54,8 @@ export interface Scanner {
     $createdAt?: string
 }
 
+export type ScannerSummary = Omit<Scanner, 'passwordHash' | 'passwordSalt'>
+
 export interface service {
     id: string,
     title: string,
