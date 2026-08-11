@@ -44,3 +44,6 @@ next-env.d.ts
 fetch-test.js
 test-events.js
 
+# git worktrees
+.worktrees/
+
