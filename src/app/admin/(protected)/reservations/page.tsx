@@ -1,13 +1,11 @@
-
-import ExportButton from '@/components/admin/ExportButton'
-import ReservationsTable from '@/components/admin/ReservationsTable'
 import AdminRealtimeSync from '@/components/admin/AdminRealtimeSync'
+import ReservationManager from '@/components/admin/ReservationManager'
 import { fetchAdminCoreData, fetchTicketsForEvents, buildReservationsWithDetails } from '../loaders'
 import { formatReservationTimestamp } from '@/utils/reservations'
 
 export default async function AdminReservationsPage() {
   const { events, reservations, customers } = await fetchAdminCoreData()
-  const { ticketMapById, totalTickets } = await fetchTicketsForEvents(events)
+  const { ticketMapById, totalTickets, ticketsWithEvent } = await fetchTicketsForEvents(events)
 
   const reservationsWithDetails = buildReservationsWithDetails(reservations, events, customers, ticketMapById)
 
@@ -52,21 +50,13 @@ export default async function AdminReservationsPage() {
         </div>
       </section>
 
-      <section className="space-y-6 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-white">Historique détaillé</h3>
-            <p className="text-sm text-zinc-400">Consultez l’ensemble des réservations et leurs informations associées.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <ExportButton data={exportData} filename="reservations_globales" />
-            <div className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
-              Dernière réservation : {lastReservation ? formatReservationTimestamp(lastReservation) : '—'}
-            </div>
-          </div>
-        </div>
-        <ReservationsTable reservations={reservationsWithDetails} />
-      </section>
+      <ReservationManager
+        events={events}
+        tickets={ticketsWithEvent}
+        reservations={reservationsWithDetails}
+        exportData={exportData}
+        lastReservationLabel={lastReservation ? formatReservationTimestamp(lastReservation) : '—'}
+      />
     </div>
   )
 }
