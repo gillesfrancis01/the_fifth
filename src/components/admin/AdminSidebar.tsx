@@ -17,7 +17,7 @@ import {
 import Image from 'next/image'
 
 const links = [
-  { href: '/admin/dashboard', label: 'Vue d\'ensemble', icon: PiChartLineUp },
+  { href: '/admin/dashboard', label: 'Vue d’ensemble', icon: PiChartLineUp },
   { href: '/admin/events', label: 'Événements', icon: PiMaskHappy },
   { href: '/admin/tickets', label: 'Tickets', icon: PiTicket },
   { href: '/admin/promo-codes', label: 'Codes Promo', icon: PiTag },
@@ -70,7 +70,7 @@ export default function AdminSidebar({ isCollapsed = false, onToggleCollapse }: 
         <div className={`space-y-2 transition-all duration-300 ${isCollapsed ? 'xl:hidden' : 'block'}`}>
           <h2 className="font-heading text-2xl text-white">Ambiance & Direction</h2>
           <p className="text-xs leading-relaxed text-white/60">
-            Naviguez dans l\'univers after-dark de la maison, pilotez les expériences et activez votre réseau VIP.
+            Naviguez dans l’univers after-dark de la maison, pilotez les expériences et activez votre réseau VIP.
           </p>
         </div>
 
