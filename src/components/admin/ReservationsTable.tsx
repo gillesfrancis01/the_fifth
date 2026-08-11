@@ -5,9 +5,12 @@ import { formatReservationTimestamp } from '@/utils/reservations'
 interface ReservationsTableProps {
   reservations: ReservationWithDetails[]
   emptyMessage?: string
+  onDelete?: (reservationId: string) => void
 }
 
-export default function ReservationsTable({ reservations, emptyMessage }: ReservationsTableProps) {
+export default function ReservationsTable({ reservations, emptyMessage, onDelete }: ReservationsTableProps) {
+  const columnCount = onDelete ? 6 : 5
+
   return (
     <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950/60 shadow-[0_24px_60px_-40px_rgba(0,0,0,0.95)]">
       <table className="min-w-full table-fixed divide-y divide-zinc-800 text-left text-sm">
@@ -18,6 +21,7 @@ export default function ReservationsTable({ reservations, emptyMessage }: Reserv
             <th scope="col" className="w-64 px-4 py-3">Événement</th>
             <th scope="col" className="w-48 px-4 py-3">Ticket</th>
             <th scope="col" className="w-56 px-4 py-3">Paiement</th>
+            {onDelete && <th scope="col" className="w-28 px-4 py-3">Actions</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-800">
@@ -64,11 +68,22 @@ export default function ReservationsTable({ reservations, emptyMessage }: Reserv
                   </span>
                 </div>
               </td>
+              {onDelete && (
+                <td className="px-4 py-3 align-top">
+                  <button
+                    type="button"
+                    onClick={() => onDelete(reservation.$id)}
+                    className="inline-flex items-center justify-center rounded-full border border-red-500/60 px-3 py-1.5 text-[11px] uppercase tracking-[0.3em] text-red-300 transition hover:border-red-400 hover:text-red-200"
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
           {reservations.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-4 py-10 text-center text-sm text-zinc-400">
+              <td colSpan={columnCount} className="px-4 py-10 text-center text-sm text-zinc-400">
                 {emptyMessage ?? 'Aucune réservation enregistrée pour le moment.'}
               </td>
             </tr>
