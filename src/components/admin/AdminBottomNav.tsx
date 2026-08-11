@@ -61,7 +61,8 @@ export default function AdminBottomNav() {
     }
   }, [isSheetOpen])
 
-  const isMoreActive = moreLinks.some((link) => isLinkActive(pathname, link.href))
+  const isPrimaryActive = primaryLinks.some((link) => isLinkActive(pathname, link.href))
+  const isMoreActive = !isPrimaryActive && moreLinks.some((link) => isLinkActive(pathname, link.href))
 
   return (
     <>
