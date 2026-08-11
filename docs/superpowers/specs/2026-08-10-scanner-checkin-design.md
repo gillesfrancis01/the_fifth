@@ -53,13 +53,23 @@ l'admin, limités à un événement) et corrige ces deux problèmes.
 
 **Prérequis avant déploiement (hors du périmètre de ce code) :** cette
 collection doit être créée manuellement dans la console Appwrite avec ces
-attributs, comme les collections existantes (`events`, `tickets`, etc.).
-Deux nouvelles variables d'environnement sont également requises :
+attributs, comme les collections existantes (`events`, `tickets`, etc.), et
+avec un **index unique sur `username`** — la vérification d'unicité côté
+application (`createScanner`) protège le cas courant mais ne remplace pas
+une contrainte en base contre deux créations concurrentes du même
+identifiant. Deux nouvelles variables d'environnement sont également
+requises :
 - `NEXT_PUBLIC_APPWRITE_COLLECTION_SCANNERS` — id de cette collection.
 - `SCANNER_SESSION_SECRET` — chaîne aléatoire longue, dédiée à la
   signature des sessions scanner (indépendante de `ADMIN_PASSWORD` : un
   compte scanner compromis ne doit pas éclairer sur l'accès admin, et
   inversement).
+
+`NEXT_PUBLIC_URL` (déjà utilisée ailleurs dans le projet) doit aussi être
+configurée : le lien du code QR en dépend directement
+(`${NEXT_PUBLIC_URL}/check-in?id=...}`) et son absence bloque désormais
+explicitement l'envoi du courriel de confirmation plutôt que de produire
+un lien cassé.
 
 `src/utils/config.ts` reçoit une fonction `getScannerConfig()` du même
 type que `getReservationConfig()` — retourne une erreur explicite si la
