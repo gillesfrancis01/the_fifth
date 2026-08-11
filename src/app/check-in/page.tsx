@@ -1,28 +1,22 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
-import type { Reservation, Ticket, events } from '@/types'
+import type { Reservation, Ticket, events, Customer } from '@/types'
 import { createAdminClient } from '../../../config/appwrite'
 import { getReservationConfig } from '@/utils/config'
 import { setReservationAvailability } from '../actions/updateReservationAvailability'
+import { getCheckInActor } from '@/utils/scannerAuth'
+import { findReservationsByEmailForEvent } from '../actions/scannerCheckIn'
 
 export const metadata: Metadata = {
   title: 'Validation du billet | The Fifth',
-}
-
-interface ParsedPayload {
-  reservationId: string
-  ticketId?: string
-  eventId?: string
-  customerId?: string
-  email?: string
-  paymentIntent?: string
 }
 
 interface ReservationDetails {
   reservation: Reservation | null
   ticket: Ticket | null
   event: events | null
+  customer: Customer | null
   error?: string
 }
 
@@ -30,90 +24,64 @@ function getFirstValue(value: string | string[] | undefined) {
   if (Array.isArray(value)) {
     return value[0]
   }
-
   return value
 }
 
-function parsePayload(rawPayload?: string): { payload?: ParsedPayload; error?: string } {
-  if (!rawPayload) {
-    return { error: 'Aucune donnée de billet fournie.' }
+function extractReservationId(idParam?: string, dataParam?: string): { reservationId?: string; error?: string } {
+  if (idParam) {
+    return { reservationId: idParam }
+  }
+
+  if (!dataParam) {
+    return {}
   }
 
   try {
-    const parsed = JSON.parse(rawPayload) as Record<string, unknown>
-
-    if (typeof parsed !== 'object' || parsed === null) {
-      return { error: 'Format de données invalide.' }
-    }
-
+    const parsed = JSON.parse(dataParam) as Record<string, unknown>
     const reservationId = parsed.reservationId
     if (typeof reservationId !== 'string' || reservationId.trim() === '') {
       return { error: 'Identifiant de réservation manquant dans le code QR.' }
     }
-
-    const payload: ParsedPayload = {
-      reservationId,
-    }
-
-    if (typeof parsed.ticketId === 'string') {
-      payload.ticketId = parsed.ticketId
-    }
-
-    if (typeof parsed.eventId === 'string') {
-      payload.eventId = parsed.eventId
-    }
-
-    if (typeof parsed.customerId === 'string') {
-      payload.customerId = parsed.customerId
-    }
-
-    if (typeof parsed.email === 'string') {
-      payload.email = parsed.email
-    }
-
-    if (typeof parsed.paymentIntent === 'string') {
-      payload.paymentIntent = parsed.paymentIntent
-    }
-
-    return { payload }
+    return { reservationId }
   } catch {
     return { error: 'Données du code QR invalides.' }
   }
 }
 
-async function fetchReservationDetails(payload: ParsedPayload): Promise<ReservationDetails> {
+async function fetchReservationDetails(reservationId: string): Promise<ReservationDetails> {
   const config = getReservationConfig()
 
   if ('error' in config) {
-    return { reservation: null, ticket: null, event: null, error: config.error }
+    return { reservation: null, ticket: null, event: null, customer: null, error: config.error }
   }
 
   try {
     const { databases } = await createAdminClient()
+    const reservationDoc = await databases.getDocument(config.databaseId, config.collectionId, reservationId)
+    const reservation = reservationDoc as unknown as Reservation
 
     const eventCollection = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS
     const ticketCollection = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TICKET
+    const customerCollection = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CUSTOMERS
 
-    const eventPromise: Promise<unknown> =
-      payload.eventId && eventCollection
-        ? databases.getDocument(config.databaseId, eventCollection, payload.eventId)
-        : Promise.resolve(null)
-    const ticketPromise: Promise<unknown> =
-      payload.ticketId && ticketCollection
-        ? databases.getDocument(config.databaseId, ticketCollection, payload.ticketId)
-        : Promise.resolve(null)
-
-    const [reservationDoc, eventDoc, ticketDoc] = await Promise.all([
-      databases.getDocument(config.databaseId, config.collectionId, payload.reservationId),
-      eventPromise,
-      ticketPromise,
+    const [eventDoc, ticketDoc, customerDoc] = await Promise.all([
+      eventCollection && reservation.event_ID
+        ? databases.getDocument(config.databaseId, eventCollection, reservation.event_ID)
+        : Promise.resolve(null),
+      ticketCollection && reservation.ticket_ID
+        ? databases.getDocument(config.databaseId, ticketCollection, reservation.ticket_ID)
+        : Promise.resolve(null),
+      customerCollection && reservation.customer_ID
+        ? databases.getDocument(config.databaseId, customerCollection, reservation.customer_ID)
+        : Promise.resolve(null),
     ])
 
-    const reservation = reservationDoc as unknown as Reservation
-    const event = (eventDoc as events) ?? null
-    const ticket = (ticketDoc as Ticket) ?? null
-
-    return { reservation, ticket, event }
+    return {
+      reservation,
+      event: (eventDoc as events) ?? null,
+      ticket: (ticketDoc as Ticket) ?? null,
+      customer: (customerDoc as Customer) ?? null,
+    }
   } catch (error) {
     console.error('Failed to load reservation for check-in', error)
 
@@ -123,13 +91,14 @@ async function fetchReservationDetails(payload: ParsedPayload): Promise<Reservat
         : undefined
 
     if (code === 404) {
-      return { reservation: null, ticket: null, event: null, error: 'Réservation introuvable.' }
+      return { reservation: null, ticket: null, event: null, customer: null, error: 'Réservation introuvable.' }
     }
 
     return {
       reservation: null,
       ticket: null,
       event: null,
+      customer: null,
       error: 'Impossible de charger les informations de réservation.',
     }
   }
@@ -139,40 +108,37 @@ async function validateReservation(formData: FormData) {
   'use server'
 
   const reservationId = formData.get('reservationId')
-  const rawPayload = formData.get('rawPayload')
-
   const params = new URLSearchParams()
-
-  if (typeof rawPayload === 'string' && rawPayload) {
-    params.set('data', rawPayload)
-  }
 
   if (typeof reservationId !== 'string' || reservationId.trim() === '') {
     params.set('error', 'Identifiant de réservation manquant.')
-    const url = params.toString() ? `/check-in?${params.toString()}` : '/check-in'
-    redirect(url)
+    redirect(`/check-in?${params.toString()}`)
   }
 
-  if (typeof rawPayload !== 'string' || rawPayload.trim() === '') {
-    params.set('error', 'Données de billet manquantes.')
-    const url = params.toString() ? `/check-in?${params.toString()}` : '/check-in'
-    redirect(url)
-  }
+  params.set('id', reservationId as string)
 
-  const result = await setReservationAvailability(reservationId, false)
+  const result = await setReservationAvailability(reservationId as string, false)
 
   if (!result.success) {
-    if (result.error) {
-      params.set('error', result.error)
-    } else {
-      params.set('error', 'Impossible de marquer la réservation comme utilisée.')
-    }
+    params.set('error', result.error ?? 'Impossible de marquer la réservation comme utilisée.')
   } else {
     params.set('status', 'validated')
   }
 
-  const url = params.toString() ? `/check-in?${params.toString()}` : '/check-in'
-  redirect(url)
+  redirect(`/check-in?${params.toString()}`)
+}
+
+async function searchByEmail(formData: FormData) {
+  'use server'
+
+  const email = formData.get('email')
+  const params = new URLSearchParams()
+
+  if (typeof email === 'string' && email.trim()) {
+    params.set('email', email.trim())
+  }
+
+  redirect(`/check-in?${params.toString()}`)
 }
 
 export default async function CheckInPage({
@@ -182,39 +148,70 @@ export default async function CheckInPage({
 }) {
   const resolvedSearchParams = (await searchParams) ?? {}
 
-  const rawData = getFirstValue(resolvedSearchParams.data)
+  const idParam = getFirstValue(resolvedSearchParams.id)
+  const dataParam = getFirstValue(resolvedSearchParams.data)
   const queryError = getFirstValue(resolvedSearchParams.error)
   const statusParam = getFirstValue(resolvedSearchParams.status)
+  const emailParam = getFirstValue(resolvedSearchParams.email)
 
-  const { payload, error: payloadError } = parsePayload(rawData ?? undefined)
+  const actor = await getCheckInActor()
+
+  if (!actor) {
+    const redirectParams = new URLSearchParams()
+    if (idParam) redirectParams.set('id', idParam)
+    if (dataParam) redirectParams.set('data', dataParam)
+    const currentPath = redirectParams.toString() ? `/check-in?${redirectParams.toString()}` : '/check-in'
+    redirect(`/scan/login?redirect=${encodeURIComponent(currentPath)}`)
+  }
+
+  const { reservationId, error: idError } = extractReservationId(idParam, dataParam)
 
   let details: ReservationDetails | null = null
-  let effectiveError = payloadError ?? queryError ?? null
+  let effectiveError = idError ?? queryError ?? null
 
-  if (!payloadError && payload) {
-    details = await fetchReservationDetails(payload)
+  if (!idError && reservationId) {
+    details = await fetchReservationDetails(reservationId)
     if (details.error) {
       effectiveError = details.error
+    } else if (actor.type === 'scanner' && details.reservation && details.reservation.event_ID !== actor.eventId) {
+      details = null
+      effectiveError = 'Ce billet appartient à un autre événement.'
     }
+  }
+
+  let searchResults: Awaited<ReturnType<typeof findReservationsByEmailForEvent>> = []
+  if (!reservationId && emailParam) {
+    searchResults = await findReservationsByEmailForEvent(
+      emailParam,
+      actor.type === 'scanner' ? actor.eventId : undefined
+    )
   }
 
   const reservation = details?.reservation ?? null
   const ticket = details?.ticket ?? null
   const event = details?.event ?? null
+  const customer = details?.customer ?? null
 
   const isAvailable = reservation ? reservation.available !== false : null
 
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-10 text-slate-900">
       <div className="mx-auto w-full max-w-2xl rounded-2xl bg-white px-6 py-8 shadow-2xl">
-        <h1 className="text-2xl font-semibold text-slate-900">Validation du billet</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-slate-900">Validation du billet</h1>
+          {actor.type === 'scanner' && (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+              {actor.name}
+            </span>
+          )}
+        </div>
         <p className="mt-2 text-sm text-slate-600">
           Scannez ce billet et confirmez sa présence en le marquant comme utilisé.
         </p>
 
         {statusParam === 'validated' && !effectiveError && (
           <div className="mt-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            Billet validé avec succès. L’entrée de cette réservation est maintenant fermée.
+            Billet validé avec succès. L&apos;entrée de cette réservation est maintenant fermée.
           </div>
         )}
 
@@ -222,6 +219,53 @@ export default async function CheckInPage({
           <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {effectiveError}
           </div>
+        )}
+
+        {!reservationId && !effectiveError && (
+          <section className="mt-8 space-y-4 border-t border-slate-200 pt-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Recherche manuelle</h2>
+            <p className="text-xs text-slate-500">
+              Si l&apos;appareil photo ne scanne pas le billet, recherchez le client par courriel.
+            </p>
+            <form action={searchByEmail} className="flex gap-3">
+              <input
+                type="email"
+                name="email"
+                defaultValue={emailParam ?? ''}
+                placeholder="courriel@exemple.com"
+                required
+                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              />
+              <button
+                type="submit"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Rechercher
+              </button>
+            </form>
+
+            {emailParam && searchResults.length === 0 && (
+              <p className="text-sm text-slate-500">Aucune réservation trouvée pour ce courriel.</p>
+            )}
+
+            {searchResults.length > 0 && (
+              <ul className="space-y-2">
+                {searchResults.map((result) => (
+                  <li key={result.reservationId}>
+                    <a
+                      href={`/check-in?id=${result.reservationId}`}
+                      className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3 text-sm hover:border-slate-400"
+                    >
+                      <span>{result.customerName}</span>
+                      <span className={result.available ? 'text-emerald-600' : 'text-red-600'}>
+                        {result.available ? 'Valide' : 'Déjà utilisé'}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         )}
 
         {!effectiveError && reservation && (
@@ -246,44 +290,39 @@ export default async function CheckInPage({
                 </div>
                 <div>
                   <dt className="font-medium text-slate-500">Référence de paiement</dt>
-                  <dd className="font-mono text-xs text-slate-800">
-                    {reservation.paymentIntent || payload?.paymentIntent || '—'}
-                  </dd>
+                  <dd className="font-mono text-xs text-slate-800">{reservation.paymentIntent || '—'}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-slate-500">Courriel</dt>
-                  <dd className="text-slate-900">{payload?.email ?? '—'}</dd>
+                  <dd className="text-slate-900">{customer?.email ?? '—'}</dd>
                 </div>
               </dl>
             </section>
 
-            {(event || ticket || payload?.ticketId || payload?.eventId) && (
-              <section>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
-                  Informations complémentaires
-                </h2>
-                <dl className="mt-4 grid grid-cols-1 gap-4 text-sm text-slate-700 md:grid-cols-2">
-                  <div>
-                    <dt className="font-medium text-slate-500">Événement</dt>
-                    <dd className="text-slate-900">{event?.name ?? payload?.eventId ?? '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-medium text-slate-500">Billet</dt>
-                    <dd className="text-slate-900">{ticket?.name ?? payload?.ticketId ?? '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-medium text-slate-500">Client</dt>
-                    <dd className="text-slate-900">{payload?.customerId ?? '—'}</dd>
-                  </div>
-                </dl>
-              </section>
-            )}
+            <section>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                Informations complémentaires
+              </h2>
+              <dl className="mt-4 grid grid-cols-1 gap-4 text-sm text-slate-700 md:grid-cols-2">
+                <div>
+                  <dt className="font-medium text-slate-500">Événement</dt>
+                  <dd className="text-slate-900">{event?.name ?? '—'}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-slate-500">Billet</dt>
+                  <dd className="text-slate-900">{ticket?.name ?? '—'}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-slate-500">Client</dt>
+                  <dd className="text-slate-900">{customer?.fullName ?? '—'}</dd>
+                </div>
+              </dl>
+            </section>
 
             <section className="border-t border-slate-200 pt-6">
               {isAvailable ? (
                 <form action={validateReservation} className="space-y-4">
                   <input type="hidden" name="reservationId" value={reservation.$id} />
-                  <input type="hidden" name="rawPayload" value={rawData ?? ''} />
                   <button
                     type="submit"
                     className="w-full rounded-lg bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
@@ -291,12 +330,12 @@ export default async function CheckInPage({
                     Marquer le billet comme utilisé
                   </button>
                   <p className="text-center text-xs text-slate-500">
-                    Cette action désactive immédiatement le billet afin d’empêcher toute réutilisation.
+                    Cette action désactive immédiatement le billet afin d&apos;empêcher toute réutilisation.
                   </p>
                 </form>
               ) : (
                 <p className="text-sm font-medium text-red-600">
-                  Ce billet a déjà été utilisé. Aucune autre action n’est nécessaire.
+                  Ce billet a déjà été utilisé. Aucune autre action n&apos;est nécessaire.
                 </p>
               )}
             </section>

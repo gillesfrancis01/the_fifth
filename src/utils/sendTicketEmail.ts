@@ -673,16 +673,9 @@ function buildEmailHtml(params: {
 export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
   const { apiKey, fromEmail } = assertEmailConfig()
 
-  const qrPayload = JSON.stringify({
-    reservationId: payload.reservationId,
-    ticketId: payload.ticket.$id,
-    eventId: payload.event.$id,
-    customerId: payload.customerId,
-    email: payload.email,
-    paymentIntent: payload.paymentIntent,
-  })
+  const checkInUrl = `${process.env.NEXT_PUBLIC_URL}/check-in?id=${payload.reservationId}`
 
-  const qrCodeUrl = await generateQrCodeDataUrl(qrPayload)
+  const qrCodeUrl = await generateQrCodeDataUrl(checkInUrl)
 
   const html = buildEmailHtml({
     fullName: payload.fullName,
