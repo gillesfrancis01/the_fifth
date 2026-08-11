@@ -13,6 +13,7 @@ import {
   PiBriefcase,
   PiCaretLeftBold,
   PiCaretRightBold,
+  PiQrCode,
 } from 'react-icons/pi'
 import Image from 'next/image'
 
@@ -22,6 +23,7 @@ const links = [
   { href: '/admin/tickets', label: 'Tickets', icon: PiTicket },
   { href: '/admin/promo-codes', label: 'Codes Promo', icon: PiTag },
   { href: '/admin/reservations', label: 'Réservations', icon: PiCalendarBlank },
+  { href: '/admin/scanners', label: 'Scanners', icon: PiQrCode },
   { href: '/admin/customers', label: 'Clients & invités', icon: PiUsersThree },
   { href: '/admin/gallery', label: 'Galerie', icon: PiImage },
   { href: '/admin/providers', label: 'Prestataires', icon: PiBriefcase },
