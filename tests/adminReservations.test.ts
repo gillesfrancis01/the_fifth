@@ -73,6 +73,13 @@ describe('adminReservations actions', () => {
       expect(mockUpsertAppwriteCustomer).not.toHaveBeenCalled()
     })
 
+    it('returns an error when quantity is not an integer', async () => {
+      const result = await createManualReservation({ ...validInput, quantity: 1.5 })
+
+      expect(result.success).toBe(false)
+      expect(mockUpsertAppwriteCustomer).not.toHaveBeenCalled()
+    })
+
     it('creates the reservation via upsertAppwriteCustomer with a manual payment marker', async () => {
       mockUpsertAppwriteCustomer.mockResolvedValueOnce(undefined)
 

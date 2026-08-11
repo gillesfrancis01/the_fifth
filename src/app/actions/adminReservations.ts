@@ -37,8 +37,8 @@ export async function createManualReservation(
     }
   }
 
-  if (!Number.isFinite(quantity) || quantity < 1) {
-    return { success: false, error: 'La quantité doit être un nombre supérieur ou égal à 1.' }
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    return { success: false, error: 'La quantité doit être un nombre entier supérieur ou égal à 1.' }
   }
 
   try {

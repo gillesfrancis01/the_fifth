@@ -89,8 +89,8 @@ export default function ReservationManager({
 
     const quantity = Number(formValues.quantity)
 
-    if (!Number.isFinite(quantity) || quantity < 1) {
-      setFeedback({ type: 'error', message: 'La quantité doit être un nombre supérieur ou égal à 1.' })
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      setFeedback({ type: 'error', message: 'La quantité doit être un nombre entier supérieur ou égal à 1.' })
       return
     }
 
