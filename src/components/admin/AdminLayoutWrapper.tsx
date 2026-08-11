@@ -2,6 +2,7 @@
 
 import React, { useState, ReactNode } from 'react'
 import AdminSidebar from './AdminSidebar'
+import AdminBottomNav from './AdminBottomNav'
 import LogoutButton from './LogoutButton'
 import { FiSearch } from 'react-icons/fi'
 import { PiBellSimpleRinging, PiGearSix, PiUserCircle, PiCaretLeftBold, PiCaretRightBold } from 'react-icons/pi'
@@ -10,7 +11,7 @@ export default function AdminLayoutWrapper({ children }: { children: ReactNode }
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
-    <div className="relative mx-auto flex min-h-screen w-full max-w-full flex-col gap-10 px-6 pb-16 pt-10 xl:flex-row xl:gap-10 xl:px-12 2xl:px-16">
+    <div className="relative mx-auto flex min-h-screen w-full max-w-full flex-col gap-10 px-6 pb-28 pt-10 xl:flex-row xl:gap-10 xl:px-12 xl:pb-16 2xl:px-16">
       {/* Sidebar container with transition */}
       <div className={`transition-all duration-300 xl:flex-shrink-0 ${isCollapsed ? 'xl:w-24' : 'xl:w-80'}`}>
         <AdminSidebar isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
@@ -75,6 +76,8 @@ export default function AdminLayoutWrapper({ children }: { children: ReactNode }
 
         <main className="mx-auto w-full space-y-12 pb-6 px-1 sm:px-2 lg:px-4">{children}</main>
       </div>
+
+      <AdminBottomNav />
     </div>
   )
 }
