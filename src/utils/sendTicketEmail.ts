@@ -31,6 +31,10 @@ function assertEmailConfig() {
     throw new Error('TICKETING_EMAIL_FROM est requis pour envoyer les courriels de confirmation.')
   }
 
+  if (!process.env.NEXT_PUBLIC_URL) {
+    throw new Error('NEXT_PUBLIC_URL est requis pour générer le lien du code QR.')
+  }
+
   return { apiKey, fromEmail }
 }
 
