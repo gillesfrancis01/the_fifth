@@ -53,6 +53,15 @@ function ensureJpegFormat(url: string) {
   }
 }
 
+// Réseau non borné dans une Server Action = risque de faire dépasser le
+// temps limite de la fonction serverless, qui tue tout le process sans
+// laisser d'erreur ni atteindre l'appel Resend qui suit. On échoue vite
+// à la place, ce que les appelants gèrent déjà (image ignorée, envoi
+// du courriel poursuivi sans elle).
+export async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  return fetch(url, { signal: AbortSignal.timeout(timeoutMs) })
+}
+
 async function generateQrCodeDataUrl(payload: string) {
   try {
     return await QRCode.toDataURL(payload)
@@ -414,7 +423,7 @@ async function generateTicketPdf(params: {
     if (qrCodeUrl.startsWith('data:')) {
       qrImage = await pdfDoc.embedPng(qrCodeUrl)
     } else {
-      const qrResponse = await fetch(qrCodeUrl)
+      const qrResponse = await fetchWithTimeout(qrCodeUrl, 8000)
       if (!qrResponse.ok) {
         throw new Error(`QR fetch failed with status ${qrResponse.status}`)
       }
@@ -533,7 +542,7 @@ async function generateTicketPdf(params: {
   let eventImage
   if (event.image) {
     try {
-      const imgRes = await fetch(event.image)
+      const imgRes = await fetchWithTimeout(event.image, 8000)
       if (!imgRes.ok) {
         throw new Error(`Impossible de charger event.image (statut ${imgRes.status})`)
       }
