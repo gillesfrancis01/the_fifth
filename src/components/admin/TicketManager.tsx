@@ -584,9 +584,13 @@ function formatEventDisplayDate(value: string) {
   if (Number.isNaN(date.getTime())) {
     return 'Date à confirmer'
   }
+  // timeZone fixé pour éviter un texte différent entre le rendu serveur et
+  // l'hydratation client (voir le correctif équivalent sur
+  // formatReservationTimestamp) — même erreur d'hydratation possible sinon.
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
     timeStyle: 'short',
+    timeZone: 'UTC',
   }).format(date)
 }
 
