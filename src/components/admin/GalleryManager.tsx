@@ -353,24 +353,22 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
                       alt={`Preview ${idx}`}
                       className="h-full w-full object-cover"
                     />
-                    
-                    {/* Delete button overlay on hover */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteSingleImage(gallery, idx)}
-                        className="rounded-full bg-red-600/90 p-1.5 text-white hover:bg-red-500 transition shadow-lg"
-                        title="Supprimer cette photo"
-                      >
-                        <PiTrash className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
 
                     {idx === 7 && gallery.images.length > 8 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white group-hover:hidden">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
                         +{gallery.images.length - 8}
                       </div>
                     )}
+
+                    {/* Bouton supprimer : badge de coin toujours visible (fonctionne au tap comme au clic) */}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSingleImage(gallery, idx)}
+                      className="absolute top-1 right-1 rounded-full bg-red-600/90 p-1 text-white shadow-lg transition hover:bg-red-500"
+                      title="Supprimer cette photo"
+                    >
+                      <PiTrash className="h-3 w-3" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -499,20 +497,20 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
                       alt={`Gallery thumbnail ${idx}`}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105 pointer-events-none"
                     />
-                    
-                    {/* Controls overlay */}
-                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition duration-200 flex flex-col justify-between p-2">
+
+                    {/* Contrôles toujours visibles (fonctionnent au tap comme au clic ; le glisser-déposer reste disponible en complément sur desktop) */}
+                    <div className="absolute inset-0 flex flex-col justify-between p-2">
                       <div className="flex justify-end">
                         <button
                           type="button"
                           onClick={() => handleRemoveImage(idx)}
-                          className="rounded-lg bg-red-600/80 p-1.5 text-white hover:bg-red-500 transition"
+                          className="rounded-lg bg-red-600/90 p-1.5 text-white hover:bg-red-500 transition shadow-lg"
                           title="Supprimer"
                         >
                           <PiTrash className="h-3.5 w-3.5" />
                         </button>
                       </div>
-                      
+
                       <div className="flex justify-between items-center bg-black/60 rounded px-1 py-0.5 text-[10px]">
                         <button
                           type="button"
