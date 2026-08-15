@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { findReservationsByEmailForEvent } from '../src/app/actions/scannerCheckIn'
+import { searchReservationsForEvent } from '../src/app/actions/scannerCheckIn'
 
 const mockListDocuments = vi.fn()
 vi.mock('../config/appwrite', () => ({
@@ -14,6 +14,7 @@ vi.mock('../config/appwrite', () => ({
 vi.mock('node-appwrite', () => ({
   Query: {
     equal: (field: string, value: any) => `equal(${field},${value})`,
+    limit: (value: number) => `limit(${value})`,
   },
 }))
 
@@ -22,7 +23,7 @@ vi.mock('@/utils/scannerAuth', () => ({
   getCheckInActor: () => mockGetCheckInActor(),
 }))
 
-describe('findReservationsByEmailForEvent', () => {
+describe('searchReservationsForEvent', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
@@ -43,15 +44,22 @@ describe('findReservationsByEmailForEvent', () => {
   it('returns an empty array without a valid actor', async () => {
     mockGetCheckInActor.mockResolvedValueOnce(null)
 
-    expect(await findReservationsByEmailForEvent('a@b.com', 'event-1')).toEqual([])
+    expect(await searchReservationsForEvent('jeanne', 'event-1')).toEqual([])
     expect(mockListDocuments).not.toHaveBeenCalled()
   })
 
-  it('returns an empty array when no customer matches the email', async () => {
+  it('returns an empty array for a blank query', async () => {
+    mockGetCheckInActor.mockResolvedValueOnce({ type: 'admin' })
+
+    expect(await searchReservationsForEvent('   ')).toEqual([])
+    expect(mockListDocuments).not.toHaveBeenCalled()
+  })
+
+  it('returns an empty array when the event has no reservations', async () => {
     mockGetCheckInActor.mockResolvedValueOnce({ type: 'admin' })
     mockListDocuments.mockResolvedValueOnce({ documents: [] })
 
-    expect(await findReservationsByEmailForEvent('a@b.com')).toEqual([])
+    expect(await searchReservationsForEvent('jeanne', 'event-1')).toEqual([])
   })
 
   it("scopes the search to the scanner's event regardless of the eventId argument", async () => {
@@ -61,26 +69,63 @@ describe('findReservationsByEmailForEvent', () => {
       eventId: 'event-1',
       name: 'Porte 1',
     })
-    mockListDocuments.mockResolvedValueOnce({ documents: [{ $id: 'customer-1', fullName: 'Jeanne Tremblay' }] })
     mockListDocuments.mockResolvedValueOnce({
-      documents: [{ $id: 'reservation-1', ticket_ID: 'ticket-1', available: true }],
+      documents: [{ $id: 'reservation-1', customer_ID: 'customer-1', ticket_ID: 'ticket-1', available: true }],
+    })
+    mockListDocuments.mockResolvedValueOnce({
+      documents: [{ $id: 'customer-1', fullName: 'Jeanne Tremblay', email: 'jeanne@example.com' }],
     })
 
-    const results = await findReservationsByEmailForEvent('jeanne@example.com', 'event-attacker-supplied')
+    const results = await searchReservationsForEvent('jeanne', 'event-attacker-supplied')
 
     expect(results).toEqual([
       { reservationId: 'reservation-1', customerName: 'Jeanne Tremblay', ticketId: 'ticket-1', available: true },
     ])
-    expect(mockListDocuments).toHaveBeenNthCalledWith(2, 'test-db-id', 'test-coll-reservation-id', [
-      'equal(customer_ID,customer-1)',
+    expect(mockListDocuments).toHaveBeenNthCalledWith(1, 'test-db-id', 'test-coll-reservation-id', [
       'equal(event_ID,event-1)',
     ])
+  })
+
+  it('matches a customer by partial first name, case-insensitive', async () => {
+    mockGetCheckInActor.mockResolvedValueOnce({ type: 'admin' })
+    mockListDocuments.mockResolvedValueOnce({
+      documents: [
+        { $id: 'reservation-1', customer_ID: 'customer-1', ticket_ID: 'ticket-1', available: true },
+        { $id: 'reservation-2', customer_ID: 'customer-2', ticket_ID: 'ticket-2', available: true },
+      ],
+    })
+    mockListDocuments.mockResolvedValueOnce({
+      documents: [
+        { $id: 'customer-1', fullName: 'Jeanne Tremblay', email: 'jeanne@example.com' },
+        { $id: 'customer-2', fullName: 'Marc Gagnon', email: 'marc@example.com' },
+      ],
+    })
+
+    const results = await searchReservationsForEvent('JEAN', 'event-1')
+
+    expect(results).toEqual([
+      { reservationId: 'reservation-1', customerName: 'Jeanne Tremblay', ticketId: 'ticket-1', available: true },
+    ])
+  })
+
+  it('matches a customer by partial email', async () => {
+    mockGetCheckInActor.mockResolvedValueOnce({ type: 'admin' })
+    mockListDocuments.mockResolvedValueOnce({
+      documents: [{ $id: 'reservation-1', customer_ID: 'customer-1', ticket_ID: 'ticket-1', available: true }],
+    })
+    mockListDocuments.mockResolvedValueOnce({
+      documents: [{ $id: 'customer-1', fullName: 'Jeanne Tremblay', email: 'jeanne@example.com' }],
+    })
+
+    const results = await searchReservationsForEvent('example.com', 'event-1')
+
+    expect(results).toHaveLength(1)
   })
 
   it('returns an empty array on failure', async () => {
     mockGetCheckInActor.mockResolvedValueOnce({ type: 'admin' })
     mockListDocuments.mockRejectedValueOnce(new Error('down'))
 
-    expect(await findReservationsByEmailForEvent('a@b.com')).toEqual([])
+    expect(await searchReservationsForEvent('jeanne', 'event-1')).toEqual([])
   })
 })

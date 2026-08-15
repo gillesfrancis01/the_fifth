@@ -6,7 +6,7 @@ import { createAdminClient } from '../../../config/appwrite'
 import { getReservationConfig } from '@/utils/config'
 import { setReservationAvailability } from '../actions/updateReservationAvailability'
 import { getCheckInActor } from '@/utils/scannerAuth'
-import { findReservationsByEmailForEvent } from '../actions/scannerCheckIn'
+import { searchReservationsForEvent } from '../actions/scannerCheckIn'
 
 export const metadata: Metadata = {
   title: 'Validation du billet | The Fifth',
@@ -128,14 +128,14 @@ async function validateReservation(formData: FormData) {
   redirect(`/check-in?${params.toString()}`)
 }
 
-async function searchByEmail(formData: FormData) {
+async function searchByQuery(formData: FormData) {
   'use server'
 
-  const email = formData.get('email')
+  const query = formData.get('q')
   const params = new URLSearchParams()
 
-  if (typeof email === 'string' && email.trim()) {
-    params.set('email', email.trim())
+  if (typeof query === 'string' && query.trim()) {
+    params.set('q', query.trim())
   }
 
   redirect(`/check-in?${params.toString()}`)
@@ -152,7 +152,7 @@ export default async function CheckInPage({
   const dataParam = getFirstValue(resolvedSearchParams.data)
   const queryError = getFirstValue(resolvedSearchParams.error)
   const statusParam = getFirstValue(resolvedSearchParams.status)
-  const emailParam = getFirstValue(resolvedSearchParams.email)
+  const searchQueryParam = getFirstValue(resolvedSearchParams.q)
 
   const actor = await getCheckInActor()
 
@@ -179,10 +179,10 @@ export default async function CheckInPage({
     }
   }
 
-  let searchResults: Awaited<ReturnType<typeof findReservationsByEmailForEvent>> = []
-  if (!reservationId && emailParam) {
-    searchResults = await findReservationsByEmailForEvent(
-      emailParam,
+  let searchResults: Awaited<ReturnType<typeof searchReservationsForEvent>> = []
+  if (!reservationId && searchQueryParam) {
+    searchResults = await searchReservationsForEvent(
+      searchQueryParam,
       actor.type === 'scanner' ? actor.eventId : undefined
     )
   }
@@ -225,14 +225,14 @@ export default async function CheckInPage({
           <section className="mt-8 space-y-4 border-t border-slate-200 pt-6">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Recherche manuelle</h2>
             <p className="text-xs text-slate-500">
-              Si l&apos;appareil photo ne scanne pas le billet, recherchez le client par courriel.
+              Si l&apos;appareil photo ne scanne pas le billet, recherchez le client par nom, prénom ou courriel.
             </p>
-            <form action={searchByEmail} className="flex gap-3">
+            <form action={searchByQuery} className="flex gap-3">
               <input
-                type="email"
-                name="email"
-                defaultValue={emailParam ?? ''}
-                placeholder="courriel@exemple.com"
+                type="text"
+                name="q"
+                defaultValue={searchQueryParam ?? ''}
+                placeholder="Nom, prénom ou courriel"
                 required
                 className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
               />
@@ -244,8 +244,8 @@ export default async function CheckInPage({
               </button>
             </form>
 
-            {emailParam && searchResults.length === 0 && (
-              <p className="text-sm text-slate-500">Aucune réservation trouvée pour ce courriel.</p>
+            {searchQueryParam && searchResults.length === 0 && (
+              <p className="text-sm text-slate-500">Aucune réservation trouvée pour cette recherche.</p>
             )}
 
             {searchResults.length > 0 && (
