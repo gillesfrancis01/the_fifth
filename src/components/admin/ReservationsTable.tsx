@@ -55,7 +55,7 @@ export default function ReservationsTable({ reservations, emptyMessage, onDelete
                   <span>{ticket?.name ?? 'Ticket inconnu'}</span>
                   {typeof ticket?.price === 'number' && (
                     <span className="text-xs text-zinc-400">
-                      {ticket.price === 0 ? 'Gratuit' : ticket.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                      {ticket.price === 0 ? 'Gratuit' : ticket.price.toLocaleString('fr-FR', { style: 'currency', currency: 'CAD' })}
                     </span>
                   )}
                 </div>

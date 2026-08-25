@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { PiEye, PiEyeSlash } from 'react-icons/pi'
 
 import Modal from '@/components/ui/Modal'
 import type { events, ScannerSummary } from '@/types'
@@ -25,6 +26,7 @@ export default function ScannerManager({ events, scanners }: ScannerManagerProps
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [banner, setBanner] = useState<FeedbackState | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function ScannerManager({ events, scanners }: ScannerManagerProps
   const openCreateModal = () => {
     setFormValues({ ...initialForm })
     setFeedback(null)
+    setIsPasswordVisible(false)
     setIsModalOpen(true)
   }
 
@@ -172,14 +175,25 @@ export default function ScannerManager({ events, scanners }: ScannerManagerProps
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm text-white/80">
               <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">Mot de passe</span>
-              <input
-                name="password"
-                type="password"
-                value={formValues.password}
-                onChange={handleChange}
-                required
-                className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
-              />
+              <div className="relative">
+                <input
+                  name="password"
+                  type={isPasswordVisible ? 'text' : 'password'}
+                  value={formValues.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 pr-10 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsPasswordVisible((previous) => !previous)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-white/50 transition hover:text-white"
+                  aria-label={isPasswordVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  title={isPasswordVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {isPasswordVisible ? <PiEyeSlash className="h-4 w-4" /> : <PiEye className="h-4 w-4" />}
+                </button>
+              </div>
             </label>
             <label className="flex flex-col gap-2 text-sm text-white/80">
               <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">Événement</span>
