@@ -104,30 +104,6 @@ async function fetchReservationDetails(reservationId: string): Promise<Reservati
   }
 }
 
-async function validateReservation(formData: FormData) {
-  'use server'
-
-  const reservationId = formData.get('reservationId')
-  const params = new URLSearchParams()
-
-  if (typeof reservationId !== 'string' || reservationId.trim() === '') {
-    params.set('error', 'Identifiant de réservation manquant.')
-    redirect(`/check-in?${params.toString()}`)
-  }
-
-  params.set('id', reservationId as string)
-
-  const result = await setReservationAvailability(reservationId as string, false)
-
-  if (!result.success) {
-    params.set('error', result.error ?? 'Impossible de marquer la réservation comme utilisée.')
-  } else {
-    params.set('status', 'validated')
-  }
-
-  redirect(`/check-in?${params.toString()}`)
-}
-
 async function searchByQuery(formData: FormData) {
   'use server'
 
@@ -150,8 +126,6 @@ export default async function CheckInPage({
 
   const idParam = getFirstValue(resolvedSearchParams.id)
   const dataParam = getFirstValue(resolvedSearchParams.data)
-  const queryError = getFirstValue(resolvedSearchParams.error)
-  const statusParam = getFirstValue(resolvedSearchParams.status)
   const searchQueryParam = getFirstValue(resolvedSearchParams.q)
 
   const actor = await getCheckInActor()
@@ -167,7 +141,8 @@ export default async function CheckInPage({
   const { reservationId, error: idError } = extractReservationId(idParam, dataParam)
 
   let details: ReservationDetails | null = null
-  let effectiveError = idError ?? queryError ?? null
+  let effectiveError = idError ?? null
+  let justValidated = false
 
   if (!idError && reservationId) {
     details = await fetchReservationDetails(reservationId)
@@ -176,6 +151,14 @@ export default async function CheckInPage({
     } else if (actor.type === 'scanner' && details.reservation && details.reservation.event_ID !== actor.eventId) {
       details = null
       effectiveError = 'Ce billet appartient à un autre événement.'
+    } else if (details.reservation && details.reservation.available !== false) {
+      const result = await setReservationAvailability(reservationId, false)
+      if (result.success) {
+        justValidated = true
+        details.reservation.available = false
+      } else {
+        effectiveError = result.error ?? 'Impossible de marquer la réservation comme utilisée.'
+      }
     }
   }
 
@@ -206,10 +189,10 @@ export default async function CheckInPage({
           )}
         </div>
         <p className="mt-2 text-sm text-slate-600">
-          Scannez ce billet et confirmez sa présence en le marquant comme utilisé.
+          Scannez ce billet : sa présence est confirmée automatiquement.
         </p>
 
-        {statusParam === 'validated' && !effectiveError && (
+        {justValidated && !effectiveError && (
           <div className="mt-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             Billet validé avec succès. L&apos;entrée de cette réservation est maintenant fermée.
           </div>
@@ -319,26 +302,13 @@ export default async function CheckInPage({
               </dl>
             </section>
 
-            <section className="border-t border-slate-200 pt-6">
-              {isAvailable ? (
-                <form action={validateReservation} className="space-y-4">
-                  <input type="hidden" name="reservationId" value={reservation.$id} />
-                  <button
-                    type="submit"
-                    className="w-full rounded-lg bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-                  >
-                    Marquer le billet comme utilisé
-                  </button>
-                  <p className="text-center text-xs text-slate-500">
-                    Cette action désactive immédiatement le billet afin d&apos;empêcher toute réutilisation.
-                  </p>
-                </form>
-              ) : (
+            {!justValidated && (
+              <section className="border-t border-slate-200 pt-6">
                 <p className="text-sm font-medium text-red-600">
                   Ce billet a déjà été utilisé. Aucune autre action n&apos;est nécessaire.
                 </p>
-              )}
-            </section>
+              </section>
+            )}
           </div>
         )}
       </div>
