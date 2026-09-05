@@ -83,7 +83,23 @@ describe('searchReservationsForEvent', () => {
     ])
     expect(mockListDocuments).toHaveBeenNthCalledWith(1, 'test-db-id', 'test-coll-reservation-id', [
       'equal(event_ID,event-1)',
+      'limit(1000)',
     ])
+  })
+
+  it('requests enough reservations per page to cover events with more than the Appwrite default of 25', async () => {
+    mockGetCheckInActor.mockResolvedValueOnce({
+      type: 'scanner',
+      scannerId: 's1',
+      eventId: 'event-1',
+      name: 'Porte 1',
+    })
+    mockListDocuments.mockResolvedValueOnce({ documents: [] })
+
+    await searchReservationsForEvent('jeanne', 'event-1')
+
+    const reservationQueryArgs = mockListDocuments.mock.calls[0][2] as string[]
+    expect(reservationQueryArgs.some((q) => q.startsWith('limit('))).toBe(true)
   })
 
   it('matches a customer by partial first name, case-insensitive', async () => {

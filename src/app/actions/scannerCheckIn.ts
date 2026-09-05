@@ -45,7 +45,12 @@ export async function searchReservationsForEvent(
   try {
     const { databases } = await createAdminClient()
 
-    const reservationQueries = scopedEventId ? [Query.equal('event_ID', scopedEventId)] : []
+    // Sans Query.limit explicite, Appwrite plafonne listDocuments à 25
+    // résultats : au-delà, la recherche ratait silencieusement les
+    // réservations situées après la 25e (cf. getReservationsByEvent.ts).
+    const reservationQueries = scopedEventId
+      ? [Query.equal('event_ID', scopedEventId), Query.limit(1000)]
+      : [Query.limit(1000)]
 
     const { documents: reservations } = await databases.listDocuments(
       config.databaseId,
