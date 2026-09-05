@@ -14,11 +14,6 @@ vi.mock('../config/appwrite', () => ({
     }),
 }))
 
-const mockRevalidatePath = vi.fn()
-vi.mock('next/cache', () => ({
-  revalidatePath: (...args: any[]) => mockRevalidatePath(...args),
-}))
-
 const mockGetCheckInActor = vi.fn()
 vi.mock('@/utils/scannerAuth', () => ({
   getCheckInActor: () => mockGetCheckInActor(),

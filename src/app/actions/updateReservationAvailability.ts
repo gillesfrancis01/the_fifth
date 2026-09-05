@@ -1,7 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-
 import { createAdminClient } from '../../../config/appwrite'
 import { getReservationConfig } from '../../utils/config'
 import { getCheckInActor } from '@/utils/scannerAuth'
@@ -50,9 +48,6 @@ export async function setReservationAvailability(
     await databases.updateDocument(config.databaseId, config.collectionId, reservationId, {
       available,
     })
-
-    revalidatePath('/admin/reservations')
-    revalidatePath('/admin/dashboard')
 
     return { success: true }
   } catch (error) {
