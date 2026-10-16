@@ -111,6 +111,8 @@ describe('adminEvents actions', () => {
           image: payload.image,
           teaser: payload.teaser,
           description_sections: payload.description_sections,
+          description_sections_en: [],
+          description_sections_fr: [],
         }
       )
       expect(mockRevalidatePath).toHaveBeenCalledWith('/admin')
@@ -125,6 +127,27 @@ describe('adminEvents actions', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toBe("Impossible de créer l'événement.")
+    })
+
+    it('passes through separate EN/FR description sections when provided', async () => {
+      mockCreateDocument.mockResolvedValueOnce({ $id: 'new-event-id' })
+
+      const result = await createEvent({
+        ...payload,
+        description_sections_en: ['Hello', 'World'],
+        description_sections_fr: ['Bonjour', 'Monde'],
+      })
+
+      expect(result.success).toBe(true)
+      expect(mockCreateDocument).toHaveBeenCalledWith(
+        'test-db-id',
+        'test-coll-id',
+        expect.any(String),
+        expect.objectContaining({
+          description_sections_en: ['Hello', 'World'],
+          description_sections_fr: ['Bonjour', 'Monde'],
+        })
+      )
     })
 
     it('automatically splits description into sections if description_sections is omitted', async () => {

@@ -15,6 +15,8 @@ interface EventPayload {
   image: string
   teaser: string
   description_sections?: string[]
+  description_sections_en?: string[]
+  description_sections_fr?: string[]
 }
 
 interface ActionResult {
@@ -68,6 +70,8 @@ export async function createEvent(payload: EventPayload): Promise<ActionResult> 
       image: payload.image,
       teaser: payload.teaser,
       description_sections: sections,
+      description_sections_en: payload.description_sections_en ?? [],
+      description_sections_fr: payload.description_sections_fr ?? [],
     })
 
     revalidateEventPaths()

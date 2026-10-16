@@ -1,5 +1,7 @@
 
 import EventManager from '@/components/admin/EventManager'
+import CreateEventButton from '@/components/admin/CreateEventButton'
+import { CreateEventModalProvider } from '@/context/CreateEventModalContext'
 import { fetchEvents } from '../loaders'
 import { formatEventDateTime } from '@/utils/eventDate'
 
@@ -13,7 +15,11 @@ export default async function AdminEventsPage() {
   const spotlightEvent = upcomingEvents[0] ?? events[0]
 
   return (
+    <CreateEventModalProvider>
     <div className="space-y-10">
+      <div className="flex items-center justify-end">
+        <CreateEventButton />
+      </div>
       <section
         className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 "
         style={{
@@ -160,6 +166,7 @@ export default async function AdminEventsPage() {
 
       <EventManager events={events} />
     </div>
+    </CreateEventModalProvider>
   )
 }
 

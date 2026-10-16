@@ -1,118 +1,21 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import React, { FormEvent, ChangeEvent, useEffect, useMemo, useState, useTransition } from 'react'
+import React, { FormEvent, useEffect, useMemo, useState, useTransition } from 'react'
 
 import type { events } from '@/types'
-import { createEvent, deleteEvent, updateEvent, uploadEventImage } from '@/app/actions/adminEvents'
+import { deleteEvent, updateEvent, uploadEventImage } from '@/app/actions/adminEvents'
 import Modal from '@/components/ui/Modal'
+import EventForm, { type FeedbackState } from '@/components/admin/EventForm'
+import CreateEventButton from '@/components/admin/CreateEventButton'
 import { formatEventDateTime } from '@/utils/eventDate'
 
 interface EventManagerProps {
   events: events[]
 }
 
-interface FeedbackState {
-  type: 'success' | 'error'
-  message: string
-}
-
-const emptyForm = {
-  name: '',
-  description: '',
-  date: '',
-  adresse: '',
-  image: '',
-  teaser: '',
-}
-
 export default function EventManager({ events }: EventManagerProps) {
-  const router = useRouter()
-  const [formValues, setFormValues] = useState(() => ({ ...emptyForm }))
-  const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [banner, setBanner] = useState<FeedbackState | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
-  useEffect(() => {
-    if (!banner) {
-      return
-    }
-
-    const timeout = window.setTimeout(() => setBanner(null), 4000)
-    return () => window.clearTimeout(timeout)
-  }, [banner])
-
-  const openCreateModal = () => {
-    setFormValues({ ...emptyForm })
-    setSelectedFile(null)
-    setFeedback(null)
-    setIsModalOpen(true)
-  }
-
-  const closeCreateModal = () => {
-    if (isPending) {
-      return
-    }
-    setIsModalOpen(false)
-  }
-
-  const handleChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const target = event.currentTarget as HTMLInputElement | HTMLTextAreaElement
-    setFormValues((previous) => ({ ...previous, [target.name]: target.value }))
-  }
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (!formValues.name || !formValues.date) {
-      setFeedback({ type: 'error', message: 'Le nom et la date sont obligatoires.' })
-      return
-    }
-
-    startTransition(async () => {
-      let imageUrl = formValues.image
-
-      if (selectedFile) {
-        const formData = new FormData()
-        formData.append('file', selectedFile)
-        const uploadResult = await uploadEventImage(formData)
-        if (!uploadResult.success || !uploadResult.url) {
-          setFeedback({ type: 'error', message: uploadResult.error ?? "Échec du téléversement de l'image." })
-          return
-        }
-        imageUrl = uploadResult.url
-      }
-
-      const sections = formValues.description
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .filter(Boolean)
-
-      const result = await createEvent({
-        name: formValues.name,
-        description: formValues.description,
-        date: formValues.date,
-        adresse: formValues.adresse,
-        image: imageUrl,
-        teaser: formValues.teaser,
-        description_sections: sections,
-      })
-
-      if (!result.success) {
-        setFeedback({ type: 'error', message: result.error ?? "Une erreur est survenue." })
-        return
-      }
-
-      setFormValues({ ...emptyForm })
-      setSelectedFile(null)
-      setFeedback(null)
-      setIsModalOpen(false)
-      setBanner({ type: 'success', message: 'Événement créé avec succès.' })
-      router.refresh()
-    })
-  }
 
   const sortedEvents = useMemo(
     () => [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
@@ -134,13 +37,7 @@ export default function EventManager({ events }: EventManagerProps) {
           <h2 className="font-heading text-2xl text-white">Gestion des événements</h2>
           <p className="text-sm text-white/60">Créez, mettez à jour ou supprimez les événements du site.</p>
         </div>
-        <button
-          type="button"
-          onClick={openCreateModal}
-          className="inline-flex items-center justify-center rounded-full border border-white/20 bg-black/40 px-6 py-2.5 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white"
-        >
-          Nouvel événement
-        </button>
+        <CreateEventButton />
       </header>
 
       {banner && (
@@ -153,26 +50,6 @@ export default function EventManager({ events }: EventManagerProps) {
           {banner.message}
         </p>
       )}
-
-      <Modal
-        open={isModalOpen}
-        onClose={closeCreateModal}
-        title="Nouvel événement signature"
-        description="Déployez un nouveau rendez-vous : renseignez les informations clés avant de l’ouvrir aux invités."
-      >
-        <EventForm
-          values={formValues}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          onCancel={closeCreateModal}
-          isPending={isPending}
-          feedback={feedback}
-          submitLabel="Créer l’événement"
-          pendingLabel="Création..."
-          selectedFile={selectedFile}
-          setSelectedFile={setSelectedFile}
-        />
-      </Modal>
 
       <div className="space-y-4">
         {sortedEvents.map((event) => (
@@ -193,7 +70,12 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
   const router = useRouter()
   const [values, setValues] = useState({
     name: event.name,
-    description: event.description_sections?.join('\n\n') || event.description || '',
+    descriptionEn:
+      event.description_sections_en?.join('\n\n') ||
+      event.description_sections?.join('\n\n') ||
+      event.description ||
+      '',
+    descriptionFr: event.description_sections_fr?.join('\n\n') || '',
     date: formatDateInput(event.date),
     adresse: event.adresse,
     image: event.image,
@@ -207,7 +89,12 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
   useEffect(() => {
     setValues({
       name: event.name,
-      description: event.description_sections?.join('\n\n') || event.description || '',
+      descriptionEn:
+        event.description_sections_en?.join('\n\n') ||
+        event.description_sections?.join('\n\n') ||
+        event.description ||
+        '',
+      descriptionFr: event.description_sections_fr?.join('\n\n') || '',
       date: formatDateInput(event.date),
       adresse: event.adresse,
       image: event.image,
@@ -251,19 +138,25 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
         imageUrl = uploadResult.url
       }
 
-      const sections = values.description
+      const sectionsEn = values.descriptionEn
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+      const sectionsFr = values.descriptionFr
         .split(/\n\s*\n/)
         .map((p) => p.trim())
         .filter(Boolean)
 
       const result = await updateEvent(event.$id, {
         name: values.name,
-        description: values.description,
+        description: values.descriptionEn,
         date: values.date,
         adresse: values.adresse,
         image: imageUrl,
         teaser: values.teaser,
-        description_sections: sections,
+        description_sections: sectionsEn,
+        description_sections_en: sectionsEn,
+        description_sections_fr: sectionsFr,
       })
 
       if (!result.success) {
@@ -332,19 +225,52 @@ function EditableEventCard({ event, onActionFeedback }: { event: events; onActio
         {event.description && <InfoRow label="Description" value={event.description} full />}
       </div>
 
-      {event.description_sections && event.description_sections.length > 0 && (
-        <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Sections de description</p>
-          <div className="space-y-2">
-            {event.description_sections.map((section, idx) => (
-              <div
-                key={idx}
-                className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/70 whitespace-pre-wrap break-words"
-              >
-                {section}
-              </div>
-            ))}
-          </div>
+      {((event.description_sections_en && event.description_sections_en.length > 0) ||
+        (event.description_sections_fr && event.description_sections_fr.length > 0) ||
+        (event.description_sections && event.description_sections.length > 0)) && (
+        <div className="space-y-4 mt-4 pt-4 border-t border-white/10">
+          {event.description_sections_en && event.description_sections_en.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Description (EN)</p>
+              {event.description_sections_en.map((section, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/70 whitespace-pre-wrap break-words"
+                >
+                  {section}
+                </div>
+              ))}
+            </div>
+          )}
+          {event.description_sections_fr && event.description_sections_fr.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">Description (FR)</p>
+              {event.description_sections_fr.map((section, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/70 whitespace-pre-wrap break-words"
+                >
+                  {section}
+                </div>
+              ))}
+            </div>
+          )}
+          {!event.description_sections_en?.length && !event.description_sections_fr?.length &&
+            event.description_sections && event.description_sections.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.35em] text-white/45">
+                Sections de description (ancien format, à répartir EN/FR)
+              </p>
+              {event.description_sections.map((section, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/70 whitespace-pre-wrap break-words"
+                >
+                  {section}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -395,208 +321,6 @@ function InfoRow({ label, value, isLink, full }: InfoRowProps) {
       )}
     </div>
   )
-}
-
-interface EventFormProps {
-  values: typeof emptyForm
-  onChange: (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
-  onCancel: () => void
-  isPending: boolean
-  feedback: FeedbackState | null
-  submitLabel: string
-  pendingLabel: string
-  selectedFile: File | null
-  setSelectedFile: (file: File | null) => void
-}
-
-function EventForm({
-  values,
-  onChange,
-  onSubmit,
-  onCancel,
-  isPending,
-  feedback,
-  submitLabel,
-  pendingLabel,
-  selectedFile,
-  setSelectedFile,
-}: EventFormProps) {
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0])
-    }
-  }
-
-  const handleRemoveFile = () => {
-    setSelectedFile(null)
-  }
-
-  return (
-    <form onSubmit={onSubmit} className="grid gap-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Nom" name="name" value={values.name} onChange={onChange} required />
-        <Field label="Date" name="date" type="datetime-local" value={values.date} onChange={onChange} required />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Adresse" name="adresse" value={values.adresse} onChange={onChange} />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">Visuel de l’événement</span>
-        <div className="relative flex items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/40 p-4 transition hover:border-[rgba(201,161,77,0.55)]">
-          {selectedFile ? (
-            <div className="flex w-full items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-white/10">
-                  <img
-                    src={URL.createObjectURL(selectedFile)}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                    onLoad={(e) => URL.revokeObjectURL(e.currentTarget.src)}
-                  />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-white max-w-[200px] truncate">{selectedFile.name}</p>
-                  <p className="text-xs text-white/45">{(selectedFile.size / 1024).toFixed(1)} KB</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleRemoveFile}
-                className="rounded-lg border border-white/10 px-3 py-1.5 text-xs uppercase tracking-wider text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
-              >
-                Supprimer
-              </button>
-            </div>
-          ) : values.image ? (
-            <div className="flex w-full items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-white/10">
-                  <img
-                    src={values.image}
-                    alt="Current image"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-white max-w-[200px] truncate">Image actuelle</p>
-                  <p className="text-xs text-white/45">Uploadez un fichier pour la remplacer</p>
-                </div>
-              </div>
-              <label className="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs uppercase tracking-wider text-white hover:bg-white/10">
-                Remplacer
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="absolute inset-0 cursor-pointer opacity-0 w-0 h-0"
-                />
-              </label>
-            </div>
-          ) : (
-            <label className="flex w-full cursor-pointer flex-col items-center justify-center py-4">
-              <span className="text-xs text-white/60">Faites glisser ou cliquez pour choisir un fichier</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="absolute inset-0 cursor-pointer opacity-0"
-              />
-            </label>
-          )}
-        </div>
-      </div>
-
-      <Field label="Teaser" name="teaser" value={values.teaser} onChange={onChange} />
-      <Textarea
-        label="Description (paragraphes)"
-        name="description"
-        value={values.description}
-        onChange={onChange}
-        rows={6}
-        helperText="Séparez vos paragraphes par une ligne vide"
-      />
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {feedback && (
-          <p className={`text-sm ${feedback.type === 'success' ? 'text-emerald-300' : 'text-red-400'}`}>{feedback.message}</p>
-        )}
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/60 transition hover:border-white/25 hover:text-white"
-          >
-            Annuler
-          </button>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2 text-[11px] uppercase tracking-[0.35em] text-white/80 transition hover:border-[rgba(201,161,77,0.55)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPending ? pendingLabel : submitLabel}
-          </button>
-        </div>
-      </div>
-    </form>
-  )
-}
-
-interface FieldProps {
-  label: string
-  name: string
-  value: string
-  type?: string
-  required?: boolean
-  onChange: (event: FormEvent<HTMLInputElement>) => void
-}
-
-function Field({ label, name, value, onChange, required, type = 'text' }: FieldProps) {
-  return (
-    <label className="flex flex-col gap-2 text-sm text-white/80">
-      <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">{label}</span>
-      <input
-        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        type={type}
-      />
-    </label>
-  )
-}
-
-interface TextareaProps {
-  label: string
-  name: string
-  value: string
-  rows?: number
-  helperText?: string
-  onChange: (event: FormEvent<HTMLTextAreaElement>) => void
-}
-
-function Textarea({ label, name, value, onChange, rows = 4, helperText }: TextareaProps) {
-  return (
-    <label className="flex flex-col gap-2 text-sm text-white/80">
-      <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">{label}</span>
-      <textarea
-        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
-        name={name}
-        value={value}
-        onChange={onChange}
-        rows={rows}
-      />
-      {helperText && <span className="text-xs text-white/45">{helperText}</span>}
-    </label>
-  )
-}
-
-function parseLines(value: string) {
-  return value
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
 }
 
 function formatDateInput(value: string) {

@@ -10,7 +10,9 @@ export interface events {
     phone?: string,
     image: string,
     teaser: string,
-    description_sections: string[]
+    description_sections: string[],
+    description_sections_en?: string[],
+    description_sections_fr?: string[]
 }
 export interface Ticket {
     $id: string
