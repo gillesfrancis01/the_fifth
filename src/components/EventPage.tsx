@@ -74,7 +74,16 @@ interface EventPageProps {
 }
 
 const EventPage = ({ event, tickets }: EventPageProps) => {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const isEventPast = new Date(event.date).getTime() < Date.now()
+  const descriptionSections =
+    (lang === 'fr' ? event.description_sections_fr : event.description_sections_en)?.filter(Boolean).length
+      ? (lang === 'fr' ? event.description_sections_fr : event.description_sections_en)
+      : event.description_sections?.length
+        ? event.description_sections
+        : event.description
+          ? [event.description]
+          : []
   const [postalCode, setPostalCode] = useState('')
   const selectedProvince = getProvinceFromPostalCode(postalCode)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -318,18 +327,13 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
         {/* Description */}
         <div className="space-y-8 max-w-4xl mx-auto text-center lg:text-left">
           <p className="text-gray-400 italic text-sm uppercase tracking-widest">
-            Event Description
+            {t('eventDescription')}
           </p>
-          <p className='text-xs text-gray-500 italic mt-4'>French description will Follow</p>
 
           <div className="space-y-6 text-lg lg:text-xl text-gray-300 font-light leading-relaxed">
-            {event.description_sections ? (
-              event.description_sections.map((section, idx) => (
-                <p key={idx}>{section}</p>
-              ))
-            ) : event.description ? (
-              <p>{event.description}</p>
-            ) : null}
+            {descriptionSections.map((section, idx) => (
+              <p key={idx}>{section}</p>
+            ))}
           </div>
 
           <div className="pt-6 flex justify-center lg:justify-start">
@@ -346,9 +350,9 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
         {/* Tickets Section */}
         <div ref={ticketsRef} className="relative">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl lg:text-4xl font-Josefin font-bold text-main">Get Your Tickets</h2>
+            <h2 className="text-3xl lg:text-4xl font-Josefin font-bold text-main">{t('getYourTickets')}</h2>
             <div className="w-24 h-1 bg-main mx-auto rounded-full" />
-            <p className="text-gray-400">Secure your spot for an unforgettable experience</p>
+            <p className="text-gray-400">{t('secureYourSpot')}</p>
           </div>
 
           <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-stretch">
@@ -384,21 +388,25 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       </span>
                     </div>
 
-                    {ticket.available === null ? (
+                    {isEventPast ? (
                       <button disabled className="w-full bg-gray-500/10 border border-gray-500/50 text-gray-400 font-bold py-3 px-6 rounded-lg cursor-not-allowed uppercase tracking-wider text-sm">
-                        Not Yet Available
+                        {t('unavailable')}
+                      </button>
+                    ) : ticket.available === null ? (
+                      <button disabled className="w-full bg-gray-500/10 border border-gray-500/50 text-gray-400 font-bold py-3 px-6 rounded-lg cursor-not-allowed uppercase tracking-wider text-sm">
+                        {t('notYetAvailable')}
                       </button>
                     ) : ticket.available && ticket.remaining > 0 ? (
                       <button
                         onClick={() => handleGetTicket(ticket)}
                         className="w-full group/btn relative overflow-hidden bg-transparent border border-[#B78418] text-[#B78418] font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-[#B78418] hover:text-black flex items-center justify-center gap-2"
                       >
-                        <span className="relative z-10">Get Ticket</span>
+                        <span className="relative z-10">{t('getTicket')}</span>
                         <FaLongArrowAltRight className="relative z-10 transform group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     ) : (
                       <button disabled className="w-full bg-red-500/10 border border-red-500/50 text-red-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed uppercase tracking-wider">
-                        Sold Out
+                        {t('soldOut')}
                       </button>
                     )}
                   </div>

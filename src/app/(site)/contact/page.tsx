@@ -7,8 +7,10 @@ import FlatButton from '@/components/FlatButton'
 import { FaLocationDot, FaPhone } from "react-icons/fa6"
 import { IoMailSharp } from "react-icons/io5"
 import { createContactMessage } from '@/app/actions/contact'
+import { useLanguage } from '@/context/LanguageContext'
 
 const ContactPage = () => {
+  const { t } = useLanguage()
   const [isPending, startTransition] = useTransition()
   
   // Form state
@@ -26,12 +28,12 @@ const ContactPage = () => {
     e.preventDefault()
 
     if (!agreed) {
-      setFeedback({ type: 'error', message: "Veuillez accepter que vos données soient collectées et stockées." })
+      setFeedback({ type: 'error', message: t('contactAgreementRequired') })
       return
     }
 
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setFeedback({ type: 'error', message: "Veuillez remplir les champs obligatoires (*)." })
+      setFeedback({ type: 'error', message: t('contactRequiredFields') })
       return
     }
 
@@ -47,7 +49,7 @@ const ContactPage = () => {
       if (result.success) {
         setFeedback({
           type: 'success',
-          message: "Merci pour votre message ! Notre équipe vous contactera dans les plus brefs délais."
+          message: t('contactSuccessMessage')
         })
         // Reset form
         setName('')
@@ -59,7 +61,7 @@ const ContactPage = () => {
       } else {
         setFeedback({
           type: 'error',
-          message: result.error || "Une erreur est survenue lors de l'envoi."
+          message: result.error || t('contactErrorMessage')
         })
       }
     })
@@ -68,9 +70,9 @@ const ContactPage = () => {
   return (
     <div className='flex flex-col'>
       <div className='text-center '>
-        <h2 className='text-main text-center text-2xl font-Josefin'>Contact</h2>
+        <h2 className='text-main text-center text-2xl font-Josefin'>{t('contactShort')}</h2>
         <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows'/>
-        <h3 className='uppercase text-2xl font-Josefin text-main font-bold '>Contact Us</h3>
+        <h3 className='uppercase text-2xl font-Josefin text-main font-bold '>{t('contact')}</h3>
         
         <div className='lg:flex lg:flex-row-reverse lg:text-left lg:w-[70vw] lg:justify-around lg:m-auto mt-8'>
           
@@ -89,7 +91,7 @@ const ContactPage = () => {
             <div className='flex gap-3'>
               <input
                 type="text"
-                placeholder='Name*'
+                placeholder={t('namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className='border-b bg-transparent w-[48%] p-3 text-sm text-white outline-none focus:border-main placeholder:text-white/40'
@@ -97,7 +99,7 @@ const ContactPage = () => {
               />
               <input
                 type="email"
-                placeholder='Email Address*'
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className='border-b bg-transparent w-[48%] p-3 text-sm text-white outline-none focus:border-main placeholder:text-white/40'
@@ -108,14 +110,14 @@ const ContactPage = () => {
             <div className='flex gap-3'>
               <input
                 type="text"
-                placeholder='Phone'
+                placeholder={t('phonePlaceholder')}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className='border-b bg-transparent w-[48%] p-3 text-sm text-white outline-none focus:border-main placeholder:text-white/40'
               />
               <input
                 type="text"
-                placeholder='Subject'
+                placeholder={t('subjectPlaceholder')}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 className='border-b bg-transparent w-[48%] p-3 text-sm text-white outline-none focus:border-main placeholder:text-white/40'
@@ -125,7 +127,7 @@ const ContactPage = () => {
             <div>
               <input
                 type="text"
-                placeholder='How can we help you? Feel free to get in touch!*'
+                placeholder={t('messagePlaceholder')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className='border-b bg-transparent w-full p-3 text-sm text-white outline-none focus:border-main placeholder:text-white/40'
@@ -143,18 +145,18 @@ const ContactPage = () => {
                 className='mt-1 accent-main h-4 w-4 border-2 border-white/20'
               />
               <label htmlFor="agreement" className="text-xs text-white/60 cursor-pointer select-none">
-                I agree that my submitted data is being collected and stored.
+                {t('dataAgreement')}
               </label>
             </div>
 
             <FlatButton type="submit" disabled={isPending} className='mt-5'>
-              {isPending ? 'Sending...' : 'Get In Touch'}
+              {isPending ? t('sending') : t('send')}
             </FlatButton>
           </form>
 
           {/* Details */}
           <div className="max-md:mt-10 lg:w-[40%]">
-            <h4 className='text-2xl font-bold'>Contact Details</h4>
+            <h4 className='text-2xl font-bold'>{t('contactDetails')}</h4>
             
             <div className='lg:flex lg:items-center lg:gap-3 mt-4'> 
               <span className='bg-main p-4 rounded-full inline-block'>

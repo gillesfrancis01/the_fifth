@@ -7,8 +7,10 @@ import { events } from '@/types'
 import { Event } from '@/components/Event'
 import { CiSearch } from "react-icons/ci"
 import { formatDate, getComparableEventDate, parseEventDate } from '../../actions/dateFormat'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function Events() {
+  const { t } = useLanguage()
   const [search, setSearch] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedLocation, setSelectedLocation] = useState('')
@@ -58,9 +60,9 @@ export default function Events() {
 
   return (
     <div className='text-center'>
-      <h2 className='text-main text-center text-2xl font-Josefin'>Event</h2>
+      <h2 className='text-main text-center text-2xl font-Josefin'>{t('Event')}</h2>
       <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows' />
-      <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>Our events</h3>
+      <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>{t('ourEvents')}</h3>
 
       {/* Search Bar */}
       <div className='flex flex-col mt-10'>
@@ -68,19 +70,19 @@ export default function Events() {
           <input
             type="text"
             className='w-[40%]'
-            placeholder='Search'
+            placeholder={t('search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <button className='text-main p-1 flex items-center gap-1 border-1 border-main'>
-            <CiSearch className='text-yellow-400' /> Find Events
+            <CiSearch className='text-yellow-400' /> {t('findEvents')}
           </button>
         </div>
 
         {/* Filters */}
         <div className='lg:flex lg:w-[80vw] lg:m-auto'>
           <div className='flex max-md:justify-between w-[90vw] m-auto mt-5 items-center gap-2'>
-            <p>Date</p>
+            <p>{t('date')}</p>
             <input
               type="date"
               className='border-1 border-main p-1 w-[60%]'
@@ -89,13 +91,13 @@ export default function Events() {
             />
           </div>
           <div className='flex max-md:justify-between w-[90vw] m-auto mt-5 items-center gap-2'>
-            <p>Location</p>
+            <p>{t('location')}</p>
             <select
               className='border-1 border-main p-1 w-[60%]'
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
             >
-              <option value="">All Locations</option>
+              <option value="">{t('allLocations')}</option>
               {[...new Set(allEvents.map(e => e.adresse))].map((loc, idx) => (
                 <option key={idx} value={loc}>{loc}</option>
               ))}
@@ -107,7 +109,7 @@ export default function Events() {
       {/* Event List */}
       <div className='flex flex-col mt-10'>
         {allEvents.length === 0 ? (
-          <p className="text-gray-500">Aucun événement n’est actuellement disponible.</p>
+          <p className="text-gray-500">{t('noEventsAvailable')}</p>
         ) : filteredEvents.length > 0 ? (
           filteredEvents.map((item) => {
             const date = formatDate(item.date)
@@ -118,7 +120,7 @@ export default function Events() {
             )
           })
         ) : (
-          <p className="text-gray-500">Aucun événement ne correspond à vos critères de recherche.</p>
+          <p className="text-gray-500">{t('noEventsMatchSearch')}</p>
         )}
       </div>
     </div>
