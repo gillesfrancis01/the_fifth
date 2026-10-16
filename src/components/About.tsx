@@ -39,7 +39,8 @@ const About = () => {
       </div>
       
       <Separator/>
-      <div className="relative z-10 bg-fixed bg-[url('/bg-logo-the-fifth.png')] bg-size-[60vw] bg-no-repeat bg-center">        {services.map((item) => (
+      <div className="relative z-10">
+        {services.map((item) => (
           <Services item={item} key={item.id} />
         ))}
       </div>
