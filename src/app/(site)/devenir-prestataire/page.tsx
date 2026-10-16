@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useTransition } from 'react'
+import React, { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
 import getAllEvents from '@/app/actions/getAllEvent'
 import { createProviderApplication } from '@/app/actions/adminProviders'
@@ -24,6 +24,10 @@ export default function DevenirPrestatairePage() {
   // UI states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [agreed, setAgreed] = useState(false)
+
+  // Anti-spam: a hidden field a human never fills, and the time the form was rendered.
+  const [website, setWebsite] = useState('')
+  const formRenderedAtRef = useRef(Date.now())
 
   useEffect(() => {
     async function loadEvents() {
@@ -63,6 +67,8 @@ export default function DevenirPrestatairePage() {
         portfolio: portfolio.trim(),
         eventId: selectedEventId || null,
         message: message.trim() || null,
+        honeypot: website,
+        formRenderedAt: formRenderedAtRef.current,
       })
 
       if (result.success) {
@@ -123,6 +129,19 @@ export default function DevenirPrestatairePage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Honeypot: hidden from real visitors, but bots that fill every field will trip it */}
+              <label className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+                Site web
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                />
+              </label>
+
               <div className="grid gap-6 sm:grid-cols-2">
                 {/* Name */}
                 <label className="flex flex-col gap-2">

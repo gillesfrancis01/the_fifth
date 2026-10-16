@@ -15,12 +15,19 @@ interface ProviderPayload {
   portfolio: string
   eventId?: string | null
   message?: string | null
+  // Anti-spam signals from the public form: a hidden field a human never
+  // fills, and the time elapsed since the form was rendered. Bots tend to
+  // fill every field and submit near-instantly.
+  honeypot?: string
+  formRenderedAt?: number
 }
 
 interface ActionResult {
   success: boolean
   error?: string
 }
+
+const MIN_SUBMISSION_MS = 3000
 
 function getProvidersConfig() {
   const databaseId = process.env.NEXT_PUBLIC_DATABASE
@@ -39,6 +46,15 @@ function revalidateProviderPaths() {
 }
 
 export async function createProviderApplication(payload: ProviderPayload): Promise<ActionResult> {
+  const isLikelyBot =
+    Boolean(payload.honeypot) ||
+    (typeof payload.formRenderedAt === 'number' && Date.now() - payload.formRenderedAt < MIN_SUBMISSION_MS)
+
+  if (isLikelyBot) {
+    // Pretend success so the bot has no signal to adjust and retry.
+    return { success: true }
+  }
+
   const config = getProvidersConfig()
   if ('error' in config) {
     return { success: false, error: config.error }
@@ -112,10 +128,13 @@ export async function getProviderApplications(): Promise<Provider[]> {
   try {
     const { databases } = await createAdminClient()
 
+    // Sans Query.limit explicite, Appwrite plafonne listDocuments à 25
+    // résultats : au-delà, l'admin ne voyait pas les candidatures les plus
+    // anciennes au-delà de la 25e (cf. searchReservationsForEvent).
     const { documents: applications } = await databases.listDocuments(
       config.databaseId,
       config.collectionId,
-      [Query.orderDesc('$createdAt')]
+      [Query.orderDesc('$createdAt'), Query.limit(1000)]
     )
 
     return applications as unknown as Provider[]
