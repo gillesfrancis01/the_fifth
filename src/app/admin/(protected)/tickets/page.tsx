@@ -1,5 +1,7 @@
 
 import TicketManager from '@/components/admin/TicketManager'
+import CreateTicketButton from '@/components/admin/CreateTicketButton'
+import { CreateTicketModalProvider } from '@/context/CreateTicketModalContext'
 import AdminRealtimeSync from '@/components/admin/AdminRealtimeSync'
 import { fetchEvents, fetchTicketsForEvents } from '../loaders'
 import { formatEventDateTime } from '@/utils/eventDate'
@@ -13,8 +15,12 @@ export default async function AdminTicketsPage() {
   const availabilityRate = totalTickets > 0 ? Math.round((availableTickets / totalTickets) * 100) : 0
 
   return (
+    <CreateTicketModalProvider events={events}>
     <div className="space-y-12">
       <AdminRealtimeSync />
+      <div className="flex items-center justify-end">
+        <CreateTicketButton />
+      </div>
       <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(170deg,rgba(15,15,15,0.95),rgba(5,5,5,0.85))] p-8 shadow-[0_45px_95px_-60px_rgba(0,0,0,0.85)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,161,77,0.15),transparent_70%)] opacity-70" />
         <div className="relative grid gap-8 lg:grid-cols-[1.6fr_1fr]">
@@ -124,6 +130,7 @@ export default async function AdminTicketsPage() {
 
       <TicketManager events={events} tickets={ticketsWithEvent} />
     </div>
+    </CreateTicketModalProvider>
   )
 }
 
