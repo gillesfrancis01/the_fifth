@@ -43,7 +43,7 @@ export const Footer = () => {
     <div className='md:hidden h-14' aria-hidden="true" />
     <div className='flex justify-between p-1 bg-[#262626] items-center px-14 max-md:fixed max-md:bottom-0 max-md:inset-x-0 max-md:z-30 max-md:h-14 max-md:px-6'>
        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100} className='max-md:w-12 max-md:h-12'/></Link> 
-       <Link href="https://www.quartier-digital.com/">Créé par Quartier Digital</Link>
+       <span className="max-md:text-xs">Designed &amp; developed by <Link href="https://www.quartier-digital.com/" className="hover:text-main transition-colors">Quartier Digital</Link></span>
        </div>
     </div>
   )
