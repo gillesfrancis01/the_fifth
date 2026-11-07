@@ -52,6 +52,15 @@ const SideBar = ({ active, handleSetVisible }: SideBarProps) => {
                 />
               </li>
             ))}
+            {/* Sur mobile, le bouton Contact du header est masqué : on le propose ici */}
+            <li>
+              <TransitionLink
+                href="/contact"
+                label={t('contact')}
+                onClick={handleSetVisible}
+                className="block hover:text-main transition-colors font-medium"
+              />
+            </li>
           </ul>
         </nav>
       </aside>

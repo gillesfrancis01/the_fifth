@@ -22,9 +22,12 @@ const Header = () => {
   //const pathname = usePathname()
 
   return (
+    <>
+    <SideBar active={visible} handleSetVisible = {handleSetVisible}/>
+    {/* Sur mobile, le menu reste fixé en haut pendant le défilement */}
+    <div className='max-md:sticky max-md:top-0 max-md:z-30 max-md:bg-black'>
     <section className='relative flex lg:space-arround items-center justify-between w-[90vw] m-auto '>
-       <SideBar active={visible} handleSetVisible = {handleSetVisible}/>
-       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link>
+       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100} className='max-md:w-16 max-md:h-16'/></Link>
        <ul className='flex gap-10 max-md:hidden'>
   {SideBarMenu.map((item) => (
       <li key={item.id} className='mt-9'>
@@ -48,6 +51,8 @@ const Header = () => {
 
         </button>
     </section>
+    </div>
+    </>
   )
 }
 

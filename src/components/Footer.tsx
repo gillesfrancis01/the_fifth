@@ -39,9 +39,11 @@ export const Footer = () => {
       <Suscribe />
 
     </div>
-    <div className='flex justify-between p-1 bg-[#262626] items-center px-14'>
-       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100}/></Link> 
-       <Link href="https://arnoldadadjissoportfolio.bit-technology.ca/">Bit</Link>
+    {/* Sur mobile, la barre du bas reste fixée en bas de l'écran ; l'espaceur évite qu'elle masque le contenu */}
+    <div className='md:hidden h-14' aria-hidden="true" />
+    <div className='flex justify-between p-1 bg-[#262626] items-center px-14 max-md:fixed max-md:bottom-0 max-md:inset-x-0 max-md:z-30 max-md:h-14 max-md:px-6'>
+       <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100} className='max-md:w-12 max-md:h-12'/></Link> 
+       <Link href="https://www.quartier-digital.com/">Créé par Quartier Digital</Link>
        </div>
     </div>
   )
