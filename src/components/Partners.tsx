@@ -37,12 +37,11 @@ const Partners = () => {
       </h2>
       <div className="flex w-full justify-around overflow-hidden opacity-40 flex-wrap gap-6">
         {[
-          { src: '/royal-fate.png', alt: 'royal fate', className: 'h-16 sm:h-20 md:h-24 lg:h-28' },
-          { src: '/client1.png', alt: 'client 1', className: 'h-12 sm:h-16 md:h-20 lg:h-24' },
-          { src: '/client2.png', alt: 'client 2', className: 'w-24 sm:w-28 md:w-32 lg:w-36' },
-          { src: '/client3.png', alt: 'client 3', className: 'w-24 sm:w-28 md:w-32 lg:w-36' },
-          { src: '/client4.png', alt: 'client 4', className: 'w-24 sm:w-28 md:w-32 lg:w-36' },
-          { src: '/client5.png', alt: 'client 5', className: 'w-24 sm:w-28 md:w-32 lg:w-36' },
+          { src: '/partners/partner-b.png', alt: 'Partner logo', className: 'h-16 sm:h-20 md:h-24 lg:h-28' },
+          { src: '/partners/partner-wave.png', alt: 'Partner logo', className: 'h-14 sm:h-16 md:h-20 lg:h-24' },
+          { src: '/partners/partner-heritaj.png', alt: 'Heritaj', className: 'h-14 sm:h-16 md:h-20 lg:h-24' },
+          { src: '/partners/partner-w.png', alt: 'W', className: 'h-12 sm:h-14 md:h-16 lg:h-20' },
+          { src: '/partners/partner-place-des-arts.png', alt: 'Place des Arts', className: 'h-12 sm:h-14 md:h-16 lg:h-20' },
         ].map((logo, i) => (
           <img
             key={i}
