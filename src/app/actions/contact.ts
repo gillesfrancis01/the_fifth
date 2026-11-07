@@ -9,11 +9,32 @@ interface ContactPayload {
   phone?: string | null
   subject?: string | null
   message: string
+  // Anti-spam signals from the public form: a hidden field a human never
+  // fills, and the time the form was rendered. Bots tend to fill every
+  // field, submit near-instantly, or call the action directly without it.
+  honeypot?: string
+  formRenderedAt?: number
 }
 
 interface ActionResult {
   success: boolean
   error?: string
+}
+
+const MIN_SUBMISSION_MS = 3000
+
+// A single "word" of random mixed-case letters, e.g. "kqmBMotXyYQFzNJjacTkRT".
+function looksRandom(value?: string | null) {
+  if (!value || !/^[A-Za-z]{8,}$/.test(value)) return false
+  const innerUppercase = value.slice(1).replace(/[^A-Z]/g, '').length
+  return innerUppercase >= 3
+}
+
+function isLikelyBot(payload: ContactPayload) {
+  if (payload.honeypot) return true
+  if (typeof payload.formRenderedAt !== 'number') return true
+  if (Date.now() - payload.formRenderedAt < MIN_SUBMISSION_MS) return true
+  return looksRandom(payload.message) && (looksRandom(payload.name) || looksRandom(payload.subject))
 }
 
 function getContactsConfig() {
@@ -30,6 +51,11 @@ function getContactsConfig() {
 const RESEND_API_URL = 'https://api.resend.com/emails'
 
 export async function createContactMessage(payload: ContactPayload): Promise<ActionResult> {
+  if (isLikelyBot(payload)) {
+    // Pretend success so the bot has no signal to adjust and retry.
+    return { success: true }
+  }
+
   const config = getContactsConfig()
   if ('error' in config) {
     return { success: false, error: config.error }

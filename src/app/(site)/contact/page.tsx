@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import React, { useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
 
 import FlatButton from '@/components/FlatButton'
@@ -20,6 +20,10 @@ const ContactPage = () => {
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [agreed, setAgreed] = useState(false)
+
+  // Anti-spam: a hidden field a human never fills, and the time the form was rendered.
+  const [website, setWebsite] = useState('')
+  const formRenderedAtRef = useRef(Date.now())
   
   // Feedback state
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -44,6 +48,8 @@ const ContactPage = () => {
         phone: phone.trim() || null,
         subject: subject.trim() || null,
         message: message.trim(),
+        honeypot: website,
+        formRenderedAt: formRenderedAtRef.current,
       })
 
       if (result.success) {
@@ -78,6 +84,19 @@ const ContactPage = () => {
           
           {/* Form */}
           <form onSubmit={handleSubmit} className='max-md:w-[90vw] max-md:m-auto space-y-4 lg:w-[50%]'>
+            {/* Honeypot: hidden from real visitors, but bots that fill every field will trip it */}
+            <label className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+              Site web
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </label>
+
             {feedback && (
               <p className={`rounded-xl border px-4 py-2.5 text-xs text-left ${
                 feedback.type === 'success'
