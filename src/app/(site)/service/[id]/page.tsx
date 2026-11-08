@@ -12,7 +12,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   if (!item) {
     return (
       <div className="text-red-500 p-10 text-center">
-        Aucun élément trouvé pour l ID : {id}
+        Aucun élément trouvé pour l’ID : {id}
       </div>
     )
   }
@@ -23,7 +23,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         src="/arrows.svg"
         alt="arrows"
         width={300}
-        height={100}
+        height={18}
         className="mx-auto"
       />
 
