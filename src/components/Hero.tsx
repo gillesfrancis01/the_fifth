@@ -6,6 +6,7 @@ import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLanguage } from '@/context/LanguageContext'
+import CtaLink from './CtaLink'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -54,9 +55,10 @@ const Hero = () => {
         <h4 className="hero-text font-Poppins mt-10 text-[16px]">
           {t('heroSubtitle')}
         </h4>
+        <div className="hero-text mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5 lg:justify-start">
         <Link
           href="/event"
-          className="hero-text flex items-center lg:justify-start mt-10 justify-center text-xl font-bold"
+          className="flex items-center text-xl font-bold"
         >
           {t('heroButton')}
           <span className="inline-block ml-2 p-2 rounded-full bg-main">
@@ -68,6 +70,10 @@ const Hero = () => {
             />
           </span>
         </Link>
+        <CtaLink href="/contact" variant="outline">
+          {t('letsTalk')}
+        </CtaLink>
+        </div>
       </div>
     </section>
   )

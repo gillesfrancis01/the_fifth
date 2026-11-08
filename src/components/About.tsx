@@ -2,8 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import FlatButton from './FlatButton'
-import Link from 'next/link'
+import CtaLink from './CtaLink'
 import useConstants from '@/hooks/useConstants'
 import { Services } from './Services'
 import { Separator } from './Separator'
@@ -24,7 +23,7 @@ const About = () => {
         />
         <div className='mt-[100px]'>
         <h2 className='text-main text-center text-2xl font-Josefin '>{t('aboutTitle')}</h2>
-        <Image src="/arrows.svg" className="m-auto" width={300} height={100} alt="arrows" />
+        <Image src="/arrows.svg" className="m-auto" width={300} height={18} alt="arrows" />
         <h3 className='uppercase lg:text-3xl lg:leading-16 font-Josefin text-main font-extrabold mt-10 lg:w-[50%] lg:m-auto'>
   {t('aboutSubtitle')}
 </h3>
@@ -32,9 +31,9 @@ const About = () => {
         <p className='w-[95vw] m-auto lg:w-[50%] lg:leading-8'>
           {t('aboutDescription')}
         </p>
-        <FlatButton className="mt-5 z-10 relative" border={0}>
-          <Link href="/about">{t('learnMore')}</Link>
-        </FlatButton>
+        <CtaLink href="/about" className="mt-8 z-10 relative">
+          {t('learnMore')}
+        </CtaLink>
       </div>
       </div>
       

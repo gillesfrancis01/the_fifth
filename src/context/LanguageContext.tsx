@@ -74,7 +74,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactAgreementRequired: 'Please agree that your data may be collected and stored.',
     contactRequiredFields: 'Please fill in all required fields (*).',
     contactSuccessMessage: 'Thank you for your message! Our team will contact you as soon as possible.',
-    contactErrorMessage: 'An error occurred while sending your message.'
+    contactErrorMessage: 'An error occurred while sending your message.',
+    contactCtaTitle: 'Let\u2019s bring your vision to life together now!',
+    contactCtaSubtitle: 'Tell us about your event and let\u2019s create something unforgettable.',
+    letsTalk: 'Let\u2019s Talk'
   },
   fr: {
     Home: 'Accueil',
@@ -139,7 +142,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactAgreementRequired: 'Veuillez accepter que vos données soient collectées et stockées.',
     contactRequiredFields: 'Veuillez remplir les champs obligatoires (*).',
     contactSuccessMessage: 'Merci pour votre message ! Notre équipe vous contactera dans les plus brefs délais.',
-    contactErrorMessage: "Une erreur est survenue lors de l'envoi."
+    contactErrorMessage: "Une erreur est survenue lors de l'envoi.",
+    contactCtaTitle: 'Donnons vie à votre vision, ensemble, dès maintenant !',
+    contactCtaSubtitle: 'Parlez-nous de votre événement et créons ensemble un moment inoubliable.',
+    letsTalk: 'Discutons'
   },
   es: {
     Home: 'Inicio',
@@ -204,7 +210,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactAgreementRequired: 'Por favor acepta que tus datos sean recopilados y almacenados.',
     contactRequiredFields: 'Por favor completa los campos obligatorios (*).',
     contactSuccessMessage: 'Gracias por tu mensaje. Nuestro equipo se pondrá en contacto contigo lo antes posible.',
-    contactErrorMessage: 'Ocurrió un error al enviar tu mensaje.'
+    contactErrorMessage: 'Ocurrió un error al enviar tu mensaje.',
+    contactCtaTitle: '¡Hagamos realidad tu visión juntos ahora!',
+    contactCtaSubtitle: 'Cuéntanos sobre tu evento y creemos juntos un momento inolvidable.',
+    letsTalk: 'Hablemos'
   }
 }
 
