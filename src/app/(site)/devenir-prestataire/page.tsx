@@ -27,7 +27,10 @@ export default function DevenirPrestatairePage() {
 
   // Anti-spam: a hidden field a human never fills, and the time the form was rendered.
   const [website, setWebsite] = useState('')
-  const formRenderedAtRef = useRef(Date.now())
+  const formRenderedAtRef = useRef(0)
+  useEffect(() => {
+    formRenderedAtRef.current = Date.now()
+  }, [])
 
   useEffect(() => {
     async function loadEvents() {
@@ -99,7 +102,7 @@ export default function DevenirPrestatairePage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-main text-center text-xl font-Josefin uppercase tracking-[0.2em]">Programmation</h2>
-          <Image src="/arrows.svg" className="m-auto opacity-80" width={220} height={60} alt="arrows" />
+          <Image src="/arrows.svg" className="m-auto opacity-80" width={220} height={13} alt="arrows" />
           <h3 className="uppercase text-3xl md:text-4xl font-Josefin text-main font-bold tracking-widest mt-2">
             Devenir Prestataire
           </h3>
@@ -147,7 +150,7 @@ export default function DevenirPrestatairePage() {
                 <label className="flex flex-col gap-2">
                   <span className="text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-1.5">
                     <PiUser className="h-4 w-4 text-main" />
-                    Nom, Nom de Scène ou Nom d'entreprise *
+                    Nom, Nom de Scène ou Nom d’entreprise *
                   </span>
                   <input
                     type="text"
@@ -308,7 +311,7 @@ export default function DevenirPrestatairePage() {
                   className="mt-1 accent-main h-4 w-4 rounded border-white/10"
                 />
                 <label htmlFor="agreement" className="text-xs text-white/60 leading-relaxed cursor-pointer select-none">
-                  J'accepte que les données soumises soient collectées et stockées par la direction de l'établissement dans le but d'analyser ma candidature de partenariat.
+                  J’accepte que les données soumises soient collectées et stockées par la direction de l’établissement dans le but d’analyser ma candidature de partenariat.
                 </label>
               </div>
 

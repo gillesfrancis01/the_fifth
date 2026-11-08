@@ -44,8 +44,8 @@ export async function processReservation(info: ProcessReservationInfo) {
         })
         
         return { success: true }
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error processing reservation:', error)
-        return { success: false, error: error.message || 'Erreur lors du traitement de la réservation' }
+        return { success: false, error: (error instanceof Error && error.message) || 'Erreur lors du traitement de la réservation' }
     }
 }

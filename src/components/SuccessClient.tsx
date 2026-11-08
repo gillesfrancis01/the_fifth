@@ -73,7 +73,7 @@ export default function SuccessClient() {
           href="/"
           className="bg-yellow-400 text-black font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition"
         >
-          Retour à l'accueil
+          Retour à l’accueil
         </Link>
       </div>
     )
@@ -96,7 +96,7 @@ export default function SuccessClient() {
         href="/"
         className="inline-block bg-yellow-400 text-black font-bold px-8 py-3 rounded-lg hover:bg-yellow-300 transition shadow-[0_0_15px_rgba(250,204,21,0.3)]"
       >
-        Retour à l'accueil
+        Retour à l’accueil
       </Link>
     </div>
   )

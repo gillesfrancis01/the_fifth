@@ -28,9 +28,7 @@ export default function HeicImage({ src, alt, onImageReady, ...props }: HeicImag
                 style={props.style}
                 loading="eager"
                 onLoad={handleLoad}
-                onError={(e) => {
-                    // Fallback or retry logic could go here
-                    // console.error("Image failed to load", src)
+                onError={() => {
                     handleLoad() // Mark as ready even if failed so loader doesn't hang
                 }}
             />

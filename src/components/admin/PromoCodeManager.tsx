@@ -1,6 +1,6 @@
 'use client'
 
-import { createPromoCode, deletePromoCode, getPromoCodes, togglePromoCode } from '@/app/actions/promo'
+import { createPromoCode, deletePromoCode, togglePromoCode } from '@/app/actions/promo'
 import { PromoCode } from '@/types'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState, useTransition } from 'react'

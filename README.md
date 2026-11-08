@@ -1,39 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Fifth Event Agency
 
-## Getting Started
+Website and back office for The Fifth Event Agency (Montréal): public event pages, ticket sales with Stripe, QR-code tickets sent by email, check-in scanning at the door, and an admin dashboard.
 
-First, run the development server:
+Designed & developed by [Quartier Digital](https://www.quartier-digital.com/).
+
+## Stack
+
+- **Next.js 16** (App Router, Server Actions) with React 19 and TypeScript
+- **Tailwind CSS 4**, GSAP for animations
+- **Appwrite** for the database and file storage
+- **Stripe** for payments
+- **Resend** for transactional emails (tickets, contact form, provider applications)
+- **Vitest** for tests
+
+## Getting started
+
+Requirements: Node.js 20+ and npm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env   # then fill in the values
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Every environment variable is listed and explained in [`.env.example`](.env.example).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command         | What it does                         |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Start the development server         |
+| `npm run build` | Build for production                 |
+| `npm start`     | Serve the production build           |
+| `npm run lint`  | Lint the project with ESLint         |
+| `npm test`      | Run the test suite (Vitest)          |
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+**Public site** (`src/app/(site)`)
+- Home, About, Services, Gallery, Portfolio, Events and Contact pages
+- Event pages with ticket purchase (Stripe) and promo codes
+- Contact form and "Join as a Provider" application form, both protected against spam bots (honeypot field, minimum fill time, gibberish detection)
+- English, French and Spanish (language switcher in the header; translations in `src/context/LanguageContext.tsx` and `src/constants`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Back office** (`/admin`, password protected with `ADMIN_PASSWORD`)
+- Dashboard, events, tickets, reservations, customers, promo codes, gallery, provider applications and scanner accounts
+- Live refresh when tickets or reservations change
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Door check-in** (`/scan`)
+- Scanner accounts created in the back office log in and scan ticket QR codes
 
-## Deploy on Vercel
+## Project structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/
+    (site)/        public pages
+    admin/         back office
+    scan/          door check-in scanner
+    check-in/      page opened by a ticket QR code
+    actions/       server actions (data access, payments, emails)
+    api/           admin and scanner login/logout routes
+  components/      UI components (admin/ and scan/ for back-office UI)
+  constants/       page content per language (en, fr, es)
+  context/         language context and translations
+  utils/           email sending, PDF tickets, auth helpers
+config/appwrite.ts Appwrite clients
+tests/             Vitest test suite
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
 
-<!-- trigger 2 -->
-<!-- trigger 3 -->
+The site is a standard Next.js app and deploys to any Node.js host that supports Next.js 16 (e.g. Vercel).
+
+1. Set every variable from `.env.example` in the host's environment settings.
+2. Use `npm run build` as the build command and `npm start` to serve it (Vercel detects this automatically).
+3. In Resend, verify the domain of the sender address (`TICKETING_EMAIL_FROM`).
+4. In Appwrite, add the production domain as a web platform for the project.

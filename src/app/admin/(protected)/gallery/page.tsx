@@ -45,10 +45,10 @@ export default async function AdminGalleryPage() {
           
           <div className="space-y-5">
             <div className="rounded-3xl border border-white/15 bg-black/55 p-6 text-sm text-white/70">
-              <h2 className="font-heading text-2xl text-white">Consignes d'édition</h2>
+              <h2 className="font-heading text-2xl text-white">Consignes d’édition</h2>
               <ul className="mt-4 space-y-3 text-xs uppercase tracking-[0.25em] text-white/55 list-disc pl-4">
                 <li>Privilégiez les images de haute qualité (formats standards acceptés).</li>
-                <li>Les vidéos YouTube doivent être au format d'URL standard ou partagé.</li>
+                <li>Les vidéos YouTube doivent être au format d’URL standard ou partagé.</li>
                 <li>Réordonnez les images en utilisant les flèches directionnelles sur les miniatures.</li>
               </ul>
             </div>

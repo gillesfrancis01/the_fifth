@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState, useTransition } from 'react'
+import React, { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
 
 import FlatButton from '@/components/FlatButton'
@@ -23,7 +23,10 @@ const ContactPage = () => {
 
   // Anti-spam: a hidden field a human never fills, and the time the form was rendered.
   const [website, setWebsite] = useState('')
-  const formRenderedAtRef = useRef(Date.now())
+  const formRenderedAtRef = useRef(0)
+  useEffect(() => {
+    formRenderedAtRef.current = Date.now()
+  }, [])
   
   // Feedback state
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -77,7 +80,7 @@ const ContactPage = () => {
     <div className='flex flex-col'>
       <div className='text-center '>
         <h2 className='text-main text-center text-2xl font-Josefin'>{t('contactShort')}</h2>
-        <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows'/>
+        <Image src="/arrows.svg" className="m-auto " width={300} height={18} alt='arrows'/>
         <h3 className='uppercase text-2xl font-Josefin text-main font-bold '>{t('contact')}</h3>
         
         <div className='lg:flex lg:flex-row-reverse lg:text-left lg:w-[70vw] lg:justify-around lg:m-auto mt-8'>

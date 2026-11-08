@@ -49,7 +49,7 @@ export default async function AdminProvidersPage() {
               <ul className="mt-4 space-y-3 text-xs uppercase tracking-[0.25em] text-white/55 list-disc pl-4">
                 <li>Examinez le portfolio ou les liens réseaux des candidats (directement cliquables).</li>
                 <li>Validez le statut pour coordonner la programmation.</li>
-                <li>Supprimez les dossiers obsolètes pour libérer de l'espace.</li>
+                <li>Supprimez les dossiers obsolètes pour libérer de l’espace.</li>
               </ul>
             </div>
           </div>

@@ -5,7 +5,7 @@ import AdminSidebar from './AdminSidebar'
 import AdminBottomNav from './AdminBottomNav'
 import LogoutButton from './LogoutButton'
 import { FiSearch } from 'react-icons/fi'
-import { PiBellSimpleRinging, PiGearSix, PiUserCircle, PiCaretLeftBold, PiCaretRightBold } from 'react-icons/pi'
+import { PiBellSimpleRinging, PiGearSix, PiUserCircle } from 'react-icons/pi'
 
 export default function AdminLayoutWrapper({ children }: { children: ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false)

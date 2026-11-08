@@ -171,7 +171,7 @@ export default function ProviderManager({ providers, events }: ProviderManagerPr
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase tracking-wider text-white/45 font-semibold">Présentation :</p>
                   <p className="text-sm text-white/75 italic bg-white/5 rounded-xl p-3 border border-white/5 whitespace-pre-wrap">
-                    "{provider.message}"
+                    “{provider.message}”
                   </p>
                 </div>
               )}
