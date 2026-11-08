@@ -38,21 +38,6 @@ function assertEmailConfig() {
   return { apiKey, fromEmail }
 }
 
-function ensureJpegFormat(url: string) {
-  try {
-    const parsed = new URL(url)
-    parsed.searchParams.set('format', 'jpg')
-    return parsed.toString()
-  } catch {
-    if (url.includes('format=')) {
-      return url.replace(/format=[^&]*/i, 'format=jpg')
-    }
-
-    const separator = url.includes('?') ? (url.endsWith('?') || url.endsWith('&') ? '' : '&') : '?'
-    return `${url}${separator}format=jpg`
-  }
-}
-
 // Réseau non borné dans une Server Action = risque de faire dépasser le
 // temps limite de la fonction serverless, qui tue tout le process sans
 // laisser d'erreur ni atteindre l'appel Resend qui suit. On échoue vite
@@ -418,7 +403,6 @@ async function generateTicketPdf(params: {
   })
 
   // ---------- QR CODE (colonne gauche) ----------
-  console.log(`[ticket-pdf reservation=${reservationId}] qr embed start, isDataUrl=${qrCodeUrl.startsWith('data:')}`)
   let qrImage
   try {
     if (qrCodeUrl.startsWith('data:')) {
@@ -439,7 +423,6 @@ async function generateTicketPdf(params: {
   } catch (e) {
     console.warn('Impossible de charger le QR code pour le billet PDF', e)
   }
-  console.log(`[ticket-pdf reservation=${reservationId}] qr embed done, hasQrImage=${Boolean(qrImage)}`)
 
   const qrZoneSize = leftWidth - 40
   if (qrImage) {
@@ -541,13 +524,10 @@ async function generateTicketPdf(params: {
   const posterY = posterTopY - posterHeight
 
   // Charger l'image d'événement (event.image)
-  console.log(`[ticket-pdf reservation=${reservationId}] event image fetch start, hasUrl=${Boolean(event.image)}`)
   let eventImage
   if (event.image) {
     try {
-      const imgFetchStartedAt = Date.now()
       const imgRes = await fetchWithTimeout(event.image, 8000)
-      console.log(`[ticket-pdf reservation=${reservationId}] event image fetch responded in ${Date.now() - imgFetchStartedAt}ms, status=${imgRes.status}`)
       if (!imgRes.ok) {
         throw new Error(`Impossible de charger event.image (statut ${imgRes.status})`)
       }
@@ -561,7 +541,6 @@ async function generateTicketPdf(params: {
       console.warn('Erreur lors du chargement de event.image pour le billet PDF', e)
     }
   }
-  console.log(`[ticket-pdf reservation=${reservationId}] event image fetch done, hasEventImage=${Boolean(eventImage)}`)
 
   if (eventImage) {
     const { width: imgW, height: imgH } = eventImage
@@ -691,15 +670,12 @@ function buildEmailHtml(params: {
 
 export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
   const tag = `[ticket-email reservation=${payload.reservationId}]`
-  console.log(`${tag} start`)
 
   const { apiKey, fromEmail } = assertEmailConfig()
-  console.log(`${tag} config ok, from=${fromEmail}`)
 
   const checkInUrl = `${process.env.NEXT_PUBLIC_URL}/check-in?id=${payload.reservationId}`
 
   const qrCodeUrl = await generateQrCodeDataUrl(checkInUrl)
-  console.log(`${tag} qr generated ok=${Boolean(qrCodeUrl)}`)
 
   const html = buildEmailHtml({
     fullName: payload.fullName,
@@ -709,9 +685,7 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
     reservationId: payload.reservationId,
     qrCodeUrl,
   })
-  console.log(`${tag} html built, length=${html.length}`)
 
-  const pdfStartedAt = Date.now()
   const pdfBuffer = await generateTicketPdf({
     fullName: payload.fullName,
     phone: payload.phone,
@@ -720,10 +694,7 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
     reservationId: payload.reservationId,
     qrCodeUrl,
   })
-  console.log(`${tag} pdf built in ${Date.now() - pdfStartedAt}ms, bytes=${pdfBuffer.length}`)
 
-  console.log(`${tag} calling Resend`)
-  const resendStartedAt = Date.now()
   const response = await fetch(RESEND_API_URL, {
     method: 'POST',
     headers: {
@@ -744,13 +715,10 @@ export async function sendTicketConfirmationEmail(payload: TicketEmailPayload) {
       ],
     }),
   })
-  console.log(`${tag} Resend responded in ${Date.now() - resendStartedAt}ms, status=${response.status}`)
 
   if (!response.ok) {
     const errorText = await response.text()
     console.error(`${tag} Resend error body: ${errorText}`)
     throw new Error(`Échec de l'envoi du courriel de confirmation: ${errorText}`)
   }
-
-  console.log(`${tag} done`)
 }

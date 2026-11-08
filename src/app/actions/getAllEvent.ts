@@ -17,7 +17,7 @@ async function getAllEvents() {
         );
         return events as unknown as events[]
     } catch(error) {
-       console.log('failed to get evens', error);
+       console.error('failed to get evens', error);
     }
     
 } 

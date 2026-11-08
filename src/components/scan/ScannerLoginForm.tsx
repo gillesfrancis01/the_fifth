@@ -40,8 +40,7 @@ export default function ScannerLoginForm() {
 
       router.push(destination)
       router.refresh()
-    } catch (error) {
-      console.error(error)
+    } catch {
       setError('Impossible de se connecter. Veuillez réessayer.')
       setIsSubmitting(false)
     }

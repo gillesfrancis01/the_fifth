@@ -48,7 +48,6 @@ export default function PaymentForm({
 
     if (error) {
       setErrorMessage(error.message || 'Une erreur est survenue.')
-      console.error(error)
     }
 
     setLoading(false)

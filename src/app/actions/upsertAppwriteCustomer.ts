@@ -73,7 +73,6 @@ export async function upsertAppwriteCustomer({
   }
 
   const reservations = await Promise.all(reservationPromises)
-  console.log(`Created ${reservations.length} reservations`)
 
   const emailPromises = reservations.map(async (reservation) => {
     try {
@@ -93,5 +92,4 @@ export async function upsertAppwriteCustomer({
   })
 
   await Promise.allSettled(emailPromises)
-  console.log('All confirmation emails processed')
 }

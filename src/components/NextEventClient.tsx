@@ -17,7 +17,7 @@ const NextEventClient = ({ nextEvent, date }: NextEventClientProps) => {
     return (
       <div className='text-center mt-9'>
         <h2 className='text-main text-2xl font-Josefin'>{t('whatWeDo')}</h2>
-        <Image src='/arrows.svg' className='m-auto' width={300} height={100} alt='arrows' />
+        <Image src='/arrows.svg' className='m-auto' width={300} height={18} alt='arrows' />
         <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>{t('nextEvent')}</h3>
         <p>{t('noNextEvent')}</p>
       </div>
@@ -27,7 +27,7 @@ const NextEventClient = ({ nextEvent, date }: NextEventClientProps) => {
   return (
     <div className='text-center mt-9'>
       <h2 className='text-main text-center text-2xl font-Josefin'>{t('whatWeDo')}</h2>
-      <Image src='/arrows.svg' className='m-auto ' width={300} height={100} alt='arrows' />
+      <Image src='/arrows.svg' className='m-auto ' width={300} height={18} alt='arrows' />
       <h3 className='uppercase text-2xl  font-Josefin text-main font-bold '>{t('nextEvent')}</h3>
       <Event event={nextEvent} date={date}/>
     </div>

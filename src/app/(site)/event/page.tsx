@@ -61,7 +61,7 @@ export default function Events() {
   return (
     <div className='text-center'>
       <h2 className='text-main text-center text-2xl font-Josefin'>{t('Event')}</h2>
-      <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows' />
+      <Image src="/arrows.svg" className="m-auto " width={300} height={18} alt='arrows' />
       <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>{t('ourEvents')}</h3>
 
       {/* Search Bar */}

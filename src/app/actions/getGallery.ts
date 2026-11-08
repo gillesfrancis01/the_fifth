@@ -23,7 +23,7 @@ async function getGallery() {
         );
         return galleries as unknown as Gallery[];
     } catch (error) {
-        console.log('failed to get gallery', error);
+        console.error('failed to get gallery', error);
         return [];
     }
 }

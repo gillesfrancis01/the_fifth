@@ -37,8 +37,7 @@ export default function LoginForm() {
 
       router.push('/admin')
       router.refresh()
-    } catch (error) {
-      console.error(error)
+    } catch {
       setError("Impossible de se connecter. Veuillez réessayer.")
       setIsSubmitting(false)
     }

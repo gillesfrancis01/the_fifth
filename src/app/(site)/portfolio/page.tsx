@@ -12,7 +12,7 @@ const Page = () => {
     <div className="flex flex-col ">
         <div className='text-center '>
         <h2 className='text-main text-center text-2xl font-Josefin'>{t('ourPortfolio')}</h2>
-        <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows'/>
+        <Image src="/arrows.svg" className="m-auto " width={300} height={18} alt='arrows'/>
         <h3 className='uppercase text-2xl  font-Josefin text-main font-bold '>{t('portfolioTagline')}</h3>
        </div>
        {Portfolio.map((item,index)=>[

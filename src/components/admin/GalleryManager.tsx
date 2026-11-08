@@ -130,8 +130,7 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
         } else {
           setFeedback({ type: 'error', message: result.error || `Erreur d'upload pour ${file.name}` })
         }
-      } catch (err) {
-        console.error(err)
+      } catch {
         setFeedback({ type: 'error', message: `Erreur d'upload pour ${file.name}` })
       } finally {
         setUploadingFiles(prev => prev.filter(u => u.name !== file.name))
@@ -411,7 +410,7 @@ export default function GalleryManager({ galleries, events }: GalleryManagerProp
 
             {isCustomEvent && (
               <label className="flex flex-col gap-2 text-sm text-white/80">
-                <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">Nom de l'événement personnalisé</span>
+                <span className="text-[11px] uppercase tracking-[0.35em] text-white/50">Nom de l’événement personnalisé</span>
                 <input
                   className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition focus:border-[rgba(201,161,77,0.55)]"
                   type="text"

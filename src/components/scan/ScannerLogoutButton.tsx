@@ -18,8 +18,7 @@ export default function ScannerLogoutButton() {
       await fetch('/api/scanner/logout', { method: 'POST' })
       router.push('/scan/login')
       router.refresh()
-    } catch (error) {
-      console.error('Impossible de se déconnecter', error)
+    } catch {
       setIsLoading(false)
     }
   }

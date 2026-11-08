@@ -48,8 +48,7 @@ async function getAllTickets(id:string): Promise<TicketWithAvailability[]> {
             } satisfies TicketWithAvailability;
         });
     } catch(error) {
-       console.log('failed to get evens', error);
-       console.log(id);
+       console.error('failed to get evens', error);
 
        return [];
     }

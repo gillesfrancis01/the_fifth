@@ -17,7 +17,6 @@ const Header = () => {
 
   const handleSetVisible = () => {
         setVisible(!visible)
-        console.log(visible)
   }
   //const pathname = usePathname()
 

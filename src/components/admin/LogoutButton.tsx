@@ -18,8 +18,7 @@ export default function LogoutButton() {
       await fetch('/api/admin/logout', { method: 'POST' })
       router.push('/admin/login')
       router.refresh()
-    } catch (error) {
-      console.error('Impossible de se déconnecter', error)
+    } catch {
       setIsLoading(false)
     }
   }

@@ -118,12 +118,10 @@ export async function sendProviderStatusEmail(payload: ProviderEmailPayload) {
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`Erreur Resend (${response.status}): ${errorText}`)
-    } else {
-      console.log(`E-mail de notification (${payload.status}) envoyé avec succès à ${payload.email}`)
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Exception lors de l'envoi de l'e-mail Resend`, error)
-    throw new Error(error.message || "Erreur de connexion au serveur d'envoi d'e-mail (Resend).")
+    throw new Error((error instanceof Error && error.message) || "Erreur de connexion au serveur d'envoi d'e-mail (Resend).")
   }
 }
 
@@ -272,8 +270,7 @@ export async function sendProviderSubmissionEmails(payload: ProviderSubmissionEm
         }),
       }),
     ])
-    console.log(`Emails de candidature envoyés avec succès pour ${payload.email}`)
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erreur lors de l'envoi des e-mails de candidature", error)
     // Non-blocking but throws to be handled in the action
     throw error

@@ -127,7 +127,7 @@ export default function GalleryPage() {
 
       <div className="text-center mb-10 mt-16 pt-10">
         <h2 className='text-main text-center text-2xl font-Josefin'>Our Data</h2>
-        <Image src="/arrows.svg" className="m-auto " width={300} height={100} alt='arrows' />
+        <Image src="/arrows.svg" className="m-auto " width={300} height={18} alt='arrows' />
         <h3 className='uppercase text-2xl font-Josefin text-main font-bold'>Inspirations</h3>
       </div>
 
