@@ -5,7 +5,7 @@ import Image from 'next/image'
 import getAllEvents from '@/app/actions/getAllEvent'
 import { createProviderApplication } from '@/app/actions/adminProviders'
 import type { events as Event } from '@/types'
-import FlatButton from '@/components/FlatButton'
+import { ctaClassName } from '@/components/CtaLink'
 import { PiUser, PiEnvelope, PiPhone, PiMusicNotes, PiGlobe, PiChatText, PiCalendar } from 'react-icons/pi'
 
 export default function DevenirPrestatairePage() {
@@ -323,13 +323,13 @@ export default function DevenirPrestatairePage() {
 
               {/* Submit Button */}
               <div className="pt-4 flex justify-center">
-                <FlatButton 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isPending}
-                  className="w-full sm:w-auto px-10"
+                  className={ctaClassName('solid', 'w-full sm:w-auto px-10')}
                 >
                   {isPending ? "Envoi..." : "Envoyer ma Candidature"}
-                </FlatButton>
+                </button>
               </div>
             </form>
           )}

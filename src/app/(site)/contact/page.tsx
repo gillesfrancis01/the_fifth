@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
 
-import FlatButton from '@/components/FlatButton'
+import { ctaClassName } from '@/components/CtaLink'
 import { FaLocationDot, FaPhone } from "react-icons/fa6"
 import { IoMailSharp } from "react-icons/io5"
 import { createContactMessage } from '@/app/actions/contact'
@@ -171,9 +171,9 @@ const ContactPage = () => {
               </label>
             </div>
 
-            <FlatButton type="submit" disabled={isPending} className='mt-5'>
+            <button type="submit" disabled={isPending} className={ctaClassName('solid', 'mt-5')}>
               {isPending ? t('sending') : t('send')}
-            </FlatButton>
+            </button>
           </form>
 
           {/* Details */}
