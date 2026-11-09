@@ -5,6 +5,7 @@ import { createAdminClient } from '../../../config/appwrite'
 import { ID } from 'node-appwrite'
 import type { events, Ticket } from '@/types'
 import { sendTicketConfirmationEmail } from '@/utils/sendTicketEmail'
+import { syncContactToBrevo } from '@/utils/brevo'
 
 interface CustomerInfo {
   fullName: string
@@ -73,6 +74,14 @@ export async function upsertAppwriteCustomer({
   }
 
   const reservations = await Promise.all(reservationPromises)
+
+  try {
+    await syncContactToBrevo({ email, fullName })
+  } catch (error) {
+    // A temporary Brevo issue must never prevent a paid customer from
+    // receiving tickets. The deployment logs retain the failure for follow-up.
+    console.error(`Failed to sync ${email} to Brevo:`, error)
+  }
 
   const emailPromises = reservations.map(async (reservation) => {
     try {

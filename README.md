@@ -77,3 +77,19 @@ The site is a standard Next.js app and deploys to any Node.js host that supports
 2. Use `npm run build` as the build command and `npm start` to serve it (Vercel detects this automatically).
 3. In Resend, verify the domain of the sender address (`TICKETING_EMAIL_FROM`).
 4. In Appwrite, add the production domain as a web platform for the project.
+
+## Brevo newsletter sync
+
+Newsletter form submissions and customers with a confirmed ticket purchase are
+added to the configured Brevo list from server-side code.
+
+Set these secrets in the production hosting environment (never in browser code
+or in Git):
+
+```text
+BREVO_API_KEY=<Brevo API key>
+BREVO_NEWSLETTER_LIST_ID=<numeric Brevo list ID>
+```
+
+The Brevo contact request uses `updateEnabled`, so submitting an existing email
+updates the contact and keeps the integration idempotent.
