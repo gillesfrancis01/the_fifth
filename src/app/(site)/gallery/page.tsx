@@ -5,6 +5,7 @@ import Image from 'next/image'
 import getGallery from '../../actions/getGallery'
 import { Gallery } from '@/types'
 import Lightbox from '@/components/ui/Lightbox'
+import Pagination from '@/components/ui/Pagination'
 import HeicImage from '@/components/ui/HeicImage'
 
 const transformImageURL = (url: string) => {
@@ -24,6 +25,8 @@ const transformImageURL = (url: string) => {
   return url;
 }
 
+const PAGE_SIZE = 24
+
 const getYouTubeEmbedUrl = (url: string) => {
   if (!url) return '';
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([^&?]+)/);
@@ -40,6 +43,9 @@ export default function GalleryPage() {
 
   // Lightbox state: index into the currently displayed pictures
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  const [page, setPage] = useState(1)
+  const gridRef = React.useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchGallery() {
@@ -75,6 +81,22 @@ export default function GalleryPage() {
     }
   }, [activeGalleryId, allGalleries])
 
+  const totalPages = Math.max(1, Math.ceil(displayedImages.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageStart = (currentPage - 1) * PAGE_SIZE
+  const pageImages = displayedImages.slice(pageStart, pageStart + PAGE_SIZE)
+
+  const selectGallery = (id: string) => {
+    setActiveGalleryId(id)
+    setPage(1)
+  }
+
+  const changePage = (next: number) => {
+    setPage(next)
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  // The viewer walks through every picture of the selection, not only the current page
   const lightboxItems = React.useMemo(
     () => displayedImages.map(i => ({ src: transformImageURL(i.url), caption: i.event })),
     [displayedImages]
@@ -119,17 +141,17 @@ export default function GalleryPage() {
         ) : (
           <>
             {/* Masonry Grid */}
-            <div className="w-[95vw] max-w-[1600px] m-auto px-2">
+            <div ref={gridRef} className="w-[95vw] max-w-[1600px] m-auto px-2 scroll-mt-24">
               <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-                {displayedImages.map((item, index) => (
+                {pageImages.map((item, i) => (
                   <div
-                    key={`${item.url}-${index}`}
+                    key={`${item.url}-${pageStart + i}`}
                     className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-lg bg-gray-900 border border-white/5 mb-4"
-                    onClick={() => setLightboxIndex(index)}
+                    onClick={() => setLightboxIndex(pageStart + i)}
                   >
                     <HeicImage
                       src={transformImageURL(item.url)}
-                      alt={`${item.event} - ${index}`}
+                      alt={`${item.event} - ${pageStart + i + 1}`}
                       className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4">
@@ -143,6 +165,13 @@ export default function GalleryPage() {
               {displayedImages.length === 0 && (
                 <div className="text-center text-gray-400 py-20">No images found</div>
               )}
+
+              {displayedImages.length > 0 && (
+                <p className="mt-10 text-center text-xs tracking-widest text-white/50">
+                  {pageStart + 1}–{pageStart + pageImages.length} / {displayedImages.length}
+                </p>
+              )}
+              <Pagination page={currentPage} totalPages={totalPages} onPageChange={changePage} />
             </div>
 
             {/* Floating Navigation Tabs: stick to the bottom of the screen while scrolling,
@@ -150,7 +179,7 @@ export default function GalleryPage() {
             <div className="sticky bottom-8 z-40 mx-auto mt-10 w-fit max-w-[95vw]">
               <div className="flex flex-nowrap overflow-x-auto gap-2 p-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl items-center no-scrollbar">
                 <button
-                  onClick={() => setActiveGalleryId('all')}
+                  onClick={() => selectGallery('all')}
                   className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all duration-300
                       ${activeGalleryId === 'all'
                       ? 'bg-white text-black shadow-lg scale-105'
@@ -163,7 +192,7 @@ export default function GalleryPage() {
                 {allGalleries.map((gallery) => (
                   <button
                     key={gallery.$id}
-                    onClick={() => setActiveGalleryId(gallery.$id)}
+                    onClick={() => selectGallery(gallery.$id)}
                     className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300
                       ${activeGalleryId === gallery.$id
                         ? 'bg-main text-black shadow-[0_0_10px_rgba(201,161,77,0.4)]'
