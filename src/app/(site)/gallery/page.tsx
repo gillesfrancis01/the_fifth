@@ -81,7 +81,7 @@ export default function GalleryPage() {
   )
 
   return (
-    <div className='min-h-screen relative pb-32'>
+    <div className='min-h-screen relative pb-10'>
 
       {/* YouTube Video Banner */}
       {displayedVideos.length > 0 && (
@@ -145,8 +145,9 @@ export default function GalleryPage() {
               )}
             </div>
 
-            {/* Floating Navigation Tabs */}
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 max-w-[95vw]">
+            {/* Floating Navigation Tabs: stick to the bottom of the screen while scrolling,
+                but stop above the footer instead of covering it */}
+            <div className="sticky bottom-8 z-40 mx-auto mt-10 w-fit max-w-[95vw]">
               <div className="flex flex-nowrap overflow-x-auto gap-2 p-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl items-center no-scrollbar">
                 <button
                   onClick={() => setActiveGalleryId('all')}
