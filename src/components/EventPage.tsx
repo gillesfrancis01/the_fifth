@@ -10,6 +10,7 @@ import { events, TicketWithAvailability } from '@/types'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import PaymentForm from './PaymentForm'
+import Link from 'next/link'
 
 import { verifyPromoCode } from '@/app/actions/promo'
 import { PromoCode } from '@/types'
@@ -581,6 +582,17 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       </div>
                     </div>
                   )}
+
+                  <p className="text-center text-xs text-gray-400">
+                    {t('checkoutPolicyNotice')}{' '}
+                    <Link href="/refund-policy" target="_blank" className="underline hover:text-white">
+                      {t('refundPolicy')}
+                    </Link>
+                    {' · '}
+                    <Link href="/privacy-policy" target="_blank" className="underline hover:text-white">
+                      {t('privacyPolicy')}
+                    </Link>
+                  </p>
 
                   <button
                     type="submit"

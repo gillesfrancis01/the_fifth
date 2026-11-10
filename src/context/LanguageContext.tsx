@@ -80,7 +80,10 @@ const translations: Record<Language, Record<string, string>> = {
     letsTalk: 'Let\u2019s Talk',
     newsletterConsent: 'I agree to receive emails from The Fifth Event Agency (news and offers). I can unsubscribe at any time.',
     newsletterConsentRequired: 'Please tick the box to subscribe to the newsletter.',
-    newsletterModalTitle: 'Subscribe to our newsletter'
+    newsletterModalTitle: 'Subscribe to our newsletter',
+    privacyPolicy: 'Privacy Policy',
+    refundPolicy: 'Refund Policy',
+    checkoutPolicyNotice: 'All ticket sales are final.'
   },
   fr: {
     Home: 'Accueil',
@@ -151,7 +154,10 @@ const translations: Record<Language, Record<string, string>> = {
     letsTalk: 'Discutons',
     newsletterConsent: 'J’accepte de recevoir les courriels de The Fifth Event Agency (nouvelles et offres). Je peux me désabonner à tout moment.',
     newsletterConsentRequired: 'Veuillez cocher la case pour vous inscrire à la newsletter.',
-    newsletterModalTitle: 'Inscrivez-vous à notre newsletter'
+    newsletterModalTitle: 'Inscrivez-vous à notre newsletter',
+    privacyPolicy: 'Politique de confidentialité',
+    refundPolicy: 'Politique de non-remboursement',
+    checkoutPolicyNotice: 'Toutes les ventes de billets sont finales.'
   },
   es: {
     Home: 'Inicio',
@@ -222,7 +228,10 @@ const translations: Record<Language, Record<string, string>> = {
     letsTalk: 'Hablemos',
     newsletterConsent: 'Acepto recibir correos de The Fifth Event Agency (novedades y ofertas). Puedo darme de baja en cualquier momento.',
     newsletterConsentRequired: 'Marca la casilla para suscribirte al boletín.',
-    newsletterModalTitle: 'Suscríbete a nuestro boletín'
+    newsletterModalTitle: 'Suscríbete a nuestro boletín',
+    privacyPolicy: 'Política de privacidad',
+    refundPolicy: 'Política de no reembolso',
+    checkoutPolicyNotice: 'Todas las ventas de entradas son definitivas.'
   }
 }
 

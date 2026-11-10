@@ -6,6 +6,8 @@ import {
   PaymentElement,
 } from '@stripe/react-stripe-js'
 import { FormEvent, useState } from 'react'
+import Link from 'next/link'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function PaymentForm({
   clientSecret,
@@ -27,6 +29,7 @@ export default function PaymentForm({
   newsletterConsent?: boolean
 }) {
 
+  const { t } = useLanguage()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -61,6 +64,12 @@ export default function PaymentForm({
       {errorMessage && (
         <div className="text-red-500 text-sm font-medium">{errorMessage}</div>
       )}
+      <p className="text-center text-xs text-gray-400">
+        {t('checkoutPolicyNotice')}{' '}
+        <Link href="/refund-policy" target="_blank" className="underline hover:text-white">
+          {t('refundPolicy')}
+        </Link>
+      </p>
       <button
         type="submit"
         disabled={!stripe || loading}

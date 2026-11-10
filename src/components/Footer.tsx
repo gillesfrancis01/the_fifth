@@ -39,6 +39,10 @@ export const Footer = () => {
       <Suscribe />
 
     </div>
+    <nav aria-label='Legal' className='flex flex-wrap justify-center gap-x-8 gap-y-2 px-6 pb-8 pt-4 text-sm text-white/60'>
+      <Link href='/privacy-policy' className='hover:text-white transition-colors'>{t('privacyPolicy')}</Link>
+      <Link href='/refund-policy' className='hover:text-white transition-colors'>{t('refundPolicy')}</Link>
+    </nav>
     <div className='flex justify-between p-1 bg-[#262626] items-center px-14 max-md:px-6'>
        <Link href="/"><Image src="/logo.png" alt='logo-the-fifth' width={100} height={100} className='max-md:w-12 max-md:h-12'/></Link> 
        <span className="max-md:text-xs">Designed &amp; developed by <Link href="https://www.quartier-digital.com/" className="hover:text-main transition-colors">Quartier Digital</Link></span>
