@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import getGallery from '../../actions/getGallery'
 import { Gallery } from '@/types'
-import Modal from '@/components/ui/Modal'
+import Lightbox from '@/components/ui/Lightbox'
 import HeicImage from '@/components/ui/HeicImage'
 
 const transformImageURL = (url: string) => {
@@ -38,9 +38,8 @@ export default function GalleryPage() {
   const [allGalleries, setAllGalleries] = useState<Gallery[]>([])
   const [activeGalleryId, setActiveGalleryId] = useState<string>('all')
 
-  // Lightbox state
+  // Lightbox state: index into the currently displayed pictures
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const [lightboxImages, setLightboxImages] = useState<string[]>([])
 
   useEffect(() => {
     async function fetchGallery() {
@@ -76,27 +75,10 @@ export default function GalleryPage() {
     }
   }, [activeGalleryId, allGalleries])
 
-  // Update lightbox images when selection changes or user clicks an image
-  // Actually, we should set the lightbox context to the currently displayed list
-
-  const handleImageClick = (index: number) => {
-    setLightboxImages(displayedImages.map(i => i.url))
-    setLightboxIndex(index)
-  }
-
-  // Handlers for Lightbox navigation
-  const handlePrev = () => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => (prev! > 0 ? prev! - 1 : lightboxImages.length - 1))
-    }
-  }
-
-  const handleNext = () => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => (prev! < lightboxImages.length - 1 ? prev! + 1 : 0))
-    }
-  }
-
+  const lightboxItems = React.useMemo(
+    () => displayedImages.map(i => ({ src: transformImageURL(i.url), caption: i.event })),
+    [displayedImages]
+  )
 
   return (
     <div className='min-h-screen relative pb-32'>
@@ -143,7 +125,7 @@ export default function GalleryPage() {
                   <div
                     key={`${item.url}-${index}`}
                     className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-lg bg-gray-900 border border-white/5 mb-4"
-                    onClick={() => handleImageClick(index)}
+                    onClick={() => setLightboxIndex(index)}
                   >
                     <HeicImage
                       src={transformImageURL(item.url)}
@@ -196,43 +178,12 @@ export default function GalleryPage() {
         )
       }
 
-      {/* Lightbox Modal */}
-      <Modal
-        open={lightboxIndex !== null}
+      <Lightbox
+        items={lightboxItems}
+        index={lightboxIndex}
         onClose={() => setLightboxIndex(null)}
-        title={lightboxIndex !== null ? /* lightboxImages[lightboxIndex] (We don't have title easily here, maybe optional) */ "Gallery" : ""}
-        description={`${(lightboxIndex || 0) + 1} / ${lightboxImages.length}`}
-      >
-        {lightboxIndex !== null && (
-          <div className="relative w-full h-[60vh] flex items-center justify-center">
-            <div className="relative w-full h-full flex items-center justify-center">
-              <HeicImage
-                src={transformImageURL(lightboxImages[lightboxIndex])}
-                alt="Lightbox"
-                className="max-h-full max-w-full object-contain shadow-2xl"
-              />
-            </div>
-
-            {/* Navigation Arrows */}
-            {lightboxImages.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                  className="absolute -left-4 md:left-0 p-4 bg-black/20 hover:bg-black/60 text-white rounded-r-lg transition-all text-2xl h-full flex items-center"
-                >
-                  &#10094;
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                  className="absolute -right-4 md:right-0 p-4 bg-black/20 hover:bg-black/60 text-white rounded-l-lg transition-all text-2xl h-full flex items-center"
-                >
-                  &#10095;
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </Modal>
+        onIndexChange={setLightboxIndex}
+      />
 
     </div >
   )
