@@ -123,6 +123,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [newsletterConsent, setNewsletterConsent] = useState(false)
   const [ticketQuantity, setTicketQuantity] = useState(1)
 
   // Promo Code State
@@ -486,6 +487,16 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       maxLength={7}
                     />
 
+                    <label className="flex items-start gap-2 text-xs text-gray-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newsletterConsent}
+                        onChange={(e) => setNewsletterConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#E6C55D]"
+                      />
+                      <span>{t('newsletterConsent')}</span>
+                    </label>
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-400">Quantity</label>
                       <select
@@ -601,6 +612,7 @@ const EventPage = ({ event, tickets }: EventPageProps) => {
                       quantity={ticketQuantity}
                       ticketId={selectedTicket!.$id}
                       eventId={event.$id}
+                      newsletterConsent={newsletterConsent}
                     />
                   </Elements>
                 </div>

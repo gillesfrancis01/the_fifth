@@ -15,6 +15,7 @@ export default function PaymentForm({
   quantity,
   ticketId,
   eventId,
+  newsletterConsent = false,
 }: {
   clientSecret: string
   fullName: string
@@ -23,6 +24,7 @@ export default function PaymentForm({
   quantity: number
   ticketId: string
   eventId: string
+  newsletterConsent?: boolean
 }) {
 
   const stripe = useStripe()
@@ -42,7 +44,7 @@ export default function PaymentForm({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/success?name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&ticketId=${encodeURIComponent(ticketId)}&eventId=${eventId}&quantity=${quantity}&paymentIntent=${clientSecret.split('_secret')[0]}`,
+        return_url: `${window.location.origin}/success?name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&ticketId=${encodeURIComponent(ticketId)}&eventId=${eventId}&quantity=${quantity}&paymentIntent=${clientSecret.split('_secret')[0]}${newsletterConsent ? '&newsletter=1' : ''}`,
       },
     })
 

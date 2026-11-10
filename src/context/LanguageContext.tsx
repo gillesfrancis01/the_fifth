@@ -77,7 +77,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactErrorMessage: 'An error occurred while sending your message.',
     contactCtaTitle: 'Let\u2019s bring your vision to life together now!',
     contactCtaSubtitle: 'Tell us about your event and let\u2019s create something unforgettable.',
-    letsTalk: 'Let\u2019s Talk'
+    letsTalk: 'Let\u2019s Talk',
+    newsletterConsent: 'I agree to receive emails from The Fifth Event Agency (news and offers). I can unsubscribe at any time.',
+    newsletterConsentRequired: 'Please tick the box to subscribe to the newsletter.',
+    newsletterModalTitle: 'Subscribe to our newsletter'
   },
   fr: {
     Home: 'Accueil',
@@ -145,7 +148,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactErrorMessage: "Une erreur est survenue lors de l'envoi.",
     contactCtaTitle: 'Donnons vie à votre vision, ensemble, dès maintenant !',
     contactCtaSubtitle: 'Parlez-nous de votre événement et créons ensemble un moment inoubliable.',
-    letsTalk: 'Discutons'
+    letsTalk: 'Discutons',
+    newsletterConsent: 'J’accepte de recevoir les courriels de The Fifth Event Agency (nouvelles et offres). Je peux me désabonner à tout moment.',
+    newsletterConsentRequired: 'Veuillez cocher la case pour vous inscrire à la newsletter.',
+    newsletterModalTitle: 'Inscrivez-vous à notre newsletter'
   },
   es: {
     Home: 'Inicio',
@@ -213,7 +219,10 @@ const translations: Record<Language, Record<string, string>> = {
     contactErrorMessage: 'Ocurrió un error al enviar tu mensaje.',
     contactCtaTitle: '¡Hagamos realidad tu visión juntos ahora!',
     contactCtaSubtitle: 'Cuéntanos sobre tu evento y creemos juntos un momento inolvidable.',
-    letsTalk: 'Hablemos'
+    letsTalk: 'Hablemos',
+    newsletterConsent: 'Acepto recibir correos de The Fifth Event Agency (novedades y ofertas). Puedo darme de baja en cualquier momento.',
+    newsletterConsentRequired: 'Marca la casilla para suscribirte al boletín.',
+    newsletterModalTitle: 'Suscríbete a nuestro boletín'
   }
 }
 

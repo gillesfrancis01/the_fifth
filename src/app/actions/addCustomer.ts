@@ -14,9 +14,15 @@ async function addCustomer(
   formData: FormData
 ): Promise<FormState> {
   try {
-    const { databases } = await createAdminClient();
-
     const email = formData.get('email');
+
+    // Explicit consent is required before storing the address or adding it to
+    // the newsletter list (checked here too: the form's checkbox can be bypassed).
+    if (formData.get('consent') !== 'on') {
+      return { error: 'Le consentement est requis pour s’inscrire à la newsletter.' };
+    }
+
+    const { databases } = await createAdminClient();
 
     if (!email || typeof email !== 'string') {
       return {

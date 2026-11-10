@@ -42,6 +42,7 @@ export default function SuccessClient() {
         ticketId,
         paymentIntent,
         quantity: Number(quantity) || 1,
+        newsletterConsent: searchParams.get('newsletter') === '1',
       })
 
       if (!result.success) {

@@ -4,6 +4,7 @@ import addCustomer from '@/app/actions/addCustomer'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function SubscriptionModal() {
   const [isFirstVisit, setIsFirstVisit] = useState(false)
@@ -11,6 +12,7 @@ export default function SubscriptionModal() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [state, formAction] = useActionState(addCustomer, {})
   const modalRef = useRef<HTMLDivElement>(null)
+  const { t } = useLanguage()
 
   // Affichage après délai (newsletter classique)
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function SubscriptionModal() {
               Unlock exclusive access  
               <br />
               <span className="text-gray-300 text-base">
-                Accédez aux privilèges exclusifs
+                {t('newsletterModalTitle')}
               </span>
             </h2>
   
@@ -101,6 +103,11 @@ export default function SubscriptionModal() {
               className="border border-gray-600 bg-transparent text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             />
   
+            <label className="flex items-start gap-2 text-xs text-gray-300 cursor-pointer">
+              <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 accent-[#E6C55D]" />
+              <span>{t('newsletterConsent')}</span>
+            </label>
+
             <button
               type="submit"
               className="bg-main text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"

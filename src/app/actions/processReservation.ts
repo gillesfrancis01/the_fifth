@@ -14,6 +14,7 @@ interface ProcessReservationInfo {
     ticketId: string
     paymentIntent: string
     quantity: number
+    newsletterConsent?: boolean
 }
 
 export async function processReservation(info: ProcessReservationInfo) {
@@ -41,6 +42,7 @@ export async function processReservation(info: ProcessReservationInfo) {
             ticketId: info.ticketId,
             paymentIntent: info.paymentIntent || 'direct-purchase',
             quantity: info.quantity,
+            newsletterConsent: info.newsletterConsent === true,
         })
         
         return { success: true }

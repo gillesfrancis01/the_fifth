@@ -15,6 +15,8 @@ interface CustomerInfo {
   ticketId: string
   paymentIntent: string
   quantity: number
+  // Only true when the customer ticked the opt-in box at checkout.
+  newsletterConsent?: boolean
 }
 
 export async function upsertAppwriteCustomer({
@@ -25,6 +27,7 @@ export async function upsertAppwriteCustomer({
   ticketId,
   paymentIntent,
   quantity,
+  newsletterConsent = false,
 }: CustomerInfo) {
   const { databases } = await createAdminClient()
 
@@ -75,12 +78,14 @@ export async function upsertAppwriteCustomer({
 
   const reservations = await Promise.all(reservationPromises)
 
-  try {
-    await syncContactToBrevo({ email, fullName })
-  } catch (error) {
-    // A temporary Brevo issue must never prevent a paid customer from
-    // receiving tickets. The deployment logs retain the failure for follow-up.
-    console.error(`Failed to sync ${email} to Brevo:`, error)
+  if (newsletterConsent) {
+    try {
+      await syncContactToBrevo({ email, fullName })
+    } catch (error) {
+      // A temporary Brevo issue must never prevent a paid customer from
+      // receiving tickets. The deployment logs retain the failure for follow-up.
+      console.error(`Failed to sync ${email} to Brevo:`, error)
+    }
   }
 
   const emailPromises = reservations.map(async (reservation) => {
